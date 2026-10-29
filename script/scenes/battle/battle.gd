@@ -245,6 +245,7 @@ func _on_end_turn_pressed() -> void:
 
 func _finish_catching(catched: bool, mon: Monster) -> void:
 	if catched:
+		State.mark_mon_defeated(mon._name)
 		var index = State.enemy_mons.find(mon)
 		if index > -1:
 			State.enemy_mons.remove_at(index)
