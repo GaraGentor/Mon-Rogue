@@ -1,0 +1,56 @@
+[gd_scene load_steps=4 format=3 uid="uid://dp31mv1lmyood"]
+
+[ext_resource type="Texture2D" uid="uid://cc0iba7o70h8m" path="res://assets/mons/4/ChatGPT Image 25. Juni 2025, 14_39_12.png" id="1_oxh2b"]
+[ext_resource type="Script" path="res://script/scenes/battle/monster_scene.gd" id="1_qfx22"]
+[ext_resource type="PackedScene" uid="uid://coyny15w4ca7j" path="res://script/scenes/battle/progress_bars.tscn" id="2_rg2b2"]
+
+[node name="MonsterScene" type="Control" node_paths=PackedStringArray("texture_rect", "hp_label", "progress_bar")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qfx22")
+texture_rect = NodePath("VBoxContainer/TextureRect")
+hp_label = NodePath("GridContainer/Label2")
+progress_bar = NodePath("VBoxContainer/ProgressBars")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="ProgressBars" parent="VBoxContainer" instance=ExtResource("2_rg2b2")]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+texture = ExtResource("1_oxh2b")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.085
+anchor_right = 0.141
+anchor_bottom = 0.358
+offset_left = 2.0
+offset_top = -0.200001
+offset_right = 0.519989
+offset_bottom = 0.23999
+columns = 2
+
+[node name="Label2" type="Label" parent="GridContainer"]
+visible = false
+layout_mode = 2
+text = "?"
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]

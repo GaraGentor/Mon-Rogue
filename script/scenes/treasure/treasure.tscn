@@ -1,0 +1,105 @@
+[gd_scene load_steps=8 format=3 uid="uid://c3ubam1ngmpg5"]
+
+[ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="1_8j781"]
+[ext_resource type="Script" path="res://script/scenes/treasure/treasure.gd" id="1_jikkn"]
+[ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_68i5x"]
+[ext_resource type="Texture2D" uid="uid://16kgyrjrsykb" path="res://assets/ui/boss_shard/ChatGPT Image 26. Dez. 2025, 16_38_12.png" id="3_eqmyk"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0ffkn"]
+shader = ExtResource("2_68i5x")
+shader_parameter/bottom_color = Color(0, 0, 0, 1)
+shader_parameter/top_color = Color(0.739611, 0.745595, 0.286619, 1)
+shader_parameter/wave_amp = 0.115
+shader_parameter/wave_size = 1.0
+shader_parameter/wave_time_mul = 0.933
+shader_parameter/total_phases = 8
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_lor6p"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g1etr"]
+
+[node name="Treasure" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jikkn")
+
+[node name="ColorRect" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_0ffkn")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = SubResource("ViewportTexture_lor6p")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_g1etr")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_bottom = 40
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(250, 250)
+layout_mode = 2
+texture = ExtResource("3_eqmyk")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Button" type="Button" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "TREASURE_TAKE_GOLD"
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -81.0
+offset_right = 81.0
+offset_bottom = 87.0
+grow_horizontal = 2
+theme_override_constants/margin_top = 40
+
+[node name="Panel2" type="Panel" parent="MarginContainer2"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("1_8j781")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer2"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Label" type="Label" parent="MarginContainer2/MarginContainer"]
+layout_mode = 2
+text = "TREASURE_CHOOSE"
+
+[connection signal="pressed" from="Panel/MarginContainer/HBoxContainer/VBoxContainer/Button" to="." method="_on_gold_button_pressed"]

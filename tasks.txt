@@ -1,0 +1,31 @@
+Tasks:
+	> Battle Speed initiative einbauen
+	> Last Screen einabuen
+		> Game End.
+	> Nach Boss Battle einabuen
+		> Finalisieren mit animationen
+	> (Monster Seen Screen einbauen)
+	> (Skills Seen Screen einbauen)
+	> Catch Logik
+	> Unique skills
+	> Monster spells rework
+		> Bessere ansicht.
+	> Judgement Rework
+		> Buttons Links anordnen
+		> Skill Selektion separat triggern.
+	> Monster sternen Logik
+	> Monster Scaling per Ebene einbauen
+	> Biom Preview einbauen 
+		> Auch im Boss finished screen
+		> Und beim Start Screen
+	> Final Boss kann nicht gefangen werden
+	> Trainer gibt nur die skills zurück, die verwendet werden können
+		> Reroll?
+	> Pfade kenntlich machen
+
+	> Mehr Monster
+	> Mehr Skills
+
+	> Status Effekte
+
+	> Relics

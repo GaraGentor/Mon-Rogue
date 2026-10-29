@@ -1,0 +1,140 @@
+keys,en,de
+COMMON_OK,OK...,OK...
+COMMON_CANCEL,Cancel,Abbrechen
+SELECTION_TITLE_START,A new adventure begins...,Ein neues Abenteuer beginnt...
+SELECTION_DRAW_EGG,Draw Egg...,Ei ziehen...
+SELECTION_BEGIN_JOURNEY,Begin journey...,Reise beginnen...
+SELECTION_PICK_WARRIOR,Now select your preferred warrior...,Wähle jetzt deinen Krieger...
+SELECTION_TIME_TO_GO,... it's time to go ...,... es ist Zeit aufzubrechen ...
+SELECTION_NO_MORE_EGGS,... no more eggs... Go! ...,... keine Eier mehr... Los! ...
+BATTLE_PHASE,Battle Phase,Kampfphase
+BATTLE_HYPNOSIS,"
+
+Hypnosis","
+
+Hypnose"
+BATTLE_INSPECT,"
+
+Inspect","
+
+Ansehen"
+BATTLE_END_TURN,"
+
+End Turn","
+
+Zugende"
+BATTLE_CATCH_CALL,Come... Join me...,Komm... Schließ dich mir an...
+BATTLE_CATCH_NOT_ON_SIDE,is not on your side!,ist nicht auf deiner Seite!
+BATTLE_CATCH_SUCCESS,Will now fight for you!,Kämpft jetzt für dich!
+BATTLE_CATCH_FAILED,Hypnosis failed!,Hypnose fehlgeschlagen!
+BATTLE_SWITCH,Switch,Wechseln
+BATTLE_NEXT,next,weiter
+MONSTER_CLOSE_INFO,Close Info,Info schließen
+MONSTER_STATUS_EFFECTS,Status effects.,Statuseffekte.
+BOSS_REWARD_OK,OKE!,OKE!
+BOSS_REWARD_DEFEATED,Boss defeated,Boss besiegt
+BOSS_REWARD_SHARD_DESC,"Boss shard, needed to upgrade your monsters permanently","Boss-Splitter, damit verbesserst du deine Monster dauerhaft"
+BOSS_REWARD_CLAIM,Claim Reward!,Belohnung abholen!
+BOSS_REWARD_EGG_DESC,Choose one of your current monsters to appear as eggs in a new run,"Wähle eines deiner Monster, das in einem neuen Lauf als Ei erscheint"
+BOSS_REWARD_CHOOSE_ONE,Choose wisely one of two rewards,Wähle weise eine von zwei Belohnungen
+BOSS_REWARD_THANKS,Thanks for playing,Danke fürs Spielen
+BOSS_REWARD_NEW_RUN,Start a new run!,Neuen Lauf starten!
+HEAL_CAMP_DESC,Your team feels refreshed and heals 50% of their health!,Dein Team fühlt sich erfrischt und heilt 50% seiner Lebenspunkte!
+JAILER_DESC,Use your Boss Shards to permanently upgrade your Monsters,"Nutze deine Boss-Splitter, um deine Monster dauerhaft zu verbessern"
+JAILER_REROLL,Reroll for ${cost} ({money}),Neu würfeln für ${cost} ({money})
+JAILER_FINISH,Finish,Fertig
+JAILER_BUY,Buy for Boss Shards,Für Boss-Splitter kaufen
+JAILER_SOLD,SOLD!,VERKAUFT!
+JAILER_MAX_UPGRADE,Max Upgrade,Max. Stufe
+JAILER_MOVES_UPGRADE,Moves 1 -> 2,Attacken 1 -> 2
+JAILER_CURRENT_UPGRADE_LEVEL,Current Upgrade Level: {level},Aktuelle Stufe: {level}
+JAILER_MAX_UPGRADE_LEVEL,Maximum Upgrade Level: {level},Maximale Stufe: {level}
+JUDGEMENT_NEXT,Next,Weiter
+JUDGEMENT_TAKE,"
+
+Take it...","
+
+Nehmen..."
+JUDGEMENT_RELEASE,"
+
+Release...","
+
+Freilassen..."
+JUDGEMENT_NO_SECOND,No second monster...,Kein zweites Monster...
+JUDGEMENT_LEARN_TITLE,Time to choose wisely... select your monster to learn a new move!,"Zeit, weise zu wählen... welches Monster soll die neue Attacke lernen?"
+JUDGEMENT_LEARN_1,Teach monster 1,Monster 1 lernt es
+JUDGEMENT_LEARN_2,Teach monster 2,Monster 2 lernt es
+JUDGEMENT_RELEASE_TITLE,Select a monster you want to release!,"Wähle ein Monster, das du freilassen willst!"
+JUDGEMENT_RELEASE_1,Release Monster 1,Monster 1 freilassen
+JUDGEMENT_RELEASE_2,Release Monster 2,Monster 2 freilassen
+LEVEL_UP_TITLE,Level Up!,Level Up!
+LEVEL_UP_KILLED,Killed Monsters: {count},Besiegte Monster: {count}
+SHOP_CHANGES_TO,Changes to,Wird zu
+SHOP_DRAG_HINT,"Drag and Drop an Element
+Potion to upgrade
+your Monster","Zieh einen Element-
+Trank auf dein Monster,
+um es zu verbessern"
+SHOP_FINISH,Finish Shopping!,Einkauf beenden!
+SHOP_NOT_ENOUGH_MONEY,"Nope, not enough money!","Nö, nicht genug Geld!"
+SKILL_CAN_LEARN,Can learn,Kann lernen
+SKILL_CAN_USE,Can use it,Kann es nutzen
+TRAINER_DECIDE_TITLE,"Gratz!
+Which monster should learn the skill?","Glückwunsch!
+Welches Monster soll die Fähigkeit lernen?"
+TRAINER_WHICH_MONSTER,"Which monster
+should learn the skill?","Welches Monster soll
+die Fähigkeit lernen?"
+TRAINER_RECOMMENDED,<Recommended>,<Empfohlen>
+TRAINER_MONSTER_1,Monster 1,Monster 1
+TRAINER_MONSTER_2,Monster 2,Monster 2
+TREASURE_TAKE_GOLD,I Take Gold!,Ich nehme Gold!
+TREASURE_CHOOSE,Choose one prize.,Wähle einen Preis.
+WORLDMAP_BOSS,BOSS,BOSS
+WORLDMAP_BOSS_SHARDS,Boss Shards: {amount},Boss-Splitter: {amount}
+WORLDMAP_MONEY,M: {amount},M: {amount}
+SKILL_HEADER_SKILL,Skill,Fähigkeit
+SKILL_HEADER_COST,Cost,Kosten
+SKILL_HEADER_CD,CD,CD
+SKILL_HEADER_POWER,Power,Stärke
+SKILL_BASIC_ATTACK,basic attack,Grundangriff
+SKILL_BASIC_ATTACK_DESC,Deals {value}% physical damage,Verursacht {value}% physischen Schaden
+SKILL_BASIC_BLOCK,basic block,Grundblock
+SKILL_BASIC_BLOCK_DESC,Blocks {value} damage,Blockt {value} Schaden
+SKILL_STRENGTH_BLOCK,strength block,Kraftblock
+SKILL_STRENGTH_BLOCK_DESC,?,?
+ELEMENT_AIR,Air,Luft
+ELEMENT_WATER,Water,Wasser
+ELEMENT_FIRE,Fire,Feuer
+ELEMENT_EARTH,Earth,Erde
+ELEMENT_ICE,Ice,Eis
+ELEMENT_STEAM,Steam,Dampf
+ELEMENT_LIGHTNING,Lightning,Blitz
+ELEMENT_MAGMA,Magma,Magma
+ELEMENT_MUD,Mud,Schlamm
+ELEMENT_DUST,Dust,Staub
+ELEMENT_THUNDERSTORM,Thunderstorm,Gewitter
+ELEMENT_VOLCANO,Volcano,Vulkan
+ELEMENT_ASH_STORM,Ash Storm,Aschesturm
+ELEMENT_SWAMP,Swamp,Sumpf
+ELEMENT_CHAOS,Chaos,Chaos
+ELEMENT_EMPTY,Empty,Leer
+ELEMENT_UNKNOWN,Unknown,Unbekannt
+STAT_HP,HP:,KP:
+STAT_ATK,ATK:,ANG:
+STAT_DEF,DEF:,VER:
+STAT_SPA,SPA:,SAN:
+STAT_SPD,SPD:,SVE:
+STAT_SPE,SPE:,INI:
+STAT_BST,BST:,GES:
+MAP_NODE_COMBAT,COMBAT,KAMPF
+MAP_NODE_BOSS,BOSS,BOSS
+MAP_NODE_CAMP,CAMP,LAGER
+MAP_NODE_SHOP,SHOP,LADEN
+MAP_NODE_TRAINER,TRAINER,TRAINER
+MAP_NODE_JAILER,JAILER,KERKERMEISTER
+MAP_NODE_EVENT,EVENT,EREIGNIS
+MAP_NODE_TREASURE,TREASURE,SCHATZ
+MONSTER_1,1,1
+MONSTER_2,2,2
+TURN_WHEEL_ROUND,Round {round},Runde {round}

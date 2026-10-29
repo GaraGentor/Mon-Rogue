@@ -1,0 +1,204 @@
+[gd_scene load_steps=13 format=3 uid="uid://bcjim8fkv613c"]
+
+[ext_resource type="Texture2D" uid="uid://v037gr3yoo3k" path="res://assets/mons/1/1_frontx512.png" id="1_6ibs6"]
+[ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="1_pmmoy"]
+[ext_resource type="Script" path="res://script/scenes/shop/shop.gd" id="1_tmap4"]
+[ext_resource type="PackedScene" uid="uid://cgnb6l7hk2gra" path="res://script/scenes/shop/element_pill.tscn" id="2_yeisq"]
+[ext_resource type="Script" path="res://script/scenes/shop/drop_panel.gd" id="3_d0f75"]
+[ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="3_ym6qj"]
+[ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="4_c0p6q"]
+[ext_resource type="PackedScene" uid="uid://owmyxu3qq3so" path="res://script/ui/element_chip/element_chip.tscn" id="5_stvx1"]
+[ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="9_64ckg"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v63o5"]
+shader = ExtResource("4_c0p6q")
+shader_parameter/bottom_color = Color(0, 0, 0, 1)
+shader_parameter/top_color = Color(0.361529, 0.769848, 0.955851, 1)
+shader_parameter/wave_amp = 0.115
+shader_parameter/wave_size = 1.0
+shader_parameter/wave_time_mul = 0.933
+shader_parameter/total_phases = 8
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_0c5lj"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2mjh7"]
+
+[node name="Shop" type="Control" node_paths=PackedStringArray("grid", "money_label")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tmap4")
+element_pill = ExtResource("2_yeisq")
+grid = NodePath("Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer/VBoxContainer/ElementContainerGrid")
+money_label = NodePath("Panel2/MarginContainer/HBoxContainer2/HBoxContainer/Panel/MarginContainer/VBoxContainer/Label")
+
+[node name="ColorRect" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_v63o5")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = SubResource("ViewportTexture_0c5lj")
+
+[node name="Panel2" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_2mjh7")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel2/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Panel2" type="Panel" parent="Panel2/MarginContainer/HBoxContainer2" node_paths=PackedStringArray("element", "to_label", "new_element", "texture", "info_label")]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("3_d0f75")
+element = NodePath("VBoxContainer/ElementChip")
+to_label = NodePath("VBoxContainer/TextureRect2")
+new_element = NodePath("VBoxContainer/ElementChip2")
+texture = NodePath("VBoxContainer/TextureRect")
+info_label = NodePath("../HBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/Panel/MarginContainer/InfoLabel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel2/MarginContainer/HBoxContainer2/Panel2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="Panel2/MarginContainer/HBoxContainer2/Panel2/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("1_6ibs6")
+expand_mode = 4
+stretch_mode = 4
+
+[node name="ElementChip" parent="Panel2/MarginContainer/HBoxContainer2/Panel2/VBoxContainer" instance=ExtResource("5_stvx1")]
+layout_mode = 2
+
+[node name="TextureRect2" type="Label" parent="Panel2/MarginContainer/HBoxContainer2/Panel2/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme = ExtResource("3_ym6qj")
+text = "SHOP_CHANGES_TO"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ElementChip2" parent="Panel2/MarginContainer/HBoxContainer2/Panel2/VBoxContainer" instance=ExtResource("5_stvx1")]
+visible = false
+layout_mode = 2
+
+[node name="HBoxContainer" type="VBoxContainer" parent="Panel2/MarginContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Panel" type="Panel" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.1
+theme_override_styles/panel = ExtResource("1_pmmoy")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("3_ym6qj")
+text = "$123123"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ElementContainerGrid" type="GridContainer" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 50
+theme_override_constants/v_separation = 50
+columns = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.5
+theme_override_constants/separation = 12
+
+[node name="Panel" type="Panel" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("1_pmmoy")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="InfoLabel" type="Label" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/Panel/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme = ExtResource("3_ym6qj")
+text = "SHOP_DRAG_HINT"
+
+[node name="Button" type="Button" parent="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("9_64ckg")
+theme_override_font_sizes/font_size = 24
+text = "SHOP_FINISH"
+
+[node name="Panel" type="Panel" parent="Panel2/MarginContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="pressed" from="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]

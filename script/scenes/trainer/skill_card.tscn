@@ -1,0 +1,141 @@
+[gd_scene load_steps=6 format=3 uid="uid://btylbkkp772gr"]
+
+[ext_resource type="Script" path="res://script/scenes/trainer/shop_skill_card.gd" id="1_2nqpc"]
+[ext_resource type="Texture2D" uid="uid://bq0pf5g35vxjd" path="res://assets/mons/1/1_frontx256.png" id="2_by2vm"]
+[ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="2_xqh05"]
+[ext_resource type="Texture2D" uid="uid://djt3q5aymms0i" path="res://assets/ui/icons/sparkle.svg" id="3_6rgjs"]
+[ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="4_0cor1"]
+
+[node name="SkillCard" type="Control" node_paths=PackedStringArray("buy_button", "name_label", "description_label", "can_learn_1", "can_learn_2", "own_it_1", "own_it_2", "mon_texture_rect1", "mon_texture_rect2")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2nqpc")
+buy_button = NodePath("VBoxContainer/Button")
+name_label = NodePath("VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Label")
+description_label = NodePath("VBoxContainer/Panel/MarginContainer/VBoxContainer/Label")
+can_learn_1 = NodePath("VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/CanLear1")
+can_learn_2 = NodePath("VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/CanLear2")
+own_it_1 = NodePath("VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/OwnIt1")
+own_it_2 = NodePath("VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/OwnIt2")
+mon_texture_rect1 = NodePath("VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer2/TextureRect2")
+mon_texture_rect2 = NodePath("VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer2/TextureRect")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="CanLear1" type="Label" parent="VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2"]
+visible = false
+layout_mode = 2
+text = "SKILL_CAN_LEARN"
+
+[node name="OwnIt1" type="Label" parent="VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2"]
+visible = false
+layout_mode = 2
+text = "SKILL_CAN_USE"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="CanLear2" type="Label" parent="VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "SKILL_CAN_LEARN"
+
+[node name="OwnIt2" type="Label" parent="VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "SKILL_CAN_USE"
+
+[node name="Panel" type="Panel" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("2_xqh05")
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+texture = ExtResource("3_6rgjs")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme = ExtResource("4_0cor1")
+theme_override_font_sizes/font_size = 16
+text = "Asdasd"
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("4_0cor1")
+theme_override_font_sizes/font_size = 16
+text = "Description"
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect2" type="TextureRect" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
+visible = false
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+texture = ExtResource("2_by2vm")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
+visible = false
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+texture = ExtResource("2_by2vm")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Buy for $"
+
+[connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_buy_button_pressed"]

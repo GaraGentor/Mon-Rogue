@@ -1,0 +1,87 @@
+[gd_scene load_steps=7 format=3 uid="uid://082mo0k6468p"]
+
+[ext_resource type="Script" path="res://script/scenes/jailer/jailer.gd" id="1_ok3m1"]
+[ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_fdvjc"]
+[ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="3_jwsx6"]
+[ext_resource type="PackedScene" uid="uid://b2ua83ytulp2x" path="res://script/scenes/jailer/monster_scene.tscn" id="4_u2q00"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pword"]
+shader = ExtResource("2_fdvjc")
+shader_parameter/bottom_color = Color(0, 0, 0, 1)
+shader_parameter/top_color = Color(0.902412, 0.589003, 0.885672, 1)
+shader_parameter/wave_amp = 0.115
+shader_parameter/wave_size = 1.0
+shader_parameter/wave_time_mul = 0.933
+shader_parameter/total_phases = 8
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_6ybq4"]
+
+[node name="Jailer" type="Control" node_paths=PackedStringArray("hbox_container", "refresh_button")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ok3m1")
+hbox_container = NodePath("MarginContainer/VBoxContainer/HBoxContainer")
+mon_scene = ExtResource("4_u2q00")
+refresh_button = NodePath("MarginContainer/VBoxContainer/HBoxContainer2/Reroll")
+
+[node name="ColorRect" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_pword")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = SubResource("ViewportTexture_6ybq4")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("3_jwsx6")
+text = "JAILER_DESC"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Reroll" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("3_jwsx6")
+text = "Reroll $25"
+
+[node name="Exit" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("3_jwsx6")
+text = "JAILER_FINISH"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer2/Reroll" to="." method="_on_reroll_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer2/Exit" to="." method="_on_exit_pressed"]

@@ -1,0 +1,109 @@
+[gd_scene load_steps=9 format=3 uid="uid://drhymvpv6slla"]
+
+[ext_resource type="Script" path="res://script/scenes/level_up/level_up.gd" id="1_j6ocv"]
+[ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_c4w1u"]
+[ext_resource type="PackedScene" uid="uid://caffuo82lusm" path="res://script/scenes/level_up/monster_scene.tscn" id="2_ciiwp"]
+[ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="2_qh7ft"]
+[ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="2_tk5hi"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7ldmi"]
+shader = ExtResource("2_c4w1u")
+shader_parameter/bottom_color = Color(0, 0, 0, 1)
+shader_parameter/top_color = Color(0.361529, 0.769848, 0.955851, 1)
+shader_parameter/wave_amp = 0.115
+shader_parameter/wave_size = 1.0
+shader_parameter/wave_time_mul = 0.933
+shader_parameter/total_phases = 8
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_eutdi"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t6nt1"]
+bg_color = Color(0, 0, 0, 0)
+
+[node name="LevelUp" type="Control" node_paths=PackedStringArray("monster_scene1", "monster_scene2", "killed_monsters_label", "go_button")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_j6ocv")
+monster_scene1 = NodePath("Panel/MarginContainer/VBoxContainer/HBoxContainer/MonsterScene")
+monster_scene2 = NodePath("Panel/MarginContainer/VBoxContainer/HBoxContainer/MonsterScene2")
+killed_monsters_label = NodePath("Panel/MarginContainer/VBoxContainer/KilledMonsterLabel")
+go_button = NodePath("Panel/MarginContainer/VBoxContainer/Button")
+
+[node name="ColorRect" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_7ldmi")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = SubResource("ViewportTexture_eutdi")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t6nt1")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_tk5hi")
+theme_override_font_sizes/font_size = 30
+text = "LEVEL_UP_TITLE"
+horizontal_alignment = 1
+
+[node name="KilledMonsterLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_tk5hi")
+theme_override_font_sizes/font_size = 30
+text = "Killed Monsters:"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="MonsterScene" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_ciiwp")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MonsterScene2" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_ciiwp")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Button" type="Button" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_qh7ft")
+disabled = true
+text = "COMMON_OK"
+
+[connection signal="pressed" from="Panel/MarginContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]

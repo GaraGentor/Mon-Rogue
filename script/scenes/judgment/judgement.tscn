@@ -1,0 +1,493 @@
+[gd_scene load_steps=21 format=3 uid="uid://cyw2det7lplq0"]
+
+[ext_resource type="Script" path="res://script/scenes/judgment/judgement.gd" id="1_nuduw"]
+[ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_g5s67"]
+[ext_resource type="PackedScene" uid="uid://bqa8vtcwoin5c" path="res://script/scenes/battle/monster_widget.tscn" id="3_4or1s"]
+[ext_resource type="Texture2D" uid="uid://cbhxckxt3qapy" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 20. Nov. 2025, 21_38_41 (1).png" id="4_67m4b"]
+[ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="4_atuse"]
+[ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="7_5vxq8"]
+[ext_resource type="Texture2D" uid="uid://co0vav5cq77mh" path="res://assets/ui/icons/chevron-double-right.svg" id="7_gwab8"]
+[ext_resource type="Script" path="res://script/scenes/judgment/learning_screen.gd" id="7_l4787"]
+[ext_resource type="Texture2D" uid="uid://bvt38f06cl4ki" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 20. Nov. 2025, 21_41_31 (1).png" id="7_sw1cn"]
+[ext_resource type="Script" path="res://script/scenes/judgment/leaving_screen.gd" id="9_8ak5o"]
+[ext_resource type="Script" path="res://script/scenes/judgment/exit_animation.gd" id="10_puvwy"]
+[ext_resource type="Texture2D" uid="uid://bayjcxae1moqp" path="res://assets/sczene_backgrounds/ChatGPT Image 25. Juni 2025, 16_50_09.png" id="11_n1j66"]
+[ext_resource type="Texture2D" uid="uid://sy03txj3fiqv" path="res://assets/ui/types/game-buttons/mhawxnfducnmzx.jpeg" id="12_a36us"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cx0eb"]
+shader = ExtResource("2_g5s67")
+shader_parameter/bottom_color = Color(0, 0, 0, 1)
+shader_parameter/top_color = Color(0.361529, 0.769848, 0.955851, 1)
+shader_parameter/wave_amp = 0.115
+shader_parameter/wave_size = 1.0
+shader_parameter/wave_time_mul = 0.933
+shader_parameter/total_phases = 8
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_fd6q6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fawbg"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="ImageTexture" id="ImageTexture_4kcka"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cvnxp"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uyajo"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_13d1o"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="Judgement" type="Control" node_paths=PackedStringArray("mw1", "mw2", "mw3", "next_button", "placeholder_panel", "learning_screen", "leaving_screen")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_nuduw")
+mw1 = NodePath("Panel/HBoxContainer/VBoxContainer/MonsterWidget")
+mw2 = NodePath("Panel/HBoxContainer/MonsterWidget2")
+mw3 = NodePath("Panel/HBoxContainer/MonsterWidget3")
+next_button = NodePath("Panel/HBoxContainer/HBoxContainer/TextureRect2/Next")
+placeholder_panel = NodePath("Panel/HBoxContainer/Panel")
+learning_screen = NodePath("LearningScreen")
+leaving_screen = NodePath("Leaving Screen")
+
+[node name="ColorRect" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_cx0eb")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = SubResource("ViewportTexture_fd6q6")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fawbg")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.3
+
+[node name="TextureRect2" type="TextureRect" parent="Panel/HBoxContainer/HBoxContainer"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("7_gwab8")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Next" type="Button" parent="Panel/HBoxContainer/HBoxContainer/TextureRect2"]
+texture_repeat = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_atuse")
+theme_override_font_sizes/font_size = 26
+text = "1/3
+
+
+Next"
+flat = true
+
+[node name="TextureRect" type="TextureRect" parent="Panel/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("4_67m4b")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Take" type="Button" parent="Panel/HBoxContainer/HBoxContainer/TextureRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_atuse")
+theme_override_font_sizes/font_size = 26
+text = "JUDGEMENT_TAKE"
+icon = SubResource("ImageTexture_4kcka")
+flat = true
+
+[node name="TextureRect3" type="TextureRect" parent="Panel/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("7_sw1cn")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Release" type="Button" parent="Panel/HBoxContainer/HBoxContainer/TextureRect3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_atuse")
+theme_override_font_sizes/font_size = 26
+text = "JUDGEMENT_RELEASE"
+flat = true
+
+[node name="Panel" type="Panel" parent="Panel/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("7_5vxq8")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MonsterWidget" parent="Panel/HBoxContainer/VBoxContainer" instance=ExtResource("3_4or1s")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+is_learning = true
+
+[node name="MonsterWidget2" parent="Panel/HBoxContainer" instance=ExtResource("3_4or1s")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MonsterWidget3" parent="Panel/HBoxContainer" instance=ExtResource("3_4or1s")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Panel" type="Panel" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_cvnxp")
+
+[node name="Label" type="Label" parent="Panel/HBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "JUDGEMENT_NO_SECOND"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LearningScreen" type="Panel" parent="." node_paths=PackedStringArray("mw1", "mw2", "lean_mon_2_button", "jug")]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_uyajo")
+script = ExtResource("7_l4787")
+mw1 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget2")
+mw2 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget3")
+lean_mon_2_button = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button2")
+jug = NodePath("..")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LearningScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="LearningScreen/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Panel" type="Panel" parent="LearningScreen/VBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = ExtResource("7_5vxq8")
+
+[node name="Label" type="Label" parent="LearningScreen/VBoxContainer/MarginContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "JUDGEMENT_LEARN_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="LearningScreen/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="LearningScreen/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Panel" type="Panel" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_13d1o")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Panel" type="Panel" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+theme_override_styles/panel = ExtResource("7_5vxq8")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "COMMON_CANCEL"
+flat = true
+
+[node name="Button3" type="Button" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "JUDGEMENT_LEARN_1"
+flat = true
+
+[node name="Button2" type="Button" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "JUDGEMENT_LEARN_2"
+flat = true
+
+[node name="Panel2" type="Panel" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("7_5vxq8")
+
+[node name="MonsterWidget2" parent="LearningScreen/VBoxContainer/HBoxContainer" instance=ExtResource("3_4or1s")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MonsterWidget3" parent="LearningScreen/VBoxContainer/HBoxContainer" instance=ExtResource("3_4or1s")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Leaving Screen" type="Panel" parent="." node_paths=PackedStringArray("mw1", "mw2", "exit_panel", "jugment")]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_uyajo")
+script = ExtResource("9_8ak5o")
+mw1 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget2")
+mw2 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget3")
+exit_panel = NodePath("VBoxContainer/HBoxContainer/Exit_animation")
+jugment = NodePath("..")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Leaving Screen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Leaving Screen/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Panel" type="Panel" parent="Leaving Screen/VBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = ExtResource("7_5vxq8")
+
+[node name="Label" type="Label" parent="Leaving Screen/VBoxContainer/MarginContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "JUDGEMENT_RELEASE_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Leaving Screen/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Leaving Screen/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Panel" type="Panel" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_13d1o")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Panel" type="Panel" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+theme_override_styles/panel = ExtResource("7_5vxq8")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "COMMON_CANCEL"
+flat = true
+
+[node name="Button3" type="Button" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "JUDGEMENT_RELEASE_1"
+flat = true
+
+[node name="Button2" type="Button" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "JUDGEMENT_RELEASE_2"
+flat = true
+
+[node name="Panel2" type="Panel" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("7_5vxq8")
+
+[node name="MonsterWidget2" parent="Leaving Screen/VBoxContainer/HBoxContainer" instance=ExtResource("3_4or1s")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MonsterWidget3" parent="Leaving Screen/VBoxContainer/HBoxContainer" instance=ExtResource("3_4or1s")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Exit_animation" type="Panel" parent="Leaving Screen/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("monster_rect", "marker_2d")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("10_puvwy")
+monster_rect = NodePath("TextureRect2")
+marker_2d = NodePath("Marker2D")
+
+[node name="TextureRect" type="TextureRect" parent="Leaving Screen/VBoxContainer/HBoxContainer/Exit_animation"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("11_n1j66")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="Leaving Screen/VBoxContainer/HBoxContainer/Exit_animation"]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.016
+anchor_top = 1.023
+anchor_right = 0.931
+anchor_bottom = 1.519
+offset_left = 0.072
+offset_top = 0.268982
+offset_right = 1.87299
+offset_bottom = 4.15698
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("12_a36us")
+expand_mode = 2
+stretch_mode = 4
+
+[node name="Marker2D" type="Marker2D" parent="Leaving Screen/VBoxContainer/HBoxContainer/Exit_animation"]
+position = Vector2(148, 752)
+
+[connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/TextureRect2/Next" to="." method="_on_next_pressed"]
+[connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/TextureRect/Take" to="." method="_on_recruit_button_pressed"]
+[connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/TextureRect3/Release" to="." method="_on_release_pressed"]
+[connection signal="visibility_changed" from="LearningScreen" to="LearningScreen" method="_on_visibility_changed"]
+[connection signal="pressed" from="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button3" to="LearningScreen" method="_on_button_mon1_pressed"]
+[connection signal="pressed" from="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button2" to="LearningScreen" method="_on_button_mon2_pressed"]
+[connection signal="visibility_changed" from="Leaving Screen" to="Leaving Screen" method="_on_visibility_changed"]
+[connection signal="pressed" from="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button3" to="Leaving Screen" method="_on_first_mon_pressed"]
+[connection signal="pressed" from="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button2" to="Leaving Screen" method="_on_second_mon_pressed"]
