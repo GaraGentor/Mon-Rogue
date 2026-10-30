@@ -114,11 +114,11 @@ BATTLE_UNKNOWN_SKILL_HINT,Element and tier are known. The details are revealed o
 LEVEL_UP_TITLE,Level Up!,Level Up!
 LEVEL_UP_KILLED,Killed Monsters: {count},Besiegte Monster: {count}
 SHOP_CHANGES_TO,Changes to,Wird zu
-SHOP_DRAG_HINT,"Drag and Drop an Element
-Potion to upgrade
-your Monster","Zieh einen Element-
-Trank auf dein Monster,
-um es zu verbessern"
+SHOP_DRAG_HINT,"Drag an Element Potion
+or a Gem onto
+your Monster","Zieh einen Element-Trank
+oder Edelstein auf
+dein Monster"
 SHOP_FINISH,Finish Shopping!,Einkauf beenden!
 SHOP_NOT_ENOUGH_MONEY,"Nope, not enough money!","Nö, nicht genug Geld!"
 SKILL_CAN_LEARN,Can learn,Kann lernen
@@ -261,3 +261,7 @@ GEM_DEF,Granite of Defense,Granit der Abwehr
 GEM_S_ATK,Amethyst of Power,Amethyst der Macht
 GEM_S_DEF,Sapphire of Warding,Saphir des Schutzes
 GEM_SPEED,Emerald of Swiftness,Smaragd der Schnelligkeit
+SHOP_BUY,Buy!,Kaufen!
+SHOP_SOLD,Sold,Verkauft
+SHOP_BOUGHT,{item} bought!,{item} gekauft!
+SHOP_GEM_GIVEN,{mon} got the gem!,{mon} hat den Edelstein bekommen!
