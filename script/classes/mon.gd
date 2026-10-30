@@ -35,6 +35,9 @@ var _computed_moves: int = 1:
 		_computed_moves = value
 		Events.refresh_ui_for_monster.emit()
 
+# Edelstein-Boni für diesen Run: Stat-Key aus STATS in gems.gd -> Anteil (0.1 = +10 %)
+var _gems: Dictionary = {}
+
 func _init(level: int, meta_data: Dictionary) -> void:
 	## get saved data and apply.
 	Events.mon_upgraded.connect(mon_upgraded)
@@ -85,25 +88,31 @@ func get_unlockable_egg_skill() -> Dictionary:
 	return {}
 
 func hp():
-	return (_growth.hp * _level) * Helper.points_per_level(_best_points)
+	return (_growth.hp * _level) * Helper.points_per_level(_best_points) * gem_factor("hp")
 
 func attack():
-	return (_growth.atk * _level) * Helper.points_per_level(_best_points)
+	return (_growth.atk * _level) * Helper.points_per_level(_best_points) * gem_factor("atk")
 
 func defense():
-	return (_growth.def * _level) * Helper.points_per_level(_best_points)
+	return (_growth.def * _level) * Helper.points_per_level(_best_points) * gem_factor("def")
 	
 func s_attack():
-	return (_growth.s_atk * _level) * Helper.points_per_level(_best_points)
+	return (_growth.s_atk * _level) * Helper.points_per_level(_best_points) * gem_factor("s_atk")
 	
 func s_defense():
-	return (_growth.s_def * _level) * Helper.points_per_level(_best_points)
+	return (_growth.s_def * _level) * Helper.points_per_level(_best_points) * gem_factor("s_def")
 
 func speed():
-	return (_growth.speed * _level) * Helper.points_per_level(_best_points)
+	return (_growth.speed * _level) * Helper.points_per_level(_best_points) * gem_factor("speed")
 
 func best():
 	return _best_points
 
 func is_alive() -> bool:
-	return _lost_hp <= (_growth.hp * _level) * Helper.points_per_level(_best_points)
+	return _lost_hp <= hp()
+
+func gem_factor(stat: String) -> float:
+	return 1.0 + _gems.get(stat, 0.0)
+
+func add_gem(stat: String, bonus: float) -> void:
+	_gems[stat] = _gems.get(stat, 0.0) + bonus

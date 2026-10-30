@@ -248,3 +248,16 @@ RELIC_GOLDEN_IDOL,Golden Idol,Goldener Götze
 RELIC_GOLDEN_IDOL_DESC,+30% EP from won battles.,+30 % EP aus gewonnenen Kämpfen.
 RELIC_REWARD_CHOOSE,Choose a relic,Wähle ein Relikt
 RELIC_REWARD_TAKE,Take!,Nehmen!
+MAP_NODE_GEM,GEMS,EDELSTEINE
+GEM_CHOOSE,Choose a gem,Wähle einen Edelstein
+GEM_CHOOSE_MON,Which monster gets the gem?,Welches Monster bekommt den Edelstein?
+GEM_DESC,{stat} +{value}% for the rest of the run,{stat} +{value} % für den restlichen Lauf
+GEM_CURRENT,Gems so far: +{value}%,Bisherige Edelsteine: +{value} %
+GEM_TAKE,Choose!,Wählen!
+GEM_GIVE,Give!,Geben!
+GEM_HP,Ruby of Life,Rubin des Lebens
+GEM_ATK,Amber of Strength,Bernstein der Stärke
+GEM_DEF,Granite of Defense,Granit der Abwehr
+GEM_S_ATK,Amethyst of Power,Amethyst der Macht
+GEM_S_DEF,Sapphire of Warding,Saphir des Schutzes
+GEM_SPEED,Emerald of Swiftness,Smaragd der Schnelligkeit

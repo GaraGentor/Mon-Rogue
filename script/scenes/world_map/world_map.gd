@@ -26,6 +26,7 @@ extends Control
 @export var treasure_scene: PackedScene
 
 const RELIC_REWARD_SCENE := preload("res://script/scenes/relic_reward/relic_reward.tscn")
+const GEM_SCENE := preload("res://script/scenes/gems/gems.tscn")
 
 @export var view_container: Panel
 
@@ -200,6 +201,8 @@ func call_event_by_type(type) -> void:
 		view_container.add_child(treasure)
 		treasure.visible = true
 		pass
+	if type == Map.PATH_TYPE.GEM:
+		view_container.add_child(GEM_SCENE.instantiate())
 	if type == Map.PATH_TYPE.JAILER:
 		var jailer = jailer_scene.instantiate()
 		view_container.add_child(jailer)

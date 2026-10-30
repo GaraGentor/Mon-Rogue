@@ -9,6 +9,7 @@ enum PATH_TYPE {
 	JAILER,
 	EVENT,
 	TREASURE,
+	GEM,
 }
 
 class path:
@@ -25,6 +26,7 @@ class path:
 		5: "JAILER",
 		6: "EVENT",
 		7: "TREASURE",
+		8: "GEM",
 	}
 
 	func _init(pos: Vector3):
@@ -38,11 +40,11 @@ var max_cols = 3
 #var path = 
 
 var map_settings = {
-	0: {"paths":6, "special_nodes": 1, "bosses": [], "lines": 1, "tresures": [1], "shops": [], "trainers": [], "jailer": []},
-	1: {"paths":8, "special_nodes": 2, "bosses": [3], "lines": 2, "tresures": [1], "shops": [], "trainers": [5], "jailer": []},
-	2: {"paths":11, "special_nodes": 3, "bosses": [5], "lines": 2, "tresures": [2], "shops": [6], "trainers": [], "jailer": [0]},
-	3: {"paths":14, "special_nodes": 4, "bosses": [7], "lines": 3, "tresures": [7], "shops": [5], "trainers": [8], "jailer": [2]},
-	4: {"paths":17, "special_nodes": 6, "bosses": [6,12], "lines": 3, "tresures": [2,8], "shops": [9], "trainers": [], "jailer": []},
+	0: {"paths":6, "special_nodes": 1, "bosses": [], "lines": 1, "tresures": [1], "shops": [], "trainers": [], "jailer": [], "gems": [3]},
+	1: {"paths":8, "special_nodes": 2, "bosses": [3], "lines": 2, "tresures": [1], "shops": [], "trainers": [5], "jailer": [], "gems": [6]},
+	2: {"paths":11, "special_nodes": 3, "bosses": [5], "lines": 2, "tresures": [2], "shops": [6], "trainers": [], "jailer": [0], "gems": [8]},
+	3: {"paths":14, "special_nodes": 4, "bosses": [7], "lines": 3, "tresures": [7], "shops": [5], "trainers": [8], "jailer": [2], "gems": [10]},
+	4: {"paths":17, "special_nodes": 6, "bosses": [6,12], "lines": 3, "tresures": [2,8], "shops": [9], "trainers": [], "jailer": [], "gems": [4,14]},
 }
 
 var all_nodes = []
@@ -124,6 +126,7 @@ func generate_grid(grid: Array):
 	generate_hard_node_tiles(grid, "tresures", PATH_TYPE.TREASURE)
 	generate_hard_node_tiles(grid, "shops", PATH_TYPE.SHOP)
 	generate_hard_node_tiles(grid, "trainers", PATH_TYPE.TRAINER)
+	generate_hard_node_tiles(grid, "gems", PATH_TYPE.GEM)
 	generate_specials(grid)
 	print_new_map(grid)
 	State.current_map = grid
@@ -159,7 +162,7 @@ func generate_specials(grid: Array):
 		for j in special_nodes:
 			var all_nodes_that_can_be_transformed = all_nodes.filter(func(_path: path): return _path._pos.z == i and _path._type == PATH_TYPE.COMBAT)
 			if all_nodes_that_can_be_transformed.size() >= 1:
-				var what_special_node = randi_range(1,7)
+				var what_special_node = randi_range(1, PATH_TYPE.GEM)
 				var np = all_nodes_that_can_be_transformed.pick_random()
 				np._type = what_special_node
 
