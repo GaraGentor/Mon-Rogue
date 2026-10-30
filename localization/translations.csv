@@ -240,3 +240,11 @@ RUN_END_KILLS,Monsters defeated,Besiegte Monster
 RUN_END_CATCHES,Monsters caught,Gefangene Monster
 RUN_END_EP,EP earned,Verdiente EP
 RUN_END_TEAM,Team: {team},Team: {team}
+RELIC_EXTRA_MOVE,Battle Drum,Kriegstrommel
+RELIC_EXTRA_MOVE_DESC,Your monsters get +1 move each turn.,Deine Monster haben jeden Zug +1 Aktion.
+RELIC_LUCKY_CHARM,Lucky Charm,Glücksbringer
+RELIC_LUCKY_CHARM_DESC,Catch chance +25%.,Fangchance +25 %.
+RELIC_GOLDEN_IDOL,Golden Idol,Goldener Götze
+RELIC_GOLDEN_IDOL_DESC,+30% EP from won battles.,+30 % EP aus gewonnenen Kämpfen.
+RELIC_REWARD_CHOOSE,Choose a relic,Wähle ein Relikt
+RELIC_REWARD_TAKE,Take!,Nehmen!

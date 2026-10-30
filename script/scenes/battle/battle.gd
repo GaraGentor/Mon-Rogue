@@ -24,6 +24,9 @@ var mouse_action = Enums.MOUSE_ACTION.NONE
 ## Monster, das laut Turn Wheel gerade am Zug ist
 var active_mon: Monster
 
+## Boss-Feld oder Biom-Boss: ein Sieg bringt eine Relic-Auswahl
+var is_boss_battle: bool = false
+
 func _enter_tree() -> void:
 	_generate_battle()
 
@@ -182,6 +185,7 @@ func _generate_battle():
 	var level: int
 	# wird unten zurückgesetzt, merken für das Kopfgeld
 	var is_map_boss: bool = State.is_map_boss
+	is_boss_battle = State.is_boss_fight or is_map_boss
 	var t = clampf(float(State.biome_fight_index) / max(encounter.fights - 1, 1), 0.0, 1.0)
 	if State.is_boss_fight:
 		var boss: Dictionary = BOSS_ENCOUNTERS[depth]
@@ -274,7 +278,10 @@ func _check_game_over(last_fainted:Monster) -> void:
 	if State.enemy_mons.all(func(mon: Monster): return not mon.is_alive()) or State.enemy_mons.size() == 0:
 		print("will close battle")
 		State.stage_clear()
-		State.ep += State.enemy_mons.map(func(mon): return mon._ep).reduce(func(a, b): return a + b, 0)
+		# der finale Boss beendet den Run, danach gibt es keine Karte mehr
+		if is_boss_battle and not State.is_final_boss:
+			State.pending_relic_reward = true
+		State.ep += Relics.modify("battle_ep", State.enemy_mons.map(func(mon): return mon._ep).reduce(func(a, b): return a + b, 0))
 		print("state ep", State.ep)
 		# clear dead monsters.
 		# open stats.

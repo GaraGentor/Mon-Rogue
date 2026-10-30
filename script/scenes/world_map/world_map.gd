@@ -25,6 +25,8 @@ extends Control
 @export var trainer_scene: PackedScene
 @export var treasure_scene: PackedScene
 
+const RELIC_REWARD_SCENE := preload("res://script/scenes/relic_reward/relic_reward.tscn")
+
 @export var view_container: Panel
 
 var tweens = []
@@ -58,6 +60,7 @@ func _ready() -> void:
 	else:
 		change_position(State.current_map_position)
 	change_ep_text(State.ep)
+	show_relic_reward()
 
 #func _enter_tree() -> void:
 #	Events.map_event_pressed.disconnect(_call_map_event)
@@ -249,3 +252,12 @@ func change_ep_text(ep) -> void:
 func reset_animation_state(ele) -> void:
 	ele._ui_item.scale = Vector2(1,1)
 	ele._ui_item.add_theme_color_override("font_color", Color.DARK_CYAN)
+
+# Relic-Auswahl nach einem Boss-Sieg, erst hier, damit Level-Up und Boss-Belohnung vorher durch sind
+func show_relic_reward() -> void:
+	if not State.pending_relic_reward:
+		return
+	if Relics.get_unowned().is_empty():
+		State.pending_relic_reward = false
+		return
+	view_container.add_child(RELIC_REWARD_SCENE.instantiate())

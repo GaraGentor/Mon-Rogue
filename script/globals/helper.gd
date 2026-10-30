@@ -31,7 +31,8 @@ func catch_chance(mon: Monster) -> float:
 	var hp_factor = 1.0 - CATCH_HP_WEIGHT * hp_left
 	var level_factor = clampf(1.0 - CATCH_LEVEL_STEP * (mon._level - _team_level()),
 		CATCH_LEVEL_FACTOR_RANGE[0], CATCH_LEVEL_FACTOR_RANGE[1])
-	return clampf(CATCH_RARITY_BASE[rarity] * hp_factor * level_factor,
+	var chance = Relics.modify("catch_chance", CATCH_RARITY_BASE[rarity] * hp_factor * level_factor, mon)
+	return clampf(chance,
 		CATCH_CHANCE_RANGE[0], CATCH_CHANCE_RANGE[1])
 
 ## Durchschnittsstufe der noch kämpfenden eigenen Monster

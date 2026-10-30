@@ -71,7 +71,7 @@ func upgrade_skill(skill, level):
 func reset_to_new_round():
 	Events.refresh_ui_for_monster.emit()
 	print("_upgrades", _upgrades, "_initial_moves", _initial_moves)
-	_computed_moves = _initial_moves + _upgrades
+	_computed_moves = Relics.modify("moves", _initial_moves + _upgrades, self)
 
 func unlock_skills():
 	for skill in _skills:

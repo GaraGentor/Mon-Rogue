@@ -19,7 +19,8 @@ var enemy_mons: Array[Monster] = []
 var catched_mons: Array[Monster] = []
 var fainted_own_mons: Array[Monster] = []
 var fainted_enemy_mons: Array[Monster] = []
-var relics := []
+# IDs der gesammelten Relics (siehe Relics.RELICS)
+var relics: Array[String] = []
 var overall_progress_level := 0
 var map_progress_level := 0
 var map_level := 0
@@ -40,6 +41,8 @@ var is_boss_fight: bool = false
 var is_final_boss: bool = false
 # Boss-Feld mitten auf der Karte: Kampf in Boss-Stärke, beendet das Biom aber nicht
 var is_map_boss: bool = false
+# nach einem Boss-Sieg: beim nächsten Betreten der Karte die Relic-Auswahl zeigen (relic_reward.tscn)
+var pending_relic_reward: bool = false
 
 # money
 signal ep_changed(ep)
@@ -102,6 +105,7 @@ func reset() -> void:
 	is_boss_fight = false
 	is_final_boss = false
 	is_map_boss = false
+	pending_relic_reward = false
 	rolled_mon_stats = {}
 	defeated_mon_names = []
 	run_won = false

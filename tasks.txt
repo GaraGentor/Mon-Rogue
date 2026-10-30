@@ -1,27 +1,21 @@
 Tasks:
 	> Battle Speed initiative einbauen
-	> Last Screen einabuen
-		> Game End.
 	> Nach Boss Battle einabuen
 		> Finalisieren mit animationen
 	> (Monster Seen Screen einbauen)
 	> (Skills Seen Screen einbauen)
-	> Catch Logik
 	> Unique skills
-	> Monster spells rework
-		> Bessere ansicht.
-	> Judgement Rework
-		> Buttons Links anordnen
-		> Skill Selektion separat triggern.
 	> Monster sternen Logik
 	> Monster Scaling per Ebene einbauen
-	> Biom Preview einbauen 
-		> Auch im Boss finished screen
-		> Und beim Start Screen
 	> Final Boss kann nicht gefangen werden
 	> Trainer gibt nur die skills zurück, die verwendet werden können
 		> Reroll?
 	> Pfade kenntlich machen
+	> Kleine Steine für den Shop die die Stats permannent verbessern
+	> Wenn ich ein Donner monster kille, kann es eines der Elemente die dazu bringen droppen
+	> Relic Drops
+	> Kleine Steine für Perma Stats auch als Loot anbieten
+	> Skills anbieten
 
 	> Mehr Monster
 	> Mehr Skills
