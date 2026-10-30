@@ -81,6 +81,10 @@ func reset() -> void:
 	rolled_mon_stats = {}
 	defeated_mon_names = []
 
+# Element-Maske des aktuellen Bioms, 0 wenn kein Biom-Pfad gewürfelt wurde.
+func current_biome() -> int:
+	return biome_path[map_level] if map_level < biome_path.size() else 0
+
 # Würfelt die Stats für alle Monster-Arten neu.
 func roll_mon_stats() -> void:
 	rolled_mon_stats = {}

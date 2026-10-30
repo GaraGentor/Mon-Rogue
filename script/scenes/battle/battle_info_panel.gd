@@ -60,14 +60,18 @@ func _build_skill_list() -> void:
 			icon.texture = physical_texture if skill.damage_type == Enums.SKILL_DAMAGE_TYPE.PHYSICAL else magic_texture
 		skill_grid.add_child(icon)
 
-		var name_color := Helper.color_by_type(skill.nature) if known else Color.WHITE
-		var name_text := tr(skill.name) if known else "?"
+		# unbekannte Skills verraten Element (Farbe) und Stufe, damit man gezielt Monster jagen kann
+		var name_color := Helper.color_by_type(skill.nature)
+		var name_text := tr(skill.name) if known else tr("BATTLE_UNKNOWN_SKILL").format({"tier": skill.get("tier", 1)})
 		if is_egg_skill:
 			name_color = EGG_SKILL_COLOR
-			name_text = tr("EGG_SKILL_TAG").format({"skill": name_text if known else "???"})
+			name_text = tr("EGG_SKILL_TAG").format({"skill": name_text})
 		var skill_name := _label(name_text, name_color)
 		if is_egg_skill:
 			skill_name.tooltip_text = tr("EGG_SKILL_HINT")
+			skill_name.mouse_filter = Control.MOUSE_FILTER_STOP
+		elif not known:
+			skill_name.tooltip_text = tr("BATTLE_UNKNOWN_SKILL_HINT")
 			skill_name.mouse_filter = Control.MOUSE_FILTER_STOP
 		skill_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		skill_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL

@@ -119,6 +119,9 @@ func _create_card(skill: Dictionary, locked: bool) -> Button:
 	]
 	if locked:
 		lines[2] = tr("CONFIGURATOR_LOCKED")
+	elif not Skills.can_use(_mon, skill):
+		# wählbar, aber erst spielbar, wenn das Monster die fehlenden Elemente bekommt (z. B. im Shop)
+		lines.append(Skills.missing_elements_text(_mon, skill))
 	card.text = "\n".join(PackedStringArray(lines))
 	card.tooltip_text = tr(skill.description).format(skill)
 	if locked:
@@ -170,8 +173,12 @@ func _toggle(skill_name: String) -> void:
 func _refresh() -> void:
 	for skill_name in _cards:
 		_cards[skill_name].set_pressed_no_signal(_selected.has(skill_name))
+	# mindestens eine Attacke muss mit dem Start-Element spielbar sein
+	var has_usable = _selected.any(func(skill_name): return Skills.can_use_name(_mon, skill_name))
 	_counter_label.text = tr("CONFIGURATOR_COUNTER").format({"count": _selected.size(), "max": SKILLS_TO_PICK})
-	_go_button.disabled = _selected.size() != SKILLS_TO_PICK
+	if _selected.size() == SKILLS_TO_PICK and not has_usable:
+		_counter_label.text = tr("CONFIGURATOR_NEED_USABLE")
+	_go_button.disabled = _selected.size() != SKILLS_TO_PICK or not has_usable
 
 func _on_go_pressed() -> void:
 	_mon._skills = []

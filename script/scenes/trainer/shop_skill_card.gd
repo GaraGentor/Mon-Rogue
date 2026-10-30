@@ -71,7 +71,7 @@ func _mon_has_skill(mon: Monster) -> bool:
 	return !skills.has(skill.name)
 
 func _mon_can_use_skill(mon: Monster) -> bool:
-	return ColorMap.has_element(mon._type, skill.nature)
+	return Skills.can_use(mon, skill)
 
 func _on_buy_button_pressed() -> void:
 	var recommendation = 9
@@ -81,5 +81,5 @@ func _on_buy_button_pressed() -> void:
 		recommendation = 1
 	elif mon_texture_rect1.visible:
 		recommendation = 0
+	# die Karte entfernt der Trainer erst, wenn der Kauf abgeschlossen ist (Abbrechen ist möglich)
 	buy_button_pressed.emit(skill, cost, recommendation)
-	queue_free()

@@ -84,6 +84,13 @@ JUDGEMENT_LEARN_2,Teach monster 2,Monster 2 lernt es
 JUDGEMENT_RELEASE_TITLE,Select a monster you want to release!,"Wähle ein Monster, das du freilassen willst!"
 JUDGEMENT_RELEASE_1,Release Monster 1,Monster 1 freilassen
 JUDGEMENT_RELEASE_2,Release Monster 2,Monster 2 freilassen
+JUDGEMENT_LEARN_KNOWN,Already knows it,Kennt es schon
+SKILL_NEEDS_ELEMENTS,Needs: {elements},Benötigt: {elements}
+CONFIGURATOR_NEED_USABLE,Pick at least one move your monster can use!,"Wähle mindestens eine Attacke, die dein Monster einsetzen kann!"
+JUDGEMENT_REPLACE_TITLE,All {max} slots are full. Which move should be forgotten?,Alle {max} Plätze sind belegt. Welche Attacke soll vergessen werden?
+JUDGEMENT_REPLACE,Forget {skill},{skill} vergessen
+BATTLE_UNKNOWN_SKILL,? (Tier {tier}),? (Stufe {tier})
+BATTLE_UNKNOWN_SKILL_HINT,Element and tier are known. The details are revealed once the enemy uses this move or you catch it.,"Element und Stufe sind bekannt. Die Details zeigen sich, sobald der Gegner die Attacke einsetzt oder du ihn fängst."
 LEVEL_UP_TITLE,Level Up!,Level Up!
 LEVEL_UP_KILLED,Killed Monsters: {count},Besiegte Monster: {count}
 SHOP_CHANGES_TO,Changes to,Wird zu
@@ -114,9 +121,15 @@ SKILL_HEADER_SKILL,Skill,Fähigkeit
 SKILL_HEADER_COST,Cost,Kosten
 SKILL_HEADER_CD,CD,CD
 SKILL_HEADER_POWER,Power,Stärke
-SKILL_BASIC_ATTACK,basic attack,Grundangriff
+SKILL_BASIC_ATTACK_EARTH,Earth Strike,Erdschlag
+SKILL_BASIC_ATTACK_FIRE,Fire Strike,Feuerschlag
+SKILL_BASIC_ATTACK_WATER,Water Strike,Wasserschlag
+SKILL_BASIC_ATTACK_AIR,Air Strike,Luftschlag
 SKILL_BASIC_ATTACK_DESC,Deals {value}% physical damage,Verursacht {value}% physischen Schaden
-SKILL_BASIC_BLOCK,basic block,Grundblock
+SKILL_BASIC_BLOCK_EARTH,Stone Wall,Steinwall
+SKILL_BASIC_BLOCK_FIRE,Ember Guard,Glutschild
+SKILL_BASIC_BLOCK_WATER,Water Shield,Wasserschild
+SKILL_BASIC_BLOCK_AIR,Wind Shield,Windschild
 SKILL_BASIC_BLOCK_DESC,Blocks {value} damage,Blockt {value} Schaden
 SKILL_STRENGTH_BLOCK,strength block,Kraftblock
 SKILL_STRENGTH_BLOCK_DESC,?,?

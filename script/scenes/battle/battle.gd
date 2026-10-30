@@ -229,7 +229,11 @@ func _ki_turn(emon: Monster) -> void:
 	var alive = State.mons.filter(func(mon: Monster): return mon.is_alive())
 	if alive.is_empty() or not emon.is_alive():
 		return
-	var skill = emon._skills.pick_random()
+	# Gegner halten sich an dieselbe Element-Regel wie der Spieler
+	var usable = emon._skills.filter(func(skill): return Skills.can_use(emon, skill))
+	if usable.is_empty():
+		return
+	var skill = usable.pick_random()
 	var to_hit = alive.pick_random()
 	if skill.target == Enums.CARD_TARGETS.SINGLE_ENEMY:
 		Events.monster_hit_monster.emit(_scene_for(emon), _scene_for(to_hit))
