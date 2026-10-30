@@ -45,6 +45,8 @@ var is_map_boss: bool = false
 signal ep_changed(ep)
 var ep: int = 0:
 	set(val):
+		if val > ep:
+			run_ep_earned += val - ep
 		ep = val
 		ep_changed.emit(ep)
 
@@ -57,6 +59,14 @@ var boss_shards: int = 0:
 
 
 var killed_monsters: int = 0
+
+# Run-Statistik für den Endbildschirm (run_end.gd). killed_monsters wird beim Level-Up verbraucht, daher eigene Zähler.
+var run_won := false
+var run_kills := 0
+var run_catches := 0
+var run_ep_earned := 0
+# Monster-Arten im Team beim Run-Ende (bei einer Niederlage stehen sie danach nicht mehr in mons)
+var run_team: Array[String] = []
 signal pos_changed(pos)
 # Linie 0 / Zeile 0 hat die Position (0,0,0), daher braucht "noch nicht gestartet" einen eigenen Wert
 const NO_MAP_POSITION := Vector3(-1, -1, -1)
@@ -94,6 +104,11 @@ func reset() -> void:
 	is_map_boss = false
 	rolled_mon_stats = {}
 	defeated_mon_names = []
+	run_won = false
+	run_kills = 0
+	run_catches = 0
+	run_ep_earned = 0
+	run_team = []
 
 # Element-Maske des aktuellen Bioms, 0 wenn kein Biom-Pfad gewürfelt wurde.
 func current_biome() -> int:
@@ -125,6 +140,11 @@ func mark_mon_defeated(mon_name: String) -> void:
 
 func is_mon_defeated(mon_name: String) -> bool:
 	return defeated_mon_names.has(mon_name)
+
+# Beendet den Run und merkt sich das Team, die Szene wechselt der Aufrufer (run_end.tscn).
+func end_run(won: bool) -> void:
+	run_won = won
+	run_team.assign(mons.map(func(mon: Monster): return mon._name))
 
 func stage_clear(progress: int = 1) -> void:
 	#for mon in mons:
