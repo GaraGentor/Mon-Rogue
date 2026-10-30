@@ -32,7 +32,8 @@ func _on_ok_button_pressed() -> void:
 
 func finish() -> void:
 	State.map_level += 1
-	if State.map_level == 4:
+	State.biome_fight_index = 0
+	if State.map_level == Map.map_settings.size():
 		thanks_panel.visible = true
 		return
 	Map.generate_starting_points()

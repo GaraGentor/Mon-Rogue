@@ -29,7 +29,7 @@ func get_tier(skill_name: String) -> int:
 const DEPTH_TIER_BONUS := 0.4
 
 # Maximale Anzahl Skills, die ein Monster gleichzeitig beherrscht.
-const MAX_SKILLS := 4
+const MAX_SKILLS := 6
 
 func get_weight(skill_name: String, depth: int = 0) -> float:
 	var tier = get_tier(skill_name)
