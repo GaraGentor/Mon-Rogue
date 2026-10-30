@@ -19,6 +19,8 @@ var relics := []
 var overall_progress_level := 0
 var map_progress_level := 0
 var map_level := 0
+# Element-Masken der Biome pro Tiefe, einmal pro Run gewürfelt (siehe Map.generate_biome_path)
+var biome_path: Array[int] = []
 
 var shopped: Array = []
 
@@ -61,6 +63,7 @@ func _ready() -> void:
 func reset() -> void:
 	ep = 0
 	map_level = 0
+	biome_path = []
 	map_progress_level = 0
 	overall_progress_level = 0
 	relics = []

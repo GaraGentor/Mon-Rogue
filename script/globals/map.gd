@@ -48,6 +48,44 @@ var map_settings = {
 var all_nodes = []
 var starting_nodes = []
 
+const MAX_BIOME_TIER = 4
+
+# Würfelt pro Run einen Biom-Pfad (Element-Masken aus ColorMap), eine Tiefe pro map_settings-Eintrag.
+# Tiefe 1 ist immer ein Einzelelement, die letzte Tiefe immer Chaos (alle 4 Elemente).
+func generate_biome_path() -> Array[int]:
+	var depth = map_settings.size()
+	var biomes: Array[int] = []
+	var prev = 0
+	for i in depth:
+		var tier = MAX_BIOME_TIER
+		if i < depth - 1:
+			tier = min(1 + roundi(float(i) * (MAX_BIOME_TIER - 1) / max(depth - 1, 1)), MAX_BIOME_TIER - 1)
+		var candidates = get_biomes_of_tier(tier).filter(func(mask): return not biomes.has(mask))
+		if candidates.is_empty():
+			candidates = get_biomes_of_tier(tier)
+		# bevorzugt Biome, die möglichst viele Elemente des vorherigen Bioms teilen
+		var best_shared = candidates.map(func(mask): return count_elements(mask & prev)).max()
+		candidates = candidates.filter(func(mask): return count_elements(mask & prev) == best_shared)
+		prev = candidates.pick_random()
+		biomes.append(prev)
+	State.biome_path = biomes
+	return biomes
+
+func get_biomes_of_tier(tier: int) -> Array:
+	var all_elements = Enums.MON_TYPES.values().reduce(func(acc, e): return acc | e, 0)
+	var result = []
+	for mask in range(1, all_elements + 1):
+		if count_elements(mask) == tier:
+			result.append(mask)
+	return result
+
+func count_elements(mask: int) -> int:
+	var count = 0
+	while mask:
+		count += mask & 1
+		mask >>= 1
+	return count
+
 func generate_starting_points():
 	all_nodes = []
 	starting_nodes = []

@@ -6,6 +6,7 @@
 [ext_resource type="FontFile" uid="uid://cbavibkhidesl" path="res://script/ui/fonts/pxelfont/PixelifySans-VariableFont_wght.ttf" id="4_tpsnj"]
 [ext_resource type="Script" uid="uid://degyfi6ckr318" path="res://script/scenes/selection/ui.gd" id="5_aea4x"]
 [ext_resource type="PackedScene" uid="uid://bqa8vtcwoin5c" path="res://script/scenes/battle/monster_widget.tscn" id="7_f6ddp"]
+[ext_resource type="Script" path="res://script/scenes/selection/biome_path.gd" id="8_biome"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cjs1n"]
 bg_color = Color(0, 0, 0, 1)
@@ -34,7 +35,7 @@ gradient = SubResource("Gradient_7ag31")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0.196581, 1)
 
-[node name="Control" type="Control" unique_id=114657079 node_paths=PackedStringArray("title_label", "go_button", "monster_widget")]
+[node name="Control" type="Control" unique_id=114657079 node_paths=PackedStringArray("title_label", "go_button", "monster_widget", "biome_path")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -47,6 +48,7 @@ script = ExtResource("1_7et7b")
 title_label = NodePath("Selection/ChatGptImage26_Juni2025,124247/Label")
 go_button = NodePath("Selection/MarginContainer/VBoxContainer/Button2")
 monster_widget = NodePath("UI/MonsterWidget")
+biome_path = NodePath("Selection/BiomePath")
 
 [node name="Selection" type="Control" parent="." unique_id=224124060]
 layout_mode = 1
@@ -81,6 +83,19 @@ theme_override_fonts/font = ExtResource("4_tpsnj")
 theme_override_font_sizes/font_size = 36
 text = "SELECTION_TITLE_START"
 horizontal_alignment = 1
+
+[node name="BiomePath" type="Control" parent="Selection" unique_id=1938274651]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.04
+anchor_top = 0.12
+anchor_right = 0.96
+anchor_bottom = 0.21
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("8_biome")
+font = ExtResource("4_tpsnj")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Selection" unique_id=320258260]
 layout_mode = 1
