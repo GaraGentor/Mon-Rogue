@@ -22,7 +22,7 @@ shader_parameter/total_phases = 8
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_27xg2"]
 
-[node name="Trainer" type="Control" node_paths=PackedStringArray("grid_container", "money_label", "deciding_panel", "deciding_skill_name", "test_button", "test_button2", "recom_label_1", "recom_label_2")]
+[node name="Trainer" type="Control" node_paths=PackedStringArray("grid_container", "money_label", "deciding_panel", "deciding_skill_name", "test_button", "test_button2", "recom_label_1", "recom_label_2", "choice_row", "cancel_button", "deciding_box")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,6 +39,9 @@ test_button = NodePath("Deciding/MarginContainer/MarginContainer/VBoxContainer/H
 test_button2 = NodePath("Deciding/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer/RecommContainer2/Button2")
 recom_label_1 = NodePath("Deciding/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer/RecommContainer/Label")
 recom_label_2 = NodePath("Deciding/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer/RecommContainer2/Label")
+choice_row = NodePath("Deciding/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer")
+cancel_button = NodePath("Deciding/MarginContainer/MarginContainer/VBoxContainer/Cancel")
+deciding_box = NodePath("Deciding/MarginContainer/MarginContainer/VBoxContainer")
 
 [node name="ColorRect" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_4fcrc")
@@ -261,6 +264,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "TRAINER_MONSTER_2"
 
+[node name="Cancel" type="Button" parent="Deciding/MarginContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "COMMON_CANCEL"
+flat = true
+
 [connection signal="pressed" from="Panel2/MarginContainer/HBoxContainer2/HBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/Close" to="." method="_on_close_pressed"]
 [connection signal="pressed" from="Deciding/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer/RecommContainer/Button" to="." method="_on_learn_to_mon_one_pressed"]
 [connection signal="pressed" from="Deciding/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer/RecommContainer2/Button2" to="." method="_on_learn_to_mon_2_pressed"]
+[connection signal="pressed" from="Deciding/MarginContainer/MarginContainer/VBoxContainer/Cancel" to="." method="_on_cancel_pressed"]

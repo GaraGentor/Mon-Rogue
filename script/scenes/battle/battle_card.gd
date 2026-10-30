@@ -45,6 +45,13 @@ func _init_card() -> void:
 	type_icon.texture = physical_texture if skill.damage_type == Enums.SKILL_DAMAGE_TYPE.PHYSICAL else magic_texture
 	description_label.text = tr(skill.description).format(skill)
 
+## Fehlen dem Monster Elemente für diesen Skill, steht das statt der Beschreibung auf der Karte
+func set_requirement(text: String) -> void:
+	if text.is_empty():
+		return
+	description_label.text = text
+	description_label.self_modulate = Color(1, 0.45, 0.45)
+
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
