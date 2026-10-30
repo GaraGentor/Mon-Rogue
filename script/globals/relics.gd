@@ -17,12 +17,16 @@ extends Node
 
 signal relics_changed
 
+## Gewöhnliche Relics gibt es auch in Schätzen, seltene nur als Boss-Belohnung und im Shop
+enum Rarity { COMMON, RARE }
+
 # var statt const: Lambdas sind keine konstanten Ausdrücke
 var RELICS := {
 	"extra_move": {
 		"name": "RELIC_EXTRA_MOVE",
 		"description": "RELIC_EXTRA_MOVE_DESC",
 		"icon": "res://assets/ui/icons/sword.svg",
+		"rarity": Rarity.RARE,
 		"hooks": {
 			# nur eigene Monster profitieren
 			"moves": func(value: int, mon: Monster) -> int: return value + 1 if State.mons.has(mon) else value,
@@ -32,6 +36,7 @@ var RELICS := {
 		"name": "RELIC_LUCKY_CHARM",
 		"description": "RELIC_LUCKY_CHARM_DESC",
 		"icon": "res://assets/ui/icons/sparkle.svg",
+		"rarity": Rarity.COMMON,
 		"hooks": {
 			"catch_chance": func(value: float, _mon: Monster) -> float: return value * 1.25,
 		},
@@ -40,6 +45,7 @@ var RELICS := {
 		"name": "RELIC_GOLDEN_IDOL",
 		"description": "RELIC_GOLDEN_IDOL_DESC",
 		"icon": "res://assets/ui/icons/firework (1).svg",
+		"rarity": Rarity.COMMON,
 		"hooks": {
 			"battle_ep": func(value: int, _ctx) -> int: return roundi(value * 1.3),
 		},
@@ -52,9 +58,9 @@ func get_relic(id: String) -> Dictionary:
 func has_relic(id: String) -> bool:
 	return State.relics.has(id)
 
-## Relics, die in diesem Run noch nicht gesammelt wurden
-func get_unowned() -> Array:
-	return RELICS.keys().filter(func(id): return not has_relic(id))
+## Relics, die in diesem Run noch nicht gesammelt wurden, optional nur einer Seltenheit
+func get_unowned(rarity: int = -1) -> Array:
+	return RELICS.keys().filter(func(id): return not has_relic(id) and (rarity < 0 or RELICS[id].rarity == rarity))
 
 func add_relic(id: String) -> void:
 	if not RELICS.has(id) or has_relic(id):

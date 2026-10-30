@@ -134,6 +134,11 @@ TRAINER_MONSTER_1,Monster 1,Monster 1
 TRAINER_MONSTER_2,Monster 2,Monster 2
 TREASURE_TAKE_GOLD,I Take Gold!,Ich nehme Gold!
 TREASURE_CHOOSE,Choose one prize.,Wähle einen Preis.
+TREASURE_GOLD,Gold,Gold
+TREASURE_TAKE,Take!,Nehmen!
+TREASURE_POTION,{element} Potion,{element}-Trank
+TREASURE_POTION_DESC,Adds the element {element} to one of your monsters.,Fügt einem deiner Monster das Element {element} hinzu.
+TREASURE_POTION_CHOOSE_MON,Which monster drinks the potion?,Welches Monster trinkt den Trank?
 WORLDMAP_BOSS,BOSS,BOSS
 WORLDMAP_BOSS_SHARDS,Boss Shards: {amount},Boss-Splitter: {amount}
 WORLDMAP_MONEY,M: {amount},M: {amount}
