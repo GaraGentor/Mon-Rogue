@@ -20,11 +20,6 @@ CONFIGURATOR_ABILITY,magical,magisch
 EGG_SKILL_TAG,{skill} (Egg),{skill} (Ei)
 EGG_SKILL_HINT,"Egg move: catch this monster and sacrifice it to unlock this move permanently","Ei-Attacke: Fange dieses Monster und opfere es, um die Attacke dauerhaft freizuschalten"
 EGG_SKILL_UNLOCKED,{skill} unlocked for {mon}!,{skill} für {mon} freigeschaltet!
-JUDGEMENT_SACRIFICE,"Sacrifice
-unlock:
-{skill}","Opfern
-freischalten:
-{skill}"
 BATTLE_PHASE,Battle Phase,Kampfphase
 BATTLE_HYPNOSIS,"
 
@@ -67,25 +62,49 @@ JAILER_MAX_UPGRADE,Max Upgrade,Max. Stufe
 JAILER_MOVES_UPGRADE,Moves 1 -> 2,Attacken 1 -> 2
 JAILER_CURRENT_UPGRADE_LEVEL,Current Upgrade Level: {level},Aktuelle Stufe: {level}
 JAILER_MAX_UPGRADE_LEVEL,Maximum Upgrade Level: {level},Maximale Stufe: {level}
-JUDGEMENT_NEXT,Next,Weiter
-JUDGEMENT_TAKE,"
-
-Take it...","
-
-Nehmen..."
-JUDGEMENT_RELEASE,"
-
-Release...","
-
-Freilassen..."
-JUDGEMENT_NO_SECOND,No second monster...,Kein zweites Monster...
-JUDGEMENT_LEARN_TITLE,Time to choose wisely... select your monster to learn a new move!,"Zeit, weise zu wählen... welches Monster soll die neue Attacke lernen?"
-JUDGEMENT_LEARN_1,Teach monster 1,Monster 1 lernt es
-JUDGEMENT_LEARN_2,Teach monster 2,Monster 2 lernt es
-JUDGEMENT_RELEASE_TITLE,Select a monster you want to release!,"Wähle ein Monster, das du freilassen willst!"
-JUDGEMENT_RELEASE_1,Release Monster 1,Monster 1 freilassen
-JUDGEMENT_RELEASE_2,Release Monster 2,Monster 2 freilassen
 JUDGEMENT_LEARN_KNOWN,Already knows it,Kennt es schon
+JUDGEMENT_NEW_CATCHES,New catches {i}/{n},Neue Fänge {i}/{n}
+JUDGEMENT_NO_CATCHES_LEFT,No open catches left,Keine offenen Fänge mehr
+JUDGEMENT_CURRENT_TEAM,Current team,Aktuelles Team
+JUDGEMENT_FREE_SLOT,"Free slot
+Drag a monster here","Freier Platz
+Ziehe ein Monster hierher"
+JUDGEMENT_HINT_IDLE,Drag monsters onto a team slot or a box below. Or click a monster and then its target.,"Ziehe Monster auf einen Team-Platz oder eine Ablage unten. Oder klicke ein Monster an und dann das Ziel."
+JUDGEMENT_HINT_HELD,{mon} selected: click a target. (Esc: cancel),{mon} ausgewählt: Klicke auf ein Ziel. (Esc: abbrechen)
+JUDGEMENT_BADGE_NEW,NEW,NEU
+JUDGEMENT_BADGE_STARTER,Starter,Start-Monster
+JUDGEMENT_BADGE_BENCHED,From your team,Aus deinem Team
+JUDGEMENT_BADGE_SLOT,Slot {slot},Platz {slot}
+JUDGEMENT_ZONE_TEACH,Teach a move,Attacke lehren
+JUDGEMENT_ZONE_SACRIFICE,Sacrifice,Opfern
+JUDGEMENT_ZONE_RELEASE,Release,Freilassen
+JUDGEMENT_ZONE_TEACH_IDLE,A monster passes one move on to your team and leaves afterwards.,Ein Monster gibt eine Attacke an dein Team weiter und geht danach.
+JUDGEMENT_ZONE_SACRIFICE_IDLE,Sacrifice new catches with an egg move to unlock it permanently.,"Neue Fänge mit Ei-Attacke opfern, um sie dauerhaft freizuschalten."
+JUDGEMENT_ZONE_RELEASE_IDLE,Let a monster go without a reward.,Ein Monster ohne Belohnung gehen lassen.
+JUDGEMENT_ZONE_TEACH_EFFECT,{mon} passes one move on and leaves afterwards.,{mon} gibt eine Attacke weiter und geht danach.
+JUDGEMENT_ZONE_SACRIFICE_EFFECT,Permanently unlocks {skill}. {mon} leaves afterwards.,Schaltet {skill} dauerhaft frei. {mon} geht danach.
+JUDGEMENT_ZONE_RELEASE_EFFECT,{mon} leaves without a reward.,{mon} geht ohne Belohnung.
+JUDGEMENT_REASON_LAST,Your team needs at least one monster.,Dein Team braucht mindestens ein Monster.
+JUDGEMENT_REASON_OWN,Your own monsters can't be sacrificed.,Eigene Monster können nicht geopfert werden.
+JUDGEMENT_REASON_NO_EGG,{mon} carries no egg move that can be unlocked.,"{mon} trägt keine Ei-Attacke, die sich freischalten lässt."
+JUDGEMENT_REASON_NOTHING_TO_TEACH,Your team already knows all of {mon}'s moves.,Dein Team kennt schon alle Attacken von {mon}.
+JUDGEMENT_DROP_SWAP,"{mon} joins the team
+{old} goes to the catches","{mon} kommt ins Team
+{old} geht zu den Fängen"
+JUDGEMENT_DROP_FILL,{mon} joins the team,{mon} kommt ins Team
+JUDGEMENT_DROP_REORDER,Swap places,Plätze tauschen
+JUDGEMENT_CONFIRM_KEEP,Keep current team,Jetzige Teamaufstellung behalten
+JUDGEMENT_CONFIRM_CHANGED,Take new team,Neue Teamaufstellung übernehmen
+JUDGEMENT_CONFIRM_RELEASES,Will be released: {mons},Werden freigelassen: {mons}
+JUDGEMENT_CONFIRM_NOTHING_LEFT,All catches are taken care of.,Alle Fänge sind versorgt.
+JUDGEMENT_RELEASE_STARTER_TITLE,Release your starter?,Start-Monster freilassen?
+JUDGEMENT_TEACH_PICK_SKILL,Which move should {mon} pass on?,Welche Attacke soll {mon} weitergeben?
+JUDGEMENT_TEACH_PICK_TARGET,Who should learn {skill}?,Wer soll {skill} lernen?
+JUDGEMENT_TEACH_PICK_REPLACE,{mon} already knows {max} moves. Which one should {skill} replace?,{mon} kennt schon {max} Attacken. Welche soll {skill} ersetzen?
+JUDGEMENT_TEACH_KNOWN_ALL,Your team already knows it,Dein Team kennt sie schon
+JUDGEMENT_TEACH_SKILL_COUNT,{count}/{max} moves,{count}/{max} Attacken
+JUDGEMENT_LEARNED,{mon} learned {skill}!,{mon} hat {skill} gelernt!
+JUDGEMENT_BACK,Back,Zurück
 SKILL_NEEDS_ELEMENTS,Needs: {elements},Benötigt: {elements}
 CONFIGURATOR_NEED_USABLE,Pick at least one move your monster can use!,"Wähle mindestens eine Attacke, die dein Monster einsetzen kann!"
 JUDGEMENT_REPLACE_TITLE,All {max} slots are full. Which move should be forgotten?,Alle {max} Plätze sind belegt. Welche Attacke soll vergessen werden?

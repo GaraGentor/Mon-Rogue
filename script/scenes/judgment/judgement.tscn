@@ -1,18 +1,11 @@
-[gd_scene load_steps=21 format=3 uid="uid://cyw2det7lplq0"]
+[gd_scene load_steps=15 format=3 uid="uid://cyw2det7lplq0"]
 
 [ext_resource type="Script" path="res://script/scenes/judgment/judgement.gd" id="1_nuduw"]
 [ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_g5s67"]
 [ext_resource type="PackedScene" uid="uid://bqa8vtcwoin5c" path="res://script/scenes/battle/monster_widget.tscn" id="3_4or1s"]
-[ext_resource type="Texture2D" uid="uid://cbhxckxt3qapy" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 20. Nov. 2025, 21_38_41 (1).png" id="4_67m4b"]
 [ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="4_atuse"]
 [ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="7_5vxq8"]
-[ext_resource type="Texture2D" uid="uid://co0vav5cq77mh" path="res://assets/ui/icons/chevron-double-right.svg" id="7_gwab8"]
-[ext_resource type="Script" path="res://script/scenes/judgment/learning_screen.gd" id="7_l4787"]
-[ext_resource type="Texture2D" uid="uid://bvt38f06cl4ki" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 20. Nov. 2025, 21_41_31 (1).png" id="7_sw1cn"]
-[ext_resource type="Script" path="res://script/scenes/judgment/leaving_screen.gd" id="9_8ak5o"]
-[ext_resource type="Script" path="res://script/scenes/judgment/exit_animation.gd" id="10_puvwy"]
-[ext_resource type="Texture2D" uid="uid://bayjcxae1moqp" path="res://assets/sczene_backgrounds/ChatGPT Image 25. Juni 2025, 16_50_09.png" id="11_n1j66"]
-[ext_resource type="Texture2D" uid="uid://sy03txj3fiqv" path="res://assets/ui/types/game-buttons/mhawxnfducnmzx.jpeg" id="12_a36us"]
+[ext_resource type="Script" path="res://script/scenes/judgment/judgement_dialog.gd" id="8_dlg01"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cx0eb"]
 shader = ExtResource("2_g5s67")
@@ -25,21 +18,76 @@ shader_parameter/total_phases = 8
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_fd6q6"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fawbg"]
-bg_color = Color(0, 0, 0, 0)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot0"]
+bg_color = Color(0, 0, 0, 0.25)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.8, 0.8, 0.8, 0.5)
+border_blend = true
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
-[sub_resource type="ImageTexture" id="ImageTexture_4kcka"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_catchframe"]
+bg_color = Color(0, 0, 0, 0.12)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.8, 0.8, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cvnxp"]
-bg_color = Color(0, 0, 0, 0)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_teamframe"]
+bg_color = Color(0.2, 0.14, 0.05, 0.6)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.858824, 0.717647, 0.45098, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uyajo"]
-bg_color = Color(0, 0, 0, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_catchlegend"]
+content_margin_left = 14.0
+content_margin_top = 2.0
+content_margin_right = 14.0
+content_margin_bottom = 2.0
+bg_color = Color(0.0933971, 0.0873049, 0.0836773, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.8, 0.8, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_13d1o"]
-bg_color = Color(0, 0, 0, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_teamlegend"]
+content_margin_left = 14.0
+content_margin_top = 2.0
+content_margin_right = 14.0
+content_margin_bottom = 2.0
+bg_color = Color(0.0933971, 0.0873049, 0.0836773, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.858824, 0.717647, 0.45098, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
-[node name="Judgement" type="Control" node_paths=PackedStringArray("mw1", "mw2", "mw3", "next_button", "placeholder_panel", "learning_screen", "leaving_screen", "sacrifice_button")]
+[node name="Judgement" type="Control" node_paths=PackedStringArray("mw1", "mw2", "mw3", "catch_header", "catch_badges", "catch_area", "catch_empty", "prev_button", "next_button", "dots", "slot_area_1", "slot_area_2", "slot_badges_1", "slot_badges_2", "slot_empty_1", "slot_empty_2", "hint_label", "zone_row", "confirm_button", "confirm_info", "dialog")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -47,14 +95,27 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_nuduw")
-mw1 = NodePath("Panel/HBoxContainer/VBoxContainer/MonsterWidget")
-mw2 = NodePath("Panel/HBoxContainer/MonsterWidget2")
-mw3 = NodePath("Panel/HBoxContainer/MonsterWidget3")
-next_button = NodePath("Panel/HBoxContainer/HBoxContainer/TextureRect2/Next")
-placeholder_panel = NodePath("Panel/HBoxContainer/Panel")
-learning_screen = NodePath("LearningScreen")
-leaving_screen = NodePath("Leaving Screen")
-sacrifice_button = NodePath("Panel/HBoxContainer/HBoxContainer/Sacrifice")
+mw1 = NodePath("Margin/VBox/Top/CatchFrame/Content/CatchArea/MonsterWidget")
+mw2 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot1/Area1/MonsterWidget2")
+mw3 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot2/Area2/MonsterWidget3")
+catch_header = NodePath("Margin/VBox/Top/CatchFrame/Legend/Label")
+catch_badges = NodePath("Margin/VBox/Top/CatchFrame/Content/Badges")
+catch_area = NodePath("Margin/VBox/Top/CatchFrame/Content/CatchArea")
+catch_empty = NodePath("Margin/VBox/Top/CatchFrame/Content/CatchArea/Empty")
+prev_button = NodePath("Margin/VBox/Top/CatchFrame/Content/Nav/Prev")
+next_button = NodePath("Margin/VBox/Top/CatchFrame/Content/Nav/Next")
+dots = NodePath("Margin/VBox/Top/CatchFrame/Content/Nav/Dots")
+slot_area_1 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot1/Area1")
+slot_area_2 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot2/Area2")
+slot_badges_1 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot1/Badges1")
+slot_badges_2 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot2/Badges2")
+slot_empty_1 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot1/Area1/Empty1")
+slot_empty_2 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot2/Area2/Empty2")
+hint_label = NodePath("Margin/VBox/Top/TeamFrame/Content/Hint")
+zone_row = NodePath("Margin/VBox/Bottom/Zones")
+confirm_button = NodePath("Margin/VBox/Bottom/Confirm/ConfirmButton")
+confirm_info = NodePath("Margin/VBox/Bottom/Confirm/Info")
+dialog = NodePath("Dialog")
 
 [node name="ColorRect" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_cx0eb")
@@ -64,152 +125,292 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
 texture = SubResource("ViewportTexture_fd6q6")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_fawbg")
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
 
-[node name="HBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+[node name="Top" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="CatchFrame" type="Control" parent="Margin/VBox/Top"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.3
 
-[node name="TextureRect2" type="TextureRect" parent="Panel/HBoxContainer/HBoxContainer"]
-texture_filter = 1
+[node name="Border" type="Panel" parent="Margin/VBox/Top/CatchFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 14.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_catchframe")
+
+[node name="Content" type="VBoxContainer" parent="Margin/VBox/Top/CatchFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 38.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="Badges" type="HBoxContainer" parent="Margin/VBox/Top/CatchFrame/Content"]
+custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-texture = ExtResource("7_gwab8")
-expand_mode = 1
-stretch_mode = 5
+theme_override_constants/separation = 6
 
-[node name="Next" type="Button" parent="Panel/HBoxContainer/HBoxContainer/TextureRect2"]
-texture_repeat = 1
+[node name="CatchArea" type="Control" parent="Margin/VBox/Top/CatchFrame/Content"]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MonsterWidget" parent="Margin/VBox/Top/CatchFrame/Content/CatchArea" instance=ExtResource("3_4or1s")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 3
-theme = ExtResource("4_atuse")
-theme_override_font_sizes/font_size = 26
-text = "1/3
 
-
-Next"
-flat = true
-
-[node name="TextureRect" type="TextureRect" parent="Panel/HBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-texture = ExtResource("4_67m4b")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Take" type="Button" parent="Panel/HBoxContainer/HBoxContainer/TextureRect"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-theme = ExtResource("4_atuse")
-theme_override_font_sizes/font_size = 26
-text = "JUDGEMENT_TAKE"
-icon = SubResource("ImageTexture_4kcka")
-flat = true
-
-[node name="TextureRect3" type="TextureRect" parent="Panel/HBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-texture = ExtResource("7_sw1cn")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Release" type="Button" parent="Panel/HBoxContainer/HBoxContainer/TextureRect3"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-theme = ExtResource("4_atuse")
-theme_override_font_sizes/font_size = 26
-text = "JUDGEMENT_RELEASE"
-flat = true
-
-[node name="Sacrifice" type="Button" parent="Panel/HBoxContainer/HBoxContainer"]
+[node name="Empty" type="Label" parent="Margin/VBox/Top/CatchFrame/Content/CatchArea"]
 visible = false
-custom_minimum_size = Vector2(0, 90)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot0")
+text = "JUDGEMENT_NO_CATCHES_LEFT"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Nav" type="HBoxContainer" parent="Margin/VBox/Top/CatchFrame/Content"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+
+[node name="Prev" type="Button" parent="Margin/VBox/Top/CatchFrame/Content/Nav"]
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+theme = ExtResource("4_atuse")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("7_5vxq8")
+text = "<"
+
+[node name="Dots" type="HBoxContainer" parent="Margin/VBox/Top/CatchFrame/Content/Nav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Next" type="Button" parent="Margin/VBox/Top/CatchFrame/Content/Nav"]
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+theme = ExtResource("4_atuse")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("7_5vxq8")
+text = ">"
+
+[node name="Legend" type="PanelContainer" parent="Margin/VBox/Top/CatchFrame"]
+layout_mode = 0
+offset_left = 18.0
+offset_right = 18.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_catchlegend")
+
+[node name="Label" type="Label" parent="Margin/VBox/Top/CatchFrame/Legend"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="TeamFrame" type="Control" parent="Margin/VBox/Top"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="Border" type="Panel" parent="Margin/VBox/Top/TeamFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 14.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_teamframe")
+
+[node name="Content" type="VBoxContainer" parent="Margin/VBox/Top/TeamFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 38.0
+offset_right = -14.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="TeamRow" type="HBoxContainer" parent="Margin/VBox/Top/TeamFrame/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Slot1" type="VBoxContainer" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Badges1" type="HBoxContainer" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot1"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Area1" type="Control" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot1"]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MonsterWidget2" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot1/Area1" instance=ExtResource("3_4or1s")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Empty1" type="Label" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot1/Area1"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot0")
+text = "JUDGEMENT_FREE_SLOT"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Slot2" type="VBoxContainer" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Badges2" type="HBoxContainer" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot2"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Area2" type="Control" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot2"]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MonsterWidget3" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot2/Area2" instance=ExtResource("3_4or1s")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Empty2" type="Label" parent="Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot2/Area2"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot0")
+text = "JUDGEMENT_FREE_SLOT"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Hint" type="Label" parent="Margin/VBox/Top/TeamFrame/Content"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Legend" type="PanelContainer" parent="Margin/VBox/Top/TeamFrame"]
+layout_mode = 0
+offset_left = 18.0
+offset_right = 18.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_teamlegend")
+
+[node name="Label" type="Label" parent="Margin/VBox/Top/TeamFrame/Legend"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_font_sizes/font_size = 18
+text = "JUDGEMENT_CURRENT_TEAM"
+
+[node name="Bottom" type="HBoxContainer" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Zones" type="HBoxContainer" parent="Margin/VBox/Bottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.6
+theme_override_constants/separation = 12
+
+[node name="Confirm" type="VBoxContainer" parent="Margin/VBox/Bottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="ConfirmButton" type="Button" parent="Margin/VBox/Bottom/Confirm"]
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme = ExtResource("4_atuse")
 theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
-theme_override_font_sizes/font_size = 15
-text = "JUDGEMENT_SACRIFICE"
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = ExtResource("7_5vxq8")
 autowrap_mode = 3
 
-[node name="Panel" type="Panel" parent="Panel/HBoxContainer/HBoxContainer"]
+[node name="Info" type="Label" parent="Margin/VBox/Bottom/Confirm"]
 layout_mode = 2
-theme_override_styles/panel = ExtResource("7_5vxq8")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="MonsterWidget" parent="Panel/HBoxContainer/VBoxContainer" instance=ExtResource("3_4or1s")]
-layout_mode = 2
-size_flags_horizontal = 3
 size_flags_vertical = 3
-is_learning = true
-
-[node name="MonsterWidget2" parent="Panel/HBoxContainer" instance=ExtResource("3_4or1s")]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="MonsterWidget3" parent="Panel/HBoxContainer" instance=ExtResource("3_4or1s")]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Panel" type="Panel" parent="Panel/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_cvnxp")
-
-[node name="Label" type="Label" parent="Panel/HBoxContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "JUDGEMENT_NO_SECOND"
+theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
-vertical_alignment = 1
+autowrap_mode = 3
+max_lines_visible = 3
 
-[node name="LearningScreen" type="Panel" parent="." node_paths=PackedStringArray("mw1", "mw2", "lean_mon_1_button", "lean_mon_2_button", "replace_container", "jug")]
+[node name="Dialog" type="Control" parent="."]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -217,294 +418,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_uyajo")
-script = ExtResource("7_l4787")
-mw1 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget2")
-mw2 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget3")
-lean_mon_1_button = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button3")
-lean_mon_2_button = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button2")
-replace_container = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel2")
-jug = NodePath("..")
+script = ExtResource("8_dlg01")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="LearningScreen"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="LearningScreen/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="Panel" type="Panel" parent="LearningScreen/VBoxContainer/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("7_5vxq8")
-
-[node name="Label" type="Label" parent="LearningScreen/VBoxContainer/MarginContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "JUDGEMENT_LEARN_TITLE"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="LearningScreen/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="MarginContainer" type="MarginContainer" parent="LearningScreen/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="Panel" type="Panel" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_13d1o")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 16
-
-[node name="Panel" type="Panel" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.2
-theme_override_styles/panel = ExtResource("7_5vxq8")
-
-[node name="HBoxContainer" type="HBoxContainer" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Button" type="Button" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-text = "COMMON_CANCEL"
-flat = true
-
-[node name="Button3" type="Button" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "JUDGEMENT_LEARN_1"
-flat = true
-
-[node name="Button2" type="Button" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-text = "JUDGEMENT_LEARN_2"
-flat = true
-
-[node name="Panel2" type="Panel" parent="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_styles/panel = ExtResource("7_5vxq8")
-
-[node name="MonsterWidget2" parent="LearningScreen/VBoxContainer/HBoxContainer" instance=ExtResource("3_4or1s")]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="MonsterWidget3" parent="LearningScreen/VBoxContainer/HBoxContainer" instance=ExtResource("3_4or1s")]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Leaving Screen" type="Panel" parent="." node_paths=PackedStringArray("mw1", "mw2", "exit_panel", "jugment", "release_button_1", "release_button_2", "warning_panel")]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_uyajo")
-script = ExtResource("9_8ak5o")
-mw1 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget2")
-mw2 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget3")
-exit_panel = NodePath("VBoxContainer/HBoxContainer/Exit_animation")
-jugment = NodePath("..")
-release_button_1 = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button3")
-release_button_2 = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button2")
-warning_panel = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel2")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Leaving Screen"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="Leaving Screen/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="Panel" type="Panel" parent="Leaving Screen/VBoxContainer/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("7_5vxq8")
-
-[node name="Label" type="Label" parent="Leaving Screen/VBoxContainer/MarginContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "JUDGEMENT_RELEASE_TITLE"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Leaving Screen/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="MarginContainer" type="MarginContainer" parent="Leaving Screen/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="Panel" type="Panel" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_13d1o")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 16
-
-[node name="Panel" type="Panel" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.2
-theme_override_styles/panel = ExtResource("7_5vxq8")
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Button" type="Button" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-text = "COMMON_CANCEL"
-flat = true
-
-[node name="Button3" type="Button" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "JUDGEMENT_RELEASE_1"
-flat = true
-
-[node name="Button2" type="Button" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "JUDGEMENT_RELEASE_2"
-flat = true
-
-[node name="Panel2" type="Panel" parent="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_styles/panel = ExtResource("7_5vxq8")
-
-[node name="MonsterWidget2" parent="Leaving Screen/VBoxContainer/HBoxContainer" instance=ExtResource("3_4or1s")]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="MonsterWidget3" parent="Leaving Screen/VBoxContainer/HBoxContainer" instance=ExtResource("3_4or1s")]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Exit_animation" type="Panel" parent="Leaving Screen/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("monster_rect", "marker_2d")]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-script = ExtResource("10_puvwy")
-monster_rect = NodePath("TextureRect2")
-marker_2d = NodePath("Marker2D")
-
-[node name="TextureRect" type="TextureRect" parent="Leaving Screen/VBoxContainer/HBoxContainer/Exit_animation"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("11_n1j66")
-expand_mode = 1
-
-[node name="TextureRect2" type="TextureRect" parent="Leaving Screen/VBoxContainer/HBoxContainer/Exit_animation"]
-custom_minimum_size = Vector2(300, 300)
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.016
-anchor_top = 1.023
-anchor_right = 0.931
-anchor_bottom = 1.519
-offset_left = 0.072
-offset_top = 0.268982
-offset_right = 1.87299
-offset_bottom = 4.15698
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("12_a36us")
-expand_mode = 2
-stretch_mode = 4
-
-[node name="Marker2D" type="Marker2D" parent="Leaving Screen/VBoxContainer/HBoxContainer/Exit_animation"]
-position = Vector2(148, 752)
-
-[connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/TextureRect2/Next" to="." method="_on_next_pressed"]
-[connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/TextureRect/Take" to="." method="_on_recruit_button_pressed"]
-[connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/TextureRect3/Release" to="." method="_on_release_pressed"]
-[connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/Sacrifice" to="." method="_on_sacrifice_pressed"]
-[connection signal="visibility_changed" from="LearningScreen" to="LearningScreen" method="_on_visibility_changed"]
-[connection signal="pressed" from="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button3" to="LearningScreen" method="_on_button_mon1_pressed"]
-[connection signal="pressed" from="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button2" to="LearningScreen" method="_on_button_mon2_pressed"]
-[connection signal="visibility_changed" from="Leaving Screen" to="Leaving Screen" method="_on_visibility_changed"]
-[connection signal="pressed" from="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button3" to="Leaving Screen" method="_on_first_mon_pressed"]
-[connection signal="pressed" from="Leaving Screen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button2" to="Leaving Screen" method="_on_second_mon_pressed"]
+[connection signal="pressed" from="Margin/VBox/Top/CatchFrame/Content/Nav/Prev" to="." method="_step" binds= [-1]]
+[connection signal="pressed" from="Margin/VBox/Top/CatchFrame/Content/Nav/Next" to="." method="_step" binds= [1]]
+[connection signal="pressed" from="Margin/VBox/Bottom/Confirm/ConfirmButton" to="." method="_on_confirm_pressed"]
