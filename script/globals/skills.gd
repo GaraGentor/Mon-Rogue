@@ -137,7 +137,8 @@ func is_unlockable_egg_skill(mon: Monster, skill: Dictionary) -> bool:
 	return skill.get("egg_skill", false) and get_locked_egg_skills(mon._name).has(skill.name)
 
 # ─────────────────────────
-# Meilenstein-Ei-Attacken: feste Freischaltungen pro Art, gezählt wird nur mit der Art als Start-Monster.
+# Meilenstein-Ei-Attacken: feste Freischaltungen pro Art, gezählt wird nur mit der Art als Start-Monster
+# und nur, solange das Start-Monster selbst noch im Team ist (ausgetauscht oder K.O. = kein Fortschritt).
 # Welcher Skill zu welchem Meilenstein gehört, steht in Monmap (milestone_egg_skills).
 # Sie tauchen nie bei wilden Monstern oder im Biom-Pool auf, man bekommt sie nur über den Meilenstein.
 # stat ist der Zähler in SaveManager (pro Art), hint der Freischalt-Hinweis im Konfigurator.
@@ -161,7 +162,7 @@ func get_locked_milestones(mon_name: String) -> Array:
 
 # Zählt einen Meilenstein-Zähler der Art hoch und liefert die Namen der dadurch neu freigeschalteten Skills.
 func add_milestone_progress(mon_name: String, stat: String) -> Array:
-	if mon_name == "":
+	if mon_name == "" or not State.is_starter_in_team():
 		return []
 	SaveManager.add_milestone_progress(mon_name, stat)
 	var unlocked = []

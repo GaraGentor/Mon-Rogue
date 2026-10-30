@@ -334,7 +334,7 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Leaving Screen" type="Panel" parent="." node_paths=PackedStringArray("mw1", "mw2", "exit_panel", "jugment")]
+[node name="Leaving Screen" type="Panel" parent="." node_paths=PackedStringArray("mw1", "mw2", "exit_panel", "jugment", "release_button_1", "release_button_2", "warning_panel")]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -348,6 +348,9 @@ mw1 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget2")
 mw2 = NodePath("VBoxContainer/HBoxContainer/MonsterWidget3")
 exit_panel = NodePath("VBoxContainer/HBoxContainer/Exit_animation")
 jugment = NodePath("..")
+release_button_1 = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button3")
+release_button_2 = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button2")
+warning_panel = NodePath("VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel2")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Leaving Screen"]
 layout_mode = 1
