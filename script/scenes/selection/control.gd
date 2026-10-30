@@ -40,6 +40,7 @@ func select_egg(index):
 func select_mon(mon):
 	State.mons = [mon]
 	State.starter_name = mon._name
+	State.starter = mon
 
 func _on_button_pressed() -> void:
 	select_mon(mons[selected_egg])

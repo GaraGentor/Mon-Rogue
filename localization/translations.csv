@@ -155,9 +155,9 @@ SKILL_UNDERTOW,undertow,Sog
 SKILL_MAELSTROM,maelstrom,Mahlstrom
 SKILL_NORTHERN_TIDE,northern tide,Nordmeerflut
 MILESTONE_UNLOCKED,New egg move for {mon}: {skills},Neue Ei-Attacke für {mon}: {skills}
-MILESTONE_HINT_BOSS_1,"Milestone egg move: defeat a biome boss with this monster as your starter","Meilenstein-Ei-Attacke: Besiege einen Biom-Boss mit diesem Monster als Start-Monster"
-MILESTONE_HINT_BOSS_5,"Milestone egg move: defeat 5 biome bosses with this monster as your starter","Meilenstein-Ei-Attacke: Besiege 5 Biom-Bosse mit diesem Monster als Start-Monster"
-MILESTONE_HINT_GAME_WIN,"Milestone egg move: finish the game with this monster as your starter","Meilenstein-Ei-Attacke: Beende das Spiel mit diesem Monster als Start-Monster"
+MILESTONE_HINT_BOSS_1,"Milestone egg move: defeat a biome boss with this monster as your starter (it has to still be in your team)","Meilenstein-Ei-Attacke: Besiege einen Biom-Boss mit diesem Monster als Start-Monster (es muss noch im Team sein)"
+MILESTONE_HINT_BOSS_5,"Milestone egg move: defeat 5 biome bosses with this monster as your starter (it has to still be in your team)","Meilenstein-Ei-Attacke: Besiege 5 Biom-Bosse mit diesem Monster als Start-Monster (es muss noch im Team sein)"
+MILESTONE_HINT_GAME_WIN,"Milestone egg move: finish the game with this monster as your starter (it has to still be in your team)","Meilenstein-Ei-Attacke: Beende das Spiel mit diesem Monster als Start-Monster (es muss noch im Team sein)"
 ELEMENT_AIR,Air,Luft
 ELEMENT_WATER,Water,Wasser
 ELEMENT_FIRE,Fire,Feuer
@@ -206,3 +206,8 @@ BOUNTY_UNLOCKED,Bounty claimed! New egg move for {mon}: {skill},Kopfgeld kassier
 BOUNTY_HINT_ALPHA_1,"Bounty hunter: defeat Alpha 1 with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege Alpha 1 mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
 BOUNTY_HINT_ALPHA_2,"Bounty hunter: defeat Alpha 2 (from biome 2) with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege Alpha 2 (ab Biom 2) mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
 BOUNTY_HINT_NORTHERN_WARDEN,"Bounty hunter: defeat the Northern Warden (from biome 4) with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege den Nordwächter (ab Biom 4) mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
+JUDGEMENT_RELEASE_CONFIRM,Release anyway,Trotzdem freilassen
+JUDGEMENT_STARTER_WARNING,"If you release {mon}, your starter won't collect any milestone progress for the rest of this run.","Wenn du {mon} freilässt, sammelt dein Start-Monster in diesem Run keinen Meilenstein-Fortschritt mehr."
+JUDGEMENT_STARTER_MILESTONE_LINE,{skill}: {stat} {progress}/{count},{skill}: {stat} {progress}/{count}
+MILESTONE_STAT_BIOME_BOSS_KILLS,Biome bosses,Biom-Bosse
+MILESTONE_STAT_GAME_WINS,Wins,Siege

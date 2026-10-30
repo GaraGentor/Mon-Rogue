@@ -11,8 +11,10 @@ var INITIAL_MONS = ["1", "2", "1"]
 var TEST_INITIAL_MONS = ["1", "2"]
 
 var mons: Array[Monster] = []
-# Art des Start-Monsters (Ei), sammelt den Meilenstein-Fortschritt, auch wenn es den Run nicht überlebt
+# Art des Start-Monsters (Ei), sammelt den Meilenstein-Fortschritt
 var starter_name := ""
+# Das Start-Monster selbst: Meilensteine zählen nur, solange genau dieses Exemplar noch im Team ist
+var starter: Monster
 var enemy_mons: Array[Monster] = []
 var catched_mons: Array[Monster] = []
 var fainted_own_mons: Array[Monster] = []
@@ -76,6 +78,7 @@ func reset() -> void:
 	relics = []
 	mons = []
 	starter_name = ""
+	starter = null
 	enemy_mons = []
 	catched_mons = []
 	current_map = []
@@ -108,6 +111,11 @@ func get_mon_stats(mon_name: String) -> Dictionary:
 	if rolled_mon_stats.is_empty():
 		roll_mon_stats()
 	return rolled_mon_stats[mon_name]
+
+# Ist das Start-Monster noch im Team? K.O. gegangene (battle.gd _clear_fainted_mons) und abgegebene Monster
+# (leaving_screen.gd) stehen nicht mehr in mons.
+func is_starter_in_team() -> bool:
+	return starter != null and mons.has(starter)
 
 func mark_mon_defeated(mon_name: String) -> void:
 	if not defeated_mon_names.has(mon_name):
