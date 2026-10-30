@@ -24,13 +24,16 @@ config/icon="res://icon.svg"
 SaveManager="*res://script/globals/save_manager.gd"
 State="*res://script/globals/state.gd"
 Skills="*res://script/globals/skills.gd"
-Relics="*res://script/globals/relics.gd"
 Map="*res://script/globals/map.gd"
 Events="*res://script/globals/events.gd"
 Enums="*res://script/globals/enums.gd"
 Helper="*res://script/globals/helper.gd"
 Monmap="*res://script/globals/monmap.gd"
 ColorMap="*res://script/globals/color_map.gd"
+Relics="*res://script/globals/relics.gd"
+MCPScreenshot="*res://addons/godot_mcp/mcp_screenshot_service.gd"
+MCPInputService="*res://addons/godot_mcp/mcp_input_service.gd"
+MCPGameInspector="*res://addons/godot_mcp/mcp_game_inspector_service.gd"
 
 [display]
 
