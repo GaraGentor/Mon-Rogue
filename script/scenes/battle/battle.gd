@@ -251,6 +251,7 @@ func _check_game_over(last_fainted:Monster) -> void:
 	print("who ded?", str(is_enemy), State.enemy_mons.size(), ":", last_fainted._name)
 	if is_enemy:
 		State.killed_monsters += 1
+		State.run_kills += 1
 		State.mark_mon_defeated(last_fainted._name)
 		State.ep += last_fainted._ep
 		var bounty_skill = Skills.claim_bounty(last_fainted)
@@ -266,10 +267,9 @@ func _check_game_over(last_fainted:Monster) -> void:
 			func(mon: Monster):
 			return not mon.is_alive()
 			):
-		State.reset()
+		State.end_run(false)
 		_clear_fainted_mons()
-		print("will go to select")
-		get_tree().change_scene_to_file("res://script/scenes/selection/selection.tscn")
+		get_tree().change_scene_to_file("res://script/scenes/run_end/run_end.tscn")
 		return
 	if State.enemy_mons.all(func(mon: Monster): return not mon.is_alive()) or State.enemy_mons.size() == 0:
 		print("will close battle")

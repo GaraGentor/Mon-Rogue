@@ -3,10 +3,8 @@ extends Control
 @export var mon_reward: Panel
 @export var more_label: Label
 
-@export var thanks_panel: Panel
-# Hinweis auf neu freigeschaltete Meilenstein-Ei-Attacken (Boss-Bildschirm / Spielende)
+# Hinweis auf neu freigeschaltete Meilenstein-Ei-Attacken (Spielende: run_end.gd)
 @export var unlock_label: Label
-@export var win_unlock_label: Label
 
 var missing_mon_egg = []
 
@@ -49,8 +47,8 @@ func finish() -> void:
 	State.map_level += 1
 	State.biome_fight_index = 0
 	if State.map_level == Map.map_settings.size():
-		thanks_panel.visible = true
-		show_unlocks(win_unlock_label, Skills.add_milestone_progress(State.starter_name, "game_wins"))
+		State.end_run(true)
+		get_tree().change_scene_to_file("res://script/scenes/run_end/run_end.tscn")
 		return
 	Map.generate_starting_points()
 	get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")
@@ -67,8 +65,3 @@ func _on_egg_button_pressed() -> void:
 	SaveManager.add_catched_monster_mon(mon_to_save._name)
 	finish()
 	pass # Replace with function body.
-
-
-func _on_start_new_run_pressed() -> void:
-	State.reset()
-	get_tree().change_scene_to_file("res://script/scenes/selection/selection.tscn")

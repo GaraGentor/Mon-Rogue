@@ -7,13 +7,19 @@ extends Control
 @export var connector_width := 36.0
 @export var reveal_time := 0.25
 
+# nicht erreichte Biome (Endbildschirm) werden abgedunkelt
+const UNREACHED_MODULATE := Color(0.55, 0.55, 0.55, 0.85)
+
+# Anzahl erreichter Biome, -1 = alle (Ei-Auswahl)
+var _reached := -1
 var _hbox: HBoxContainer
 var _panels: Array[Control] = []
 var _lines: Array[ColorRect] = []
 var _traveler: Panel
 var _traveler_tween: Tween
 
-func show_path(biomes: Array) -> void:
+func show_path(biomes: Array, reached := -1) -> void:
+	_reached = reached
 	_build(biomes)
 	await get_tree().process_frame
 	_animate_reveal()
@@ -115,26 +121,33 @@ func _animate_reveal() -> void:
 		var panel = _panels[i]
 		panel.pivot_offset = panel.size / 2
 		panel.scale = Vector2(0.6, 0.6)
-		tween.tween_property(panel, "modulate:a", 1.0, reveal_time)
+		var target = Color.WHITE if i < _reached_count() else UNREACHED_MODULATE
+		tween.tween_property(panel, "modulate", target, reveal_time)
 		tween.parallel().tween_property(panel, "scale", Vector2.ONE, reveal_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		if i < _lines.size():
+			# Linie i führt zu Biom i + 1
+			if i + 1 >= _reached_count():
+				_lines[i].modulate = UNREACHED_MODULATE
 			tween.tween_property(_lines[i], "scale:x", 1.0, reveal_time * 0.8)
 	tween.tween_callback(_start_traveler)
 
+func _reached_count() -> int:
+	return _panels.size() if _reached < 0 else clampi(_reached, 0, _panels.size())
+
 func _start_traveler() -> void:
-	if _panels.size() < 2:
+	if _reached_count() < 2:
 		return
 	if _traveler_tween:
 		_traveler_tween.kill()
 	_traveler_tween = create_tween().set_loops()
 	_traveler_tween.tween_property(_traveler, "modulate:a", 1.0, 0.2)
-	_traveler_tween.parallel().tween_method(_move_traveler, 0.0, 1.0, 0.4 * _panels.size())
+	_traveler_tween.parallel().tween_method(_move_traveler, 0.0, 1.0, 0.4 * _reached_count())
 	_traveler_tween.tween_property(_traveler, "modulate:a", 0.0, 0.2)
 	_traveler_tween.tween_interval(0.6)
 
 func _move_traveler(t: float) -> void:
 	var start = _panel_center(_panels.front())
-	var end = _panel_center(_panels.back())
+	var end = _panel_center(_panels[_reached_count() - 1])
 	_traveler.position = start.lerp(end, t) - _traveler.size / 2
 
 func _panel_center(panel: Control) -> Vector2:

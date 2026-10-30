@@ -21,6 +21,7 @@ func catch_mon(mon: Monster) -> void:
 		Events.mon_is_catched.emit(mon)
 		mon.unlock_skills()
 		State.catched_mons.append(mon)
+		State.run_catches += 1
 		State.enemy_mons.remove_at(State.enemy_mons.find(mon))
 
 func display_progress(mon: Monster) -> void:

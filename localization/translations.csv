@@ -230,3 +230,13 @@ JUDGEMENT_STARTER_WARNING,"If you release {mon}, your starter won't collect any 
 JUDGEMENT_STARTER_MILESTONE_LINE,{skill}: {stat} {progress}/{count},{skill}: {stat} {progress}/{count}
 MILESTONE_STAT_BIOME_BOSS_KILLS,Biome bosses,Biom-Bosse
 MILESTONE_STAT_GAME_WINS,Wins,Siege
+RUN_END_WIN,Victory!,Sieg!
+RUN_END_LOSE,Defeat,Niederlage
+RUN_END_WIN_SUB,You made it all the way north. Thanks for playing!,Du hast es bis in den Norden geschafft. Danke fürs Spielen!
+RUN_END_LOSE_SUB,Your whole team has fallen.,Dein ganzes Team ist gefallen.
+RUN_END_DEPTH,Biome reached,Erreichtes Biom
+RUN_END_FIGHTS,Fights won,Gewonnene Kämpfe
+RUN_END_KILLS,Monsters defeated,Besiegte Monster
+RUN_END_CATCHES,Monsters caught,Gefangene Monster
+RUN_END_EP,EP earned,Verdiente EP
+RUN_END_TEAM,Team: {team},Team: {team}
