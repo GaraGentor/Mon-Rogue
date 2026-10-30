@@ -1,18 +1,18 @@
-[gd_scene load_steps=19 format=3 uid="uid://bqa8vtcwoin5c"]
+[gd_scene format=3 uid="uid://bqa8vtcwoin5c"]
 
-[ext_resource type="Script" path="res://script/scenes/battle/monster_widget.gd" id="1_iuy1o"]
+[ext_resource type="Script" uid="uid://c4yvt3ruax2av" path="res://script/scenes/battle/monster_widget.gd" id="1_iuy1o"]
 [ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="2_2w2hn"]
 [ext_resource type="Texture2D" uid="uid://bq0pf5g35vxjd" path="res://assets/mons/1/1_frontx256.png" id="3_pwhph"]
 [ext_resource type="PackedScene" uid="uid://m3rvs4wik3f2" path="res://script/scenes/battle/monster_switcher.tscn" id="3_xmagv"]
-[ext_resource type="Script" path="res://script/scenes/battle/stats_grid_container.gd" id="4_jq4j5"]
+[ext_resource type="Script" uid="uid://ci4eknn4ye3v3" path="res://script/scenes/battle/stats_grid_container.gd" id="4_jq4j5"]
 [ext_resource type="PackedScene" uid="uid://owmyxu3qq3so" path="res://script/ui/element_chip/element_chip.tscn" id="4_wkgyw"]
 [ext_resource type="FontFile" uid="uid://cbavibkhidesl" path="res://script/ui/fonts/pxelfont/PixelifySans-VariableFont_wght.ttf" id="5_4s83u"]
 [ext_resource type="Texture2D" uid="uid://bxoeupl6ad2ke" path="res://assets/ui/icons/firework (1).svg" id="8_8nd3e"]
 [ext_resource type="Texture2D" uid="uid://djt3q5aymms0i" path="res://assets/ui/icons/sparkle.svg" id="9_7me2p"]
 [ext_resource type="Texture2D" uid="uid://cfrcn60nkchoe" path="res://assets/ui/icons/sword.svg" id="9_vmias"]
 [ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="11_4goch"]
-[ext_resource type="Script" path="res://script/scenes/battle/monster_widget_skill_label.gd" id="11_pnkja"]
-[ext_resource type="Script" path="res://script/scenes/battle/skill_info_scroll_container.gd" id="13_m6wl3"]
+[ext_resource type="Script" uid="uid://74e2sad2jg6s" path="res://script/scenes/battle/monster_widget_skill_label.gd" id="11_pnkja"]
+[ext_resource type="Script" uid="uid://7pjv8ftyswon" path="res://script/scenes/battle/skill_info_scroll_container.gd" id="13_m6wl3"]
 [ext_resource type="Texture2D" uid="uid://b04ik3o7e4jqy" path="res://assets/ui/icons/machine-learning.svg" id="13_oppc6"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_x8ik0"]
@@ -28,7 +28,7 @@ border_color = Color(0.8, 0.8, 0.8, 0.807843)
 [sub_resource type="LabelSettings" id="LabelSettings_y7ch6"]
 resource_local_to_scene = true
 
-[node name="MonsterWidget" type="Control" node_paths=PackedStringArray("info_container", "selection_monster_image_panel", "monster_switcher", "monster_texture", "element_chip", "name_label", "grid_container", "initial_skill_label", "play_button", "learn_button", "first_panel", "type_splash", "magic_splash", "skill_info_container", "info_panel", "info_label", "skill_panel")]
+[node name="MonsterWidget" type="Control" unique_id=1280703230 node_paths=PackedStringArray("info_container", "selection_monster_image_panel", "monster_switcher", "monster_texture", "element_chip", "name_label", "grid_container", "initial_skill_label", "play_button", "learn_button", "first_panel", "type_splash", "magic_splash", "skill_info_container", "info_panel", "info_label", "skill_panel")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -54,7 +54,7 @@ info_panel = NodePath("MarginContainer/VBoxContainer/InfoPanel")
 info_label = NodePath("MarginContainer/VBoxContainer/InfoPanel/Label")
 skill_panel = NodePath("MarginContainer/VBoxContainer/Panel2")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1195608864]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -66,30 +66,30 @@ theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1305960599]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="InfoPanel" type="Panel" parent="MarginContainer/VBoxContainer"]
+[node name="InfoPanel" type="Panel" parent="MarginContainer/VBoxContainer" unique_id=1440953349]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.2
 theme_override_styles/panel = ExtResource("2_2w2hn")
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/InfoPanel"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/InfoPanel" unique_id=1923699739]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 text = "ASD ASD ASD "
 
-[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer"]
+[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer" unique_id=1964581624]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.8
 theme_override_styles/panel = ExtResource("2_2w2hn")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Panel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Panel" unique_id=318437868]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -98,23 +98,23 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer" unique_id=171232474]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer" unique_id=1069704515]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxEmpty_x8ik0")
 text = "[NAME]"
 horizontal_alignment = 1
 
-[node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer"]
+[node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer" unique_id=1838055928]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxEmpty_6wlmv")
 
-[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Panel2"]
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Panel2" unique_id=1649055286]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -126,22 +126,22 @@ texture = ExtResource("3_pwhph")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="ElementChip" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer" instance=ExtResource("4_wkgyw")]
+[node name="ElementChip" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer" unique_id=511930933 instance=ExtResource("4_wkgyw")]
 layout_mode = 2
 size_flags_stretch_ratio = 0.31
 
-[node name="NewMonsterSwitcher" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer" instance=ExtResource("3_xmagv")]
+[node name="NewMonsterSwitcher" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer" unique_id=326309774 instance=ExtResource("3_xmagv")]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer"]
+[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer" unique_id=1254040576]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 theme_override_styles/panel = SubResource("StyleBoxFlat_v8ewt")
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel" unique_id=2112924587]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -150,20 +150,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel/MarginContainer" node_paths=PackedStringArray("label")]
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel/MarginContainer" unique_id=1183065624 node_paths=PackedStringArray("label")]
 layout_mode = 2
 columns = 2
 script = ExtResource("4_jq4j5")
 label = NodePath("Label")
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel/MarginContainer/GridContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel/MarginContainer/GridContainer" unique_id=873801863]
 visible = false
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_4s83u")
 theme_override_font_sizes/font_size = 24
 text = "ATK"
 
-[node name="FirstPanel" type="Panel" parent="MarginContainer/VBoxContainer/Panel"]
+[node name="FirstPanel" type="Panel" parent="MarginContainer/VBoxContainer/Panel" unique_id=1488300562]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -173,12 +173,12 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("2_2w2hn")
 
-[node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainer"]
+[node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainer" unique_id=61333713]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = ExtResource("2_2w2hn")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Panel2"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Panel2" unique_id=733216425]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -186,7 +186,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Splash" type="TextureRect" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer"]
+[node name="Splash" type="TextureRect" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer" unique_id=759793223]
 visible = false
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
@@ -194,7 +194,7 @@ texture = ExtResource("8_8nd3e")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Magic" type="TextureRect" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer"]
+[node name="Magic" type="TextureRect" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer" unique_id=1250020945]
 visible = false
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
@@ -202,7 +202,7 @@ texture = ExtResource("9_7me2p")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SkillLabel" type="Label" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer"]
+[node name="SkillLabel" type="Label" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer" unique_id=1533837364]
 visible = false
 layout_mode = 2
 mouse_filter = 0
@@ -210,7 +210,7 @@ text = "Name"
 label_settings = SubResource("LabelSettings_y7ch6")
 script = ExtResource("11_pnkja")
 
-[node name="Attack" type="Button" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer"]
+[node name="Attack" type="Button" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer" unique_id=2119059931]
 visible = false
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
@@ -221,7 +221,7 @@ icon = ExtResource("9_vmias")
 flat = true
 expand_icon = true
 
-[node name="Learnbutton" type="Button" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer"]
+[node name="Learnbutton" type="Button" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer" unique_id=613794328]
 visible = false
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
@@ -232,7 +232,7 @@ icon = ExtResource("13_oppc6")
 flat = true
 expand_icon = true
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer" unique_id=411252210]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -241,14 +241,14 @@ theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 12
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer/MarginContainer"]
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/Panel2/ScrollContainer/MarginContainer" unique_id=267337442]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 12
 columns = 6
 
-[node name="SkillInfoScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Panel2" node_paths=PackedStringArray("skill_name", "skill_description")]
+[node name="SkillInfoScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Panel2" unique_id=1026877788 node_paths=PackedStringArray("skill_name", "skill_description")]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -261,7 +261,7 @@ script = ExtResource("13_m6wl3")
 skill_name = NodePath("MarginContainer/VBoxContainer/SkillName")
 skill_description = NodePath("MarginContainer/VBoxContainer/SkillDescription")
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer" unique_id=1379635145]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -270,18 +270,18 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer/MarginContainer" unique_id=469818354]
 layout_mode = 2
 
-[node name="SkillName" type="Label" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "asdasd asd asd asd"
-
-[node name="SkillDescription" type="Label" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer/MarginContainer/VBoxContainer"]
+[node name="SkillName" type="Label" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer/MarginContainer/VBoxContainer" unique_id=399358176]
 layout_mode = 2
 text = "asdasd asd asd asd"
 
-[node name="CloseInfoButton" type="Button" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer/MarginContainer/VBoxContainer"]
+[node name="SkillDescription" type="Label" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer/MarginContainer/VBoxContainer" unique_id=622184203]
+layout_mode = 2
+text = "asdasd asd asd asd"
+
+[node name="CloseInfoButton" type="Button" parent="MarginContainer/VBoxContainer/Panel2/SkillInfoScrollContainer/MarginContainer/VBoxContainer" unique_id=989251021]
 layout_mode = 2
 text = "MONSTER_CLOSE_INFO"
 flat = true

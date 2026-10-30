@@ -52,9 +52,13 @@ func generate_mons(props: Dictionary = {
 			mons.append(newMon)
 		return mons
 
+	# optional ein Kopfgeld-Monster (Eintrag aus Skills.BOUNTIES) als erster Gegner
+	var bounty: Dictionary = props.get("bounty", {})
 	for i in default_props.count:
-		var mon_meta_data = Monmap.mon_metainfos_by_name(mons_to_pick.pick_random())
+		var mon_meta_data = Monmap.mon_metainfos_by_name(bounty.mon if i == 0 and not bounty.is_empty() else mons_to_pick.pick_random())
 		var newMon = Monster.new(default_props.level, mon_meta_data)
+		# eigene Kopfgeld-Arten (Monmap bounty_target) sind auch bei normalem Auftauchen das Kopfgeld-Monster
+		newMon._bounty = bounty.key if i == 0 and not bounty.is_empty() else mon_meta_data.get("bounty_target", "")
 		add_biome_element(newMon)
 		roll_wild_skills(newMon, mon_meta_data)
 		roll_egg_skill(newMon)
@@ -110,6 +114,31 @@ func color_by_mon(mon: Monster) -> Color:
 
 func mon_display_name(mon_name: String) -> String:
 	return tr("MONSTER_" + mon_name)
+
+# Anzeigename eines konkreten Monsters, Kopfgeld-Monster tragen ihren Titel ("Alpha 1").
+func mon_battle_name(mon: Monster) -> String:
+	if mon._bounty == "":
+		return mon_display_name(mon._name)
+	return tr(Skills.get_bounty(mon._bounty).label).format({"mon": mon_display_name(mon._name)})
+
+# Kurzer Hinweis oben auf dem Bildschirm, der von selbst verblasst (bleibt auch bei Szenenwechseln stehen).
+func show_unlock_message(text: String) -> void:
+	var label := Label.new()
+	label.text = text
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 28)
+	label.add_theme_color_override("font_color", Color(0.858824, 0.717647, 0.45098, 1))
+	label.add_theme_color_override("font_outline_color", Color.BLACK)
+	label.add_theme_constant_override("outline_size", 8)
+	label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	label.position.y = 40
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	get_tree().root.add_child(label)
+	label.position.x = (get_tree().root.get_visible_rect().size.x - label.get_minimum_size().x) / 2
+	var tween := label.create_tween()
+	tween.tween_interval(1.5)
+	tween.tween_property(label, "modulate:a", 0.0, 0.8)
+	tween.tween_callback(label.queue_free)
 
 func type_name_by_mon(mon: Monster) -> String:
 	return ColorMap.get_combo(mon._type).label

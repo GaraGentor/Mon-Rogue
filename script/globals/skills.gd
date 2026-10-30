@@ -1,6 +1,8 @@
 extends Node
 
 func deal_damage(props):
+	# für Kopfgelder: wer zuletzt getroffen hat, hat das Monster besiegt
+	props.mon._last_hit_by = props.from
 	print("lose:" + str(props.skill.value) + ":" + str(props.from.attack()) + "::" + str(props.from.attack() * ((props.skill.value / 100))))
 	props.mon._lost_hp += props.from.attack() * ((props.skill.value / 100))
 
@@ -14,7 +16,7 @@ const TIER_WEIGHTS = {1: 50, 2: 25, 3: 10, 4: 3}
 
 # Liefert eine frische Kopie des Skills mit diesem Namen (aus allen Skill-Listen) oder {}.
 func get_skill(skill_name: String) -> Dictionary:
-	for list in [attack_skills, defensive_skills, buff_skills, egg_skills]:
+	for list in [attack_skills, defensive_skills, buff_skills, egg_skills, milestone_skills, bounty_skills]:
 		for skill in list:
 			if skill.name == skill_name:
 				var copy = skill.duplicate()
@@ -119,6 +121,9 @@ func get_available_egg_skills(mon_name: String) -> Array:
 	for skill_name in meta.get("unlockable_egg_skills", []):
 		if SaveManager.is_egg_skill_unlocked(mon_name, skill_name):
 			available.append(skill_name)
+	for skill_name in meta.get("milestone_egg_skills", {}).values() + meta.get("bounty_egg_skills", {}).values():
+		if SaveManager.is_egg_skill_unlocked(mon_name, skill_name):
+			available.append(skill_name)
 	return available
 
 # Ei-Attacken der Art, die noch freigeschaltet werden können.
@@ -130,6 +135,98 @@ func get_locked_egg_skills(mon_name: String) -> Array:
 # Ist dieser Skill eines Monsters eine Ei-Attacke, die durch Opfern freigeschaltet werden kann?
 func is_unlockable_egg_skill(mon: Monster, skill: Dictionary) -> bool:
 	return skill.get("egg_skill", false) and get_locked_egg_skills(mon._name).has(skill.name)
+
+# ─────────────────────────
+# Meilenstein-Ei-Attacken: feste Freischaltungen pro Art, gezählt wird nur mit der Art als Start-Monster.
+# Welcher Skill zu welchem Meilenstein gehört, steht in Monmap (milestone_egg_skills).
+# Sie tauchen nie bei wilden Monstern oder im Biom-Pool auf, man bekommt sie nur über den Meilenstein.
+# stat ist der Zähler in SaveManager (pro Art), hint der Freischalt-Hinweis im Konfigurator.
+const MILESTONES = [
+	{"key": "boss_1", "stat": "biome_boss_kills", "count": 1, "hint": "MILESTONE_HINT_BOSS_1"},
+	{"key": "boss_5", "stat": "biome_boss_kills", "count": 5, "hint": "MILESTONE_HINT_BOSS_5"},
+	{"key": "game_win", "stat": "game_wins", "count": 1, "hint": "MILESTONE_HINT_GAME_WIN"},
+]
+
+# Noch gesperrte Meilensteine der Art als [{skill, hint, ...}].
+func get_locked_milestones(mon_name: String) -> Array:
+	var skills_by_key = Monmap.mon_metainfos_by_name(mon_name).get("milestone_egg_skills", {})
+	var locked = []
+	for milestone in MILESTONES:
+		var skill_name = skills_by_key.get(milestone.key, "")
+		if skill_name != "" and not SaveManager.is_egg_skill_unlocked(mon_name, skill_name):
+			var entry = milestone.duplicate()
+			entry.skill = skill_name
+			locked.append(entry)
+	return locked
+
+# Zählt einen Meilenstein-Zähler der Art hoch und liefert die Namen der dadurch neu freigeschalteten Skills.
+func add_milestone_progress(mon_name: String, stat: String) -> Array:
+	if mon_name == "":
+		return []
+	SaveManager.add_milestone_progress(mon_name, stat)
+	var unlocked = []
+	for milestone in get_locked_milestones(mon_name):
+		if SaveManager.get_milestone_progress(mon_name, milestone.stat) >= milestone.count:
+			SaveManager.unlock_egg_skill(mon_name, milestone.skill)
+			unlocked.append(milestone.skill)
+	return unlocked
+
+# ─────────────────────────
+# Bounty Hunter: besondere Kopfgeld-Monster tauchen selten in normalen Kämpfen auf.
+# Nur wenn ein Monster einer Art den letzten Treffer selbst landet, bekommt diese Art die Ei-Attacke aus
+# Monmap (bounty_egg_skills). K.O. durch ein anderes Team-Mitglied oder Fangen zählt nicht.
+# mon: Art des Kopfgeld-Monsters, level_bonus: Stufen über dem Kampf, min_depth: ab welcher Biom-Tiefe es auftaucht,
+# label: Anzeigename (Platzhalter {mon} = Name der Art), hint: Freischalt-Hinweis im Konfigurator.
+# Beispiele, bis es eigene Monster für die Kopfgelder gibt. Bekommt ein Kopfgeld eine eigene Art, trägt diese in
+# Monmap "bounty_target": "<key>" und kommt in den normalen Spawn-Pool: dann zählt jedes Auftauchen als Kopfgeld-Monster.
+const BOUNTIES = [
+	{"key": "alpha_1", "mon": "1", "level_bonus": 2, "min_depth": 0, "label": "BOUNTY_ALPHA", "hint": "BOUNTY_HINT_ALPHA_1"},
+	{"key": "alpha_2", "mon": "2", "level_bonus": 2, "min_depth": 1, "label": "BOUNTY_ALPHA", "hint": "BOUNTY_HINT_ALPHA_2"},
+	{"key": "northern_warden", "mon": "1", "level_bonus": 4, "min_depth": 3, "label": "BOUNTY_NORTHERN_WARDEN", "hint": "BOUNTY_HINT_NORTHERN_WARDEN"},
+]
+
+# Chance pro normalem Kampf, dass ein Kopfgeld-Monster eingestreut wird (zusätzlich zu denen, die von selbst kommen).
+# Ein ganzer Run hat rund 26 normale Kämpfe: 1 - 0.985^26 ≈ 33 %, also etwa jeder dritte Run.
+const BOUNTY_CHANCE := 0.015
+
+func get_bounty(key: String) -> Dictionary:
+	for bounty in BOUNTIES:
+		if bounty.key == key:
+			return bounty
+	return {}
+
+# Noch gesperrte Kopfgelder der Art als [{skill, hint, ...}].
+func get_locked_bounties(mon_name: String) -> Array:
+	var skills_by_key = Monmap.mon_metainfos_by_name(mon_name).get("bounty_egg_skills", {})
+	var locked = []
+	for bounty in BOUNTIES:
+		var skill_name = skills_by_key.get(bounty.key, "")
+		if skill_name != "" and not SaveManager.is_egg_skill_unlocked(mon_name, skill_name):
+			var entry = bounty.duplicate()
+			entry.skill = skill_name
+			locked.append(entry)
+	return locked
+
+# Kopfgelder, die für mindestens ein Team-Monster noch etwas freischalten und in dieser Biom-Tiefe auftauchen.
+func get_open_bounties(team: Array, depth: int) -> Array:
+	var keys = []
+	for mon in team:
+		for bounty in get_locked_bounties(mon._name):
+			if bounty.min_depth <= depth and not keys.has(bounty.key):
+				keys.append(bounty.key)
+	return keys.map(func(key): return get_bounty(key))
+
+# Das Kopfgeld-Monster wurde besiegt: freigeschaltet wird nur für die Art, die den letzten Treffer gelandet hat.
+# Liefert den Namen der neu freigeschalteten Ei-Attacke oder "".
+func claim_bounty(defeated: Monster) -> String:
+	var killer = defeated._last_hit_by
+	if defeated._bounty == "" or killer == null or not State.mons.has(killer):
+		return ""
+	var skill_name = Monmap.mon_metainfos_by_name(killer._name).get("bounty_egg_skills", {}).get(defeated._bounty, "")
+	if skill_name == "" or SaveManager.is_egg_skill_unlocked(killer._name, skill_name):
+		return ""
+	SaveManager.unlock_egg_skill(killer._name, skill_name)
+	return skill_name
 
 # Basis-Angriff und -Block gibt es pro Element. Über die Werte bekommt jedes Element seinen Charakter:
 # Feuer greift hart an und blockt kaum, Erde blockt viel und trifft schwächer, Wasser und Luft liegen dazwischen.
@@ -192,6 +289,32 @@ var egg_skills = [
 	_egg_skill("SKILL_ICE_SPEAR", Enums.MON_TYPES.AIR | Enums.MON_TYPES.WATER, 60.0, 3, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
 	_egg_skill("SKILL_MAGMA_BURST", Enums.MON_TYPES.EARTH | Enums.MON_TYPES.FIRE, 60.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
 	_egg_skill("SKILL_CHAOS_NOVA", Enums.MON_TYPES.AIR | Enums.MON_TYPES.WATER | Enums.MON_TYPES.FIRE | Enums.MON_TYPES.EARTH, 90.0, 4, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+]
+
+# Meilenstein-Ei-Attacken pro Art, nur im Grund-Element der Art: das Start-Monster kann sie immer einsetzen.
+# Stufe 3 liegt etwas unter den Mehr-Element-Skills (60), braucht dafür aber keine weiteren Elemente.
+var milestone_skills = [
+	# Monster 1 (Luft)
+	_egg_skill("SKILL_TAILWIND_STRIKE", Enums.MON_TYPES.AIR, 28.0, 1, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_CYCLONE", Enums.MON_TYPES.AIR, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_NORTHERN_GALE", Enums.MON_TYPES.AIR, 55.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	# Monster 2 (Wasser)
+	_egg_skill("SKILL_UNDERTOW", Enums.MON_TYPES.WATER, 28.0, 1, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_MAELSTROM", Enums.MON_TYPES.WATER, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_NORTHERN_TIDE", Enums.MON_TYPES.WATER, 55.0, 3, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+]
+
+# Bounty-Hunter-Ei-Attacken pro Art, wie die Meilenstein-Skills nur im Grund-Element der Art.
+# Gibt es nur über Kopfgelder, nie bei wilden Monstern oder im Biom-Pool.
+var bounty_skills = [
+	# Monster 1 (Luft)
+	_egg_skill("SKILL_RAPTOR_DIVE", Enums.MON_TYPES.AIR, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_HUNTERS_GALE", Enums.MON_TYPES.AIR, 58.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_TROPHY_TEMPEST", Enums.MON_TYPES.AIR, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	# Monster 2 (Wasser)
+	_egg_skill("SKILL_SHARK_BITE", Enums.MON_TYPES.WATER, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_HUNTERS_TIDE", Enums.MON_TYPES.WATER, 58.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_TROPHY_TSUNAMI", Enums.MON_TYPES.WATER, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
 ]
 
 func _egg_skill(skill_name: String, nature: int, value: float, tier: int, damage_type: int) -> Dictionary:

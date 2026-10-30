@@ -9,6 +9,7 @@ const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 
 @export var turn_wheel: Control
 @export var name_label: Label
+@export var element_chip: Control
 @export var stats_grid: GridContainer
 @export var skill_grid: GridContainer
 @export var skill_info_container: ScrollContainer
@@ -30,8 +31,9 @@ func _exit_tree() -> void:
 func refresh() -> void:
 	if monster == null:
 		return
-	name_label.text = "%s  Lv. %d" % [Helper.mon_display_name(monster._name), monster._level]
+	name_label.text = "%s  Lv. %d" % [Helper.mon_battle_name(monster), monster._level]
 	name_label.self_modulate = Helper.color_by_mon(monster)
+	element_chip._init_color(monster)
 	# eigene Stats sind bekannt, gegnerische erst nachdem die Art in diesem Run besiegt wurde
 	var stats_known := State.mons.has(monster) or State.is_mon_defeated(monster._name)
 	stats_grid.init_with_mon(monster, not stats_known)

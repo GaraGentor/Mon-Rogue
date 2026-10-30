@@ -51,26 +51,8 @@ func _on_sacrifice_pressed() -> void:
 	if egg_skill.is_empty():
 		return
 	SaveManager.unlock_egg_skill(mon._name, egg_skill.name)
-	_show_unlock_message(tr("EGG_SKILL_UNLOCKED").format({"skill": tr(egg_skill.name), "mon": Helper.mon_display_name(mon._name)}))
+	Helper.show_unlock_message(tr("EGG_SKILL_UNLOCKED").format({"skill": tr(egg_skill.name), "mon": Helper.mon_display_name(mon._name)}))
 	_on_release_pressed()
-
-func _show_unlock_message(text: String) -> void:
-	var label := Label.new()
-	label.text = text
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 28)
-	label.add_theme_color_override("font_color", Color(0.858824, 0.717647, 0.45098, 1))
-	label.add_theme_color_override("font_outline_color", Color.BLACK)
-	label.add_theme_constant_override("outline_size", 8)
-	label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	label.position.y = 40
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	get_tree().root.add_child(label)
-	label.position.x = (get_viewport_rect().size.x - label.get_minimum_size().x) / 2
-	var tween := label.create_tween()
-	tween.tween_interval(1.5)
-	tween.tween_property(label, "modulate:a", 0.0, 0.8)
-	tween.tween_callback(label.queue_free)
 
 func _on_recruit_button_pressed() -> void:
 	if State.mons.size() == 2:

@@ -80,6 +80,10 @@ func _build() -> void:
 		grid.add_child(card)
 	for skill_name in Skills.get_locked_egg_skills(_mon._name):
 		grid.add_child(_create_card(Skills.get_skill(skill_name), true))
+	for milestone in Skills.get_locked_milestones(_mon._name):
+		grid.add_child(_create_card(Skills.get_skill(milestone.skill), true, "CONFIGURATOR_LOCKED_MILESTONE", milestone.hint))
+	for bounty in Skills.get_locked_bounties(_mon._name):
+		grid.add_child(_create_card(Skills.get_skill(bounty.skill), true, "CONFIGURATOR_LOCKED_BOUNTY", bounty.hint))
 
 	# unten: Zähler und Aufbrechen
 	var footer := HBoxContainer.new()
@@ -97,7 +101,7 @@ func _build() -> void:
 	_go_button.pressed.connect(_on_go_pressed)
 	footer.add_child(_go_button)
 
-func _create_card(skill: Dictionary, locked: bool) -> Button:
+func _create_card(skill: Dictionary, locked: bool, locked_label := "CONFIGURATOR_LOCKED", hint := "EGG_SKILL_HINT") -> Button:
 	var color := Helper.color_by_type(skill.nature)
 	var card := Button.new()
 	card.custom_minimum_size = Vector2(0, 110)
@@ -118,14 +122,14 @@ func _create_card(skill: Dictionary, locked: bool) -> Button:
 		tr("CONFIGURATOR_TIER").format({"tier": skill.tier}),
 	]
 	if locked:
-		lines[2] = tr("CONFIGURATOR_LOCKED")
+		lines[2] = tr(locked_label)
 	elif not Skills.can_use(_mon, skill):
 		# wählbar, aber erst spielbar, wenn das Monster die fehlenden Elemente bekommt (z. B. im Shop)
 		lines.append(Skills.missing_elements_text(_mon, skill))
 	card.text = "\n".join(PackedStringArray(lines))
 	card.tooltip_text = tr(skill.description).format(skill)
 	if locked:
-		card.tooltip_text += "\n" + tr("EGG_SKILL_HINT")
+		card.tooltip_text += "\n" + tr(hint)
 
 	var normal := _card_style(color, Color(BG.lightened(0.05), 0.95), 2)
 	var hover := _card_style(color.lightened(0.2), Color(BG.lightened(0.12), 0.95), 2)

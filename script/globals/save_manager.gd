@@ -11,6 +11,9 @@ var save_data := {
 	"seen_monsters": [],
 	# freigeschaltete Ei-Attacken: Monster-Name -> [Skill-Namen]
 	"egg_skills": {},
+	# Meilenstein-Fortschritt pro Art als Start-Monster: Monster-Name -> {Zähler -> Anzahl} (siehe Skills.MILESTONES)
+	# freigeschaltete Meilenstein-Ei-Attacken landen wie die anderen in egg_skills
+	"milestones": {},
 }
 
 # Called when the node enters the scene tree for the first time.
@@ -71,6 +74,15 @@ func unlock_egg_skill(monster_name: String, skill_name: String):
 
 func is_egg_skill_unlocked(monster_name: String, skill_name: String) -> bool:
 	return save_data["egg_skills"].get(monster_name, []).has(skill_name)
+
+func add_milestone_progress(monster_name: String, stat: String, amount := 1):
+	if not save_data["milestones"].has(monster_name):
+		save_data["milestones"][monster_name] = {}
+	save_data["milestones"][monster_name][stat] = get_milestone_progress(monster_name, stat) + amount
+	save_game()
+
+func get_milestone_progress(monster_name: String, stat: String) -> int:
+	return int(save_data["milestones"].get(monster_name, {}).get(stat, 0))
 
 func add_catched_monster_mon(monster_name = "1"):
 	if not save_data["catched_monsters"].has(monster_name):

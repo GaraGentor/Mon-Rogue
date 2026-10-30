@@ -25,6 +25,7 @@ Tasks:
 
 	> Mehr Monster
 	> Mehr Skills
+		> Skill-System mit Effekt-Bausteinen, Synergien und Passiven (siehe skill_system_idee.txt)
 
 	> Status Effekte
 

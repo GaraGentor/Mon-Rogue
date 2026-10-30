@@ -14,6 +14,7 @@ CONFIGURATOR_COUNTER,{count}/{max} selected,{count}/{max} gewählt
 CONFIGURATOR_SKILL_STATS,Cost {cost} · Power {value} · {type},Kosten {cost} · Stärke {value} · {type}
 CONFIGURATOR_TIER,Tier {tier},Stufe {tier}
 CONFIGURATOR_LOCKED,Locked (catch & sacrifice),Gesperrt (fangen & opfern)
+CONFIGURATOR_LOCKED_MILESTONE,Locked (milestone),Gesperrt (Meilenstein)
 CONFIGURATOR_PHYSICAL,physical,physisch
 CONFIGURATOR_ABILITY,magical,magisch
 EGG_SKILL_TAG,{skill} (Egg),{skill} (Ei)
@@ -147,6 +148,16 @@ SKILL_THUNDER_STRIKE,thunder strike,Donnerschlag
 SKILL_ICE_SPEAR,ice spear,Eisspeer
 SKILL_MAGMA_BURST,magma burst,Magmaausbruch
 SKILL_CHAOS_NOVA,chaos nova,Chaosnova
+SKILL_TAILWIND_STRIKE,tailwind strike,Rückenwindhieb
+SKILL_CYCLONE,cyclone,Zyklon
+SKILL_NORTHERN_GALE,northern gale,Nordwind
+SKILL_UNDERTOW,undertow,Sog
+SKILL_MAELSTROM,maelstrom,Mahlstrom
+SKILL_NORTHERN_TIDE,northern tide,Nordmeerflut
+MILESTONE_UNLOCKED,New egg move for {mon}: {skills},Neue Ei-Attacke für {mon}: {skills}
+MILESTONE_HINT_BOSS_1,"Milestone egg move: defeat a biome boss with this monster as your starter","Meilenstein-Ei-Attacke: Besiege einen Biom-Boss mit diesem Monster als Start-Monster"
+MILESTONE_HINT_BOSS_5,"Milestone egg move: defeat 5 biome bosses with this monster as your starter","Meilenstein-Ei-Attacke: Besiege 5 Biom-Bosse mit diesem Monster als Start-Monster"
+MILESTONE_HINT_GAME_WIN,"Milestone egg move: finish the game with this monster as your starter","Meilenstein-Ei-Attacke: Beende das Spiel mit diesem Monster als Start-Monster"
 ELEMENT_AIR,Air,Luft
 ELEMENT_WATER,Water,Wasser
 ELEMENT_FIRE,Fire,Feuer
@@ -182,3 +193,16 @@ MAP_NODE_TREASURE,TREASURE,SCHATZ
 MONSTER_1,1,1
 MONSTER_2,2,2
 TURN_WHEEL_ROUND,Round {round},Runde {round}
+SKILL_RAPTOR_DIVE,raptor dive,Raubvogelsturz
+SKILL_HUNTERS_GALE,hunter's gale,Jägerböe
+SKILL_TROPHY_TEMPEST,trophy tempest,Trophäensturm
+SKILL_SHARK_BITE,shark bite,Haibiss
+SKILL_HUNTERS_TIDE,hunter's tide,Jägerflut
+SKILL_TROPHY_TSUNAMI,trophy tsunami,Trophäentsunami
+CONFIGURATOR_LOCKED_BOUNTY,Locked (bounty hunter),Gesperrt (Bounty Hunter)
+BOUNTY_ALPHA,Alpha {mon},Alpha {mon}
+BOUNTY_NORTHERN_WARDEN,Northern Warden {mon},Nordwächter {mon}
+BOUNTY_UNLOCKED,Bounty claimed! New egg move for {mon}: {skill},Kopfgeld kassiert! Neue Ei-Attacke für {mon}: {skill}
+BOUNTY_HINT_ALPHA_1,"Bounty hunter: defeat Alpha 1 with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege Alpha 1 mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
+BOUNTY_HINT_ALPHA_2,"Bounty hunter: defeat Alpha 2 (from biome 2) with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege Alpha 2 (ab Biom 2) mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
+BOUNTY_HINT_NORTHERN_WARDEN,"Bounty hunter: defeat the Northern Warden (from biome 4) with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege den Nordwächter (ab Biom 4) mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"

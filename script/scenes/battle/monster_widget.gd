@@ -70,7 +70,7 @@ func toggle_panels() -> void:
 		selection_monster_image_panel.visible = false
 
 func switch_image(mon: Monster) -> void:
-	name_label.text = Helper.mon_display_name(mon._name)
+	name_label.text = Helper.mon_battle_name(mon)
 	monster_texture.texture = Monmap.mon_metainfos_by_name(mon._name).texture_front
 	pass
 

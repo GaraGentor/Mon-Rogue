@@ -180,6 +180,8 @@ func _generate_battle():
 	var encounter: Dictionary = ENCOUNTERS[depth]
 	var count: int
 	var level: int
+	# wird unten zurückgesetzt, merken für das Kopfgeld
+	var is_map_boss: bool = State.is_map_boss
 	var t = clampf(float(State.biome_fight_index) / max(encounter.fights - 1, 1), 0.0, 1.0)
 	if State.is_boss_fight:
 		var boss: Dictionary = BOSS_ENCOUNTERS[depth]
@@ -196,11 +198,25 @@ func _generate_battle():
 		level = roundi(lerpf(encounter.level[0], encounter.level[1], t))
 		State.biome_fight_index += 1
 	var ms = Helper.generate_mons({"count": count})
+	# kam kein Kopfgeld-Monster von selbst, wird in normalen Kämpfen selten eins eingestreut
+	if not State.is_boss_fight and not is_map_boss and not ms.any(func(mon): return mon._bounty != ""):
+		var bounty = _roll_bounty(depth)
+		if not bounty.is_empty():
+			ms[0] = Helper.generate_mons({"count": 1, "bounty": bounty})[0]
 	# Stufe direkt setzen: Monster.new(level) ergibt sonst 2 * level + 1
 	for mon in ms:
 		mon._level = max(1, level + randi_range(encounter.offset[0], encounter.offset[1]))
+		if mon._bounty != "":
+			mon._level += Skills.get_bounty(mon._bounty).level_bonus
 	print("encounter depth ", depth, " fight ", State.biome_fight_index, ": ", count, "x level ", level)
 	State.enemy_mons = ms
+
+## Nur solange ein Team-Monster mit dem Kopfgeld noch etwas freischalten kann (sonst kommen sie nur noch von selbst).
+func _roll_bounty(depth: int) -> Dictionary:
+	var open = Skills.get_open_bounties(State.mons, depth)
+	if open.is_empty() or randf() > Skills.BOUNTY_CHANCE:
+		return {}
+	return open.pick_random()
 
 ## Zieht die Gegneranzahl (1-3) mit zwischen Biom-Anfang und -Ende interpolierten Gewichten.
 func _roll_enemy_count(counts: Array, t: float) -> int:
@@ -237,6 +253,9 @@ func _check_game_over(last_fainted:Monster) -> void:
 		State.killed_monsters += 1
 		State.mark_mon_defeated(last_fainted._name)
 		State.ep += last_fainted._ep
+		var bounty_skill = Skills.claim_bounty(last_fainted)
+		if bounty_skill != "":
+			Helper.show_unlock_message(tr("BOUNTY_UNLOCKED").format({"skill": tr(bounty_skill), "mon": Helper.mon_display_name(last_fainted._last_hit_by._name)}))
 		print("State.mons.all(func(mon: Monster): return mon._hp <= 0 and not mon._new)",
 		State.mons.all(
 			func(mon: Monster):

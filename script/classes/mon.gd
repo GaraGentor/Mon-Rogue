@@ -13,6 +13,10 @@ var _level_progress: int = 0
 var _catch_probability: int = 10
 var _ep: int = 5
 var _upgrades: int = 0
+# Key aus Skills.BOUNTIES, wenn dieses wilde Monster ein Kopfgeld-Monster ist, sonst ""
+var _bounty: String = ""
+# Monster, das zuletzt Schaden verursacht hat (entscheidet, wer ein Kopfgeld bekommt)
+var _last_hit_by: Monster
 var _lost_hp: float = 0:
 	set(value):
 		_lost_hp = value

@@ -11,6 +11,8 @@ var INITIAL_MONS = ["1", "2", "1"]
 var TEST_INITIAL_MONS = ["1", "2"]
 
 var mons: Array[Monster] = []
+# Art des Start-Monsters (Ei), sammelt den Meilenstein-Fortschritt, auch wenn es den Run nicht überlebt
+var starter_name := ""
 var enemy_mons: Array[Monster] = []
 var catched_mons: Array[Monster] = []
 var fainted_own_mons: Array[Monster] = []
@@ -73,6 +75,7 @@ func reset() -> void:
 	overall_progress_level = 0
 	relics = []
 	mons = []
+	starter_name = ""
 	enemy_mons = []
 	catched_mons = []
 	current_map = []

@@ -22,7 +22,7 @@ shader_parameter/total_phases = 8
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t43jh"]
 bg_color = Color(0, 0, 0, 1)
 
-[node name="BossReward" type="Control" node_paths=PackedStringArray("mon_reward", "more_label")]
+[node name="BossReward" type="Control" node_paths=PackedStringArray("mon_reward", "more_label", "thanks_panel", "unlock_label", "win_unlock_label")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,6 +32,9 @@ grow_vertical = 2
 script = ExtResource("1_7tagj")
 mon_reward = NodePath("MarginContainer/VBoxContainer/HBoxContainer/Panel2")
 more_label = NodePath("MarginContainer/VBoxContainer/Label2")
+thanks_panel = NodePath("Panel")
+unlock_label = NodePath("MarginContainer/VBoxContainer/UnlockLabel")
+win_unlock_label = NodePath("Panel/VBoxContainer/UnlockLabel")
 
 [node name="ColorRect" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_twfxh")
@@ -77,6 +80,13 @@ horizontal_alignment = 1
 visible = false
 layout_mode = 2
 theme = ExtResource("3_sj5wi")
+horizontal_alignment = 1
+
+[node name="UnlockLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme = ExtResource("3_sj5wi")
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
 horizontal_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
@@ -190,6 +200,14 @@ layout_mode = 2
 theme = ExtResource("3_sj5wi")
 theme_override_font_sizes/font_size = 40
 text = "BOSS_REWARD_THANKS"
+horizontal_alignment = 1
+
+[node name="UnlockLabel" type="Label" parent="Panel/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme = ExtResource("3_sj5wi")
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
+horizontal_alignment = 1
 
 [node name="Button" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
