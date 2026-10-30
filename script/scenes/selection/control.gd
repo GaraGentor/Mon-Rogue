@@ -16,11 +16,13 @@ var common_egg_crack = preload("res://assets/ui/eggs/common_2.png")
 @export var go_button: Button
 
 @export var monster_widget: Control
+@export var biome_path: Control
 
 var selected_egg: int = 0
 
 func _ready() -> void:
 	mons = Helper.generate_mons({"count": 3, "initial": true})
+	biome_path.show_path(Map.generate_biome_path())
 	# display_mons()
 	Events.select_initial_mon.connect(select_egg)
 	# Events.select_initial_mon.emit(0)
