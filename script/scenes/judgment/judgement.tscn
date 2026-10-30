@@ -39,7 +39,7 @@ bg_color = Color(0, 0, 0, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_13d1o"]
 bg_color = Color(0, 0, 0, 1)
 
-[node name="Judgement" type="Control" node_paths=PackedStringArray("mw1", "mw2", "mw3", "next_button", "placeholder_panel", "learning_screen", "leaving_screen")]
+[node name="Judgement" type="Control" node_paths=PackedStringArray("mw1", "mw2", "mw3", "next_button", "placeholder_panel", "learning_screen", "leaving_screen", "sacrifice_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -54,6 +54,7 @@ next_button = NodePath("Panel/HBoxContainer/HBoxContainer/TextureRect2/Next")
 placeholder_panel = NodePath("Panel/HBoxContainer/Panel")
 learning_screen = NodePath("LearningScreen")
 leaving_screen = NodePath("Leaving Screen")
+sacrifice_button = NodePath("Panel/HBoxContainer/HBoxContainer/Sacrifice")
 
 [node name="ColorRect" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_cx0eb")
@@ -158,6 +159,16 @@ theme = ExtResource("4_atuse")
 theme_override_font_sizes/font_size = 26
 text = "JUDGEMENT_RELEASE"
 flat = true
+
+[node name="Sacrifice" type="Button" parent="Panel/HBoxContainer/HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+theme = ExtResource("4_atuse")
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_font_sizes/font_size = 15
+text = "JUDGEMENT_SACRIFICE"
+autowrap_mode = 3
 
 [node name="Panel" type="Panel" parent="Panel/HBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -485,6 +496,7 @@ position = Vector2(148, 752)
 [connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/TextureRect2/Next" to="." method="_on_next_pressed"]
 [connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/TextureRect/Take" to="." method="_on_recruit_button_pressed"]
 [connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/TextureRect3/Release" to="." method="_on_release_pressed"]
+[connection signal="pressed" from="Panel/HBoxContainer/HBoxContainer/Sacrifice" to="." method="_on_sacrifice_pressed"]
 [connection signal="visibility_changed" from="LearningScreen" to="LearningScreen" method="_on_visibility_changed"]
 [connection signal="pressed" from="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button3" to="LearningScreen" method="_on_button_mon1_pressed"]
 [connection signal="pressed" from="LearningScreen/VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/Panel/HBoxContainer/Button2" to="LearningScreen" method="_on_button_mon2_pressed"]

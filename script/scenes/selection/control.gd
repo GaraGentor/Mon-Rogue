@@ -42,7 +42,7 @@ func select_mon(mon):
 
 func _on_button_pressed() -> void:
 	select_mon(mons[selected_egg])
-	get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")
+	get_tree().change_scene_to_file("res://script/scenes/egg_configurator/egg_configurator.tscn")
 
 func on_select_egg(event: InputEvent, index):
 	if event is InputEventMouseButton:
