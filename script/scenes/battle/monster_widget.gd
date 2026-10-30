@@ -97,6 +97,10 @@ func init_skills(mon: Monster) -> void:
 				print(skill.nature)
 				var new_ls = name_label.label_settings.duplicate(DuplicateFlags.DUPLICATE_USE_INSTANTIATION)
 				new_ls.font_color = Helper.color_by_type(skill.nature)
+				if Skills.is_unlockable_egg_skill(mon, skill):
+					name_label.text = tr("EGG_SKILL_TAG").format({"skill": name_label.text})
+					name_label.tooltip_text = tr("EGG_SKILL_HINT")
+					new_ls.font_color = Color(0.858824, 0.717647, 0.45098, 1)
 				name_label.label_settings = new_ls
 				name_label.skill = skill
 			if st == "damage_type":

@@ -74,6 +74,13 @@ func unlock_skills():
 	for skill in _skills:
 		skill.scouted = true
 
+# Ei-Attacke, die durch Opfern dieses Monsters freigeschaltet werden kann, sonst {}
+func get_unlockable_egg_skill() -> Dictionary:
+	for skill in _skills:
+		if Skills.is_unlockable_egg_skill(self, skill):
+			return skill
+	return {}
+
 func hp():
 	return (_growth.hp * _level) * Helper.points_per_level(_best_points)
 

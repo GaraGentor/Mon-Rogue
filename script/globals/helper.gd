@@ -39,29 +39,33 @@ func generate_mons(props: Dictionary = {
 		for i in initial_mons:
 			var mon_meta_data = Monmap.mon_metainfos_by_name(i)
 			var newMon = Monster.new(default_props.level, mon_meta_data)
-			newMon._skills.append(Skills.attack_skills[0].duplicate())
-			newMon._skills[0].id = Helper.generate_fake_uuid()
-			newMon._skills.append(Skills.attack_skills[0].duplicate())
-			newMon._skills[1].id = Helper.generate_fake_uuid()
-			newMon._skills.append(Skills.defensive_skills[0].duplicate())
-			newMon._skills[2].id = Helper.generate_fake_uuid()
-			newMon._skills[0].scouted = true
-			newMon._skills[1].scouted = true
-			newMon._skills[2].scouted = true
+			# Vorschlag aus den verfügbaren Ei-Attacken, im Konfigurator noch änderbar
+			for skill_name in Skills.pick_weighted_unique(Skills.get_available_egg_skills(i), 3):
+				var skill = Skills.get_skill(skill_name)
+				skill.scouted = true
+				newMon._skills.append(skill)
 			mons.append(newMon)
 		return mons
 
 	for i in default_props.count:
 		var mon_meta_data = Monmap.mon_metainfos_by_name(mons_to_pick.pick_random())
 		var newMon = Monster.new(default_props.level, mon_meta_data)
-		newMon._skills.append(Skills.attack_skills[0].duplicate())
-		newMon._skills[0].id = Helper.generate_fake_uuid()
-		newMon._skills.append(Skills.attack_skills[0].duplicate())
-		newMon._skills[1].id = Helper.generate_fake_uuid()
-		newMon._skills.append(Skills.defensive_skills[0].duplicate())
-		newMon._skills[2].id = Helper.generate_fake_uuid()
+		for j in 3:
+			newMon._skills.append(Skills.get_skill(Skills.pick_weighted(mon_meta_data.default_egg_skills)))
+		roll_egg_skill(newMon)
 		mons.append(newMon)
 	return mons
+
+const EGG_SKILL_CHANCE := 0.35
+
+# Wilde Monster tragen mit etwas Glück genau eine noch nicht freigeschaltete Ei-Attacke ihrer Art.
+func roll_egg_skill(mon: Monster) -> void:
+	var locked = Skills.get_locked_egg_skills(mon._name)
+	if locked.is_empty() or randf() > EGG_SKILL_CHANCE:
+		return
+	var skill = Skills.get_skill(Skills.pick_weighted(locked))
+	skill.egg_skill = true
+	mon._skills[mon._skills.size() - 1] = skill
 	
 func color_by_mon(mon: Monster) -> Color:
 	return ColorMap.get_combo(mon._type).color

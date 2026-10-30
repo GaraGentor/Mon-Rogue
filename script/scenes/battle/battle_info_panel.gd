@@ -4,6 +4,8 @@ extends Control
 ## des Monsters, das gerade auf dem Feld ausgewählt ist (eigenes oder gegnerisches).
 
 const SKILL_COLUMNS := ["SKILL_HEADER_SKILL", "SKILL_HEADER_COST", "SKILL_HEADER_CD", "SKILL_HEADER_POWER"]
+const EGG_SKILL_COLOR := Color(0.858824, 0.717647, 0.45098, 1)
+const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 
 @export var turn_wheel: Control
 @export var name_label: Label
@@ -45,15 +47,28 @@ func _build_skill_list() -> void:
 	var known_all := State.mons.has(monster)
 	for skill in monster._skills:
 		var known: bool = known_all or skill.scouted
+		# Ei-Attacken, die durch Fangen + Opfern freigeschaltet werden können, sind immer markiert
+		var is_egg_skill := Skills.is_unlockable_egg_skill(monster, skill)
 		var icon := TextureRect.new()
 		icon.custom_minimum_size = Vector2(20, 20)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		if known:
+		if is_egg_skill:
+			icon.texture = EGG_TEXTURE
+			icon.tooltip_text = tr("EGG_SKILL_HINT")
+		elif known:
 			icon.texture = physical_texture if skill.damage_type == Enums.SKILL_DAMAGE_TYPE.PHYSICAL else magic_texture
 		skill_grid.add_child(icon)
 
-		var skill_name := _label(tr(skill.name) if known else "?", Helper.color_by_type(skill.nature) if known else Color.WHITE)
+		var name_color := Helper.color_by_type(skill.nature) if known else Color.WHITE
+		var name_text := tr(skill.name) if known else "?"
+		if is_egg_skill:
+			name_color = EGG_SKILL_COLOR
+			name_text = tr("EGG_SKILL_TAG").format({"skill": name_text if known else "???"})
+		var skill_name := _label(name_text, name_color)
+		if is_egg_skill:
+			skill_name.tooltip_text = tr("EGG_SKILL_HINT")
+			skill_name.mouse_filter = Control.MOUSE_FILTER_STOP
 		skill_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		skill_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		skill_name.clip_text = true

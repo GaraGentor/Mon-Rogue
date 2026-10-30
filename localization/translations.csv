@@ -8,6 +8,22 @@ SELECTION_PICK_WARRIOR,Now select your preferred warrior...,Wähle jetzt deinen 
 SELECTION_TIME_TO_GO,... it's time to go ...,... es ist Zeit aufzubrechen ...
 SELECTION_NO_MORE_EGGS,... no more eggs... Go! ...,... keine Eier mehr... Los! ...
 BIOME_DEPTH,Depth {depth},Tiefe {depth}
+CONFIGURATOR_TITLE,Choose 3 egg moves for your journey,Wähle 3 Ei-Attacken für deine Reise
+CONFIGURATOR_GO,Set off...,Aufbrechen...
+CONFIGURATOR_COUNTER,{count}/{max} selected,{count}/{max} gewählt
+CONFIGURATOR_SKILL_STATS,Cost {cost} · Power {value} · {type},Kosten {cost} · Stärke {value} · {type}
+CONFIGURATOR_TIER,Tier {tier},Stufe {tier}
+CONFIGURATOR_LOCKED,Locked (catch & sacrifice),Gesperrt (fangen & opfern)
+CONFIGURATOR_PHYSICAL,physical,physisch
+CONFIGURATOR_ABILITY,magical,magisch
+EGG_SKILL_TAG,{skill} (Egg),{skill} (Ei)
+EGG_SKILL_HINT,"Egg move: catch this monster and sacrifice it to unlock this move permanently","Ei-Attacke: Fange dieses Monster und opfere es, um die Attacke dauerhaft freizuschalten"
+EGG_SKILL_UNLOCKED,{skill} unlocked for {mon}!,{skill} für {mon} freigeschaltet!
+JUDGEMENT_SACRIFICE,"Sacrifice
+unlock:
+{skill}","Opfern
+freischalten:
+{skill}"
 BATTLE_PHASE,Battle Phase,Kampfphase
 BATTLE_HYPNOSIS,"
 
@@ -104,6 +120,20 @@ SKILL_BASIC_BLOCK,basic block,Grundblock
 SKILL_BASIC_BLOCK_DESC,Blocks {value} damage,Blockt {value} Schaden
 SKILL_STRENGTH_BLOCK,strength block,Kraftblock
 SKILL_STRENGTH_BLOCK_DESC,?,?
+SKILL_DAMAGE_PHYSICAL_DESC,Deals {value}% physical damage,Verursacht {value}% physischen Schaden
+SKILL_DAMAGE_ABILITY_DESC,Deals {value}% magical damage,Verursacht {value}% magischen Schaden
+SKILL_GUST,gust,Windstoß
+SKILL_SPLASH,splash,Platscher
+SKILL_EMBER,ember,Glut
+SKILL_PEBBLE_THROW,pebble throw,Kieselwurf
+SKILL_WIND_BLADE,wind blade,Windklinge
+SKILL_TIDAL_SLAM,tidal slam,Flutschlag
+SKILL_FLAME_CLAW,flame claw,Flammenklaue
+SKILL_ROCK_CRUSH,rock crush,Felsbrecher
+SKILL_THUNDER_STRIKE,thunder strike,Donnerschlag
+SKILL_ICE_SPEAR,ice spear,Eisspeer
+SKILL_MAGMA_BURST,magma burst,Magmaausbruch
+SKILL_CHAOS_NOVA,chaos nova,Chaosnova
 ELEMENT_AIR,Air,Luft
 ELEMENT_WATER,Water,Wasser
 ELEMENT_FIRE,Fire,Feuer
