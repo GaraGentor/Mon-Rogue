@@ -1,9 +1,8 @@
-[gd_scene load_steps=17 format=4 uid="uid://cljr4qcwlnyny"]
+[gd_scene load_steps=16 format=4 uid="uid://cljr4qcwlnyny"]
 
 [ext_resource type="Script" path="res://script/scenes/battle/battle.gd" id="1_08vc2"]
 [ext_resource type="Script" path="res://script/scenes/battle/animation_controller.gd" id="3_cggex"]
 [ext_resource type="Texture2D" uid="uid://bayjcxae1moqp" path="res://assets/sczene_backgrounds/ChatGPT Image 25. Juni 2025, 16_50_09.png" id="3_das7h"]
-[ext_resource type="Curve" uid="uid://c5npusb61n0op" path="res://script/scenes/battle/difficulty.tres" id="3_sjrc7"]
 [ext_resource type="Texture2D" uid="uid://bq0pf5g35vxjd" path="res://assets/mons/1/1_frontx256.png" id="4_hpryk"]
 [ext_resource type="PackedScene" uid="uid://dp31mv1lmyood" path="res://script/scenes/battle/monster_scene.tscn" id="5_wskai"]
 [ext_resource type="PackedScene" path="res://script/scenes/battle/battle_info_panel.tscn" id="6_5lcde"]
@@ -37,7 +36,6 @@ grow_vertical = 2
 script = ExtResource("1_08vc2")
 catch_anim = NodePath("Catch_anim")
 catch_button = NodePath("UI/HBoxContainer/TextureRect/Catch")
-difficulty_curve = ExtResource("3_sjrc7")
 battle_info = NodePath("UI/BattleInfoPanel")
 card_hand = NodePath("GameWindow/CardHand")
 

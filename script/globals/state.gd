@@ -19,6 +19,8 @@ var relics := []
 var overall_progress_level := 0
 var map_progress_level := 0
 var map_level := 0
+# normale Kämpfe im aktuellen Biom, bestimmt Stufe und Anzahl der Gegner (siehe battle.gd ENCOUNTERS)
+var biome_fight_index := 0
 # Element-Masken der Biome pro Tiefe, einmal pro Run gewürfelt (siehe Map.generate_biome_path)
 var biome_path: Array[int] = []
 
@@ -32,6 +34,8 @@ var defeated_mon_names: Array[String] = []
 
 var is_boss_fight: bool = false
 var is_final_boss: bool = false
+# Boss-Feld mitten auf der Karte: Kampf in Boss-Stärke, beendet das Biom aber nicht
+var is_map_boss: bool = false
 
 # money
 signal ep_changed(ep)
@@ -63,6 +67,7 @@ func _ready() -> void:
 func reset() -> void:
 	ep = 0
 	map_level = 0
+	biome_fight_index = 0
 	biome_path = []
 	map_progress_level = 0
 	overall_progress_level = 0
@@ -78,6 +83,7 @@ func reset() -> void:
 	shopped = []
 	is_boss_fight = false
 	is_final_boss = false
+	is_map_boss = false
 	rolled_mon_stats = {}
 	defeated_mon_names = []
 

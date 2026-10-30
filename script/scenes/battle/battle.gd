@@ -7,7 +7,6 @@ const ENEMY_ACTION_TIME := 0.9
 
 @export var catch_anim: Control
 @export var catch_button: Button
-@export var difficulty_curve: Curve
 @export var battle_info: Control
 @export var card_hand: ScrollContainer
 
@@ -146,27 +145,74 @@ func _refresh_skill_points() -> void:
 		if mon.is_alive():
 			mon.reset_to_new_round()
 
+## Feste Begegnungstabelle pro Biom-Tiefe (map_level), unabhängig vom eigenen Team.
+## Werte werden über die Kämpfe im Biom von Anfang bis Ende interpoliert:
+## - fights: erwartete normale Kämpfe im Biom (danach bleibt es beim Endwert)
+## - level: [Stufe beim ersten Kampf, Stufe beim letzten Kampf]
+## - offset: zufällige Abweichung pro Monster [min, max]
+## - counts: Gewichte für 1/2/3 Gegner [am Anfang, am Ende]
+## Ein Team, das jeden Kampf ausfechtet (2 K.O.s = +1 Stufe), liegt etwa gleichauf;
+## wer lieber alles fängt, levelt nicht und fällt zurück.
+const ENCOUNTERS := [
+	# Biom 1: Einstieg, fast nur Einzelkämpfe auf gleicher oder niedrigerer Stufe
+	{"fights": 4, "level": [2, 4], "offset": [-1, 0], "counts": [[100, 0, 0], [70, 30, 0]]},
+	# Biom 2: Doppelkämpfe werden normal
+	{"fights": 4, "level": [5, 9], "offset": [-1, 1], "counts": [[70, 30, 0], [40, 50, 10]]},
+	# Biom 3: erste 3er-Gruppen
+	{"fights": 5, "level": [10, 15], "offset": [-1, 1], "counts": [[40, 50, 10], [15, 55, 30]]},
+	# Biom 4: gleiche oder höhere Stufe
+	{"fights": 6, "level": [16, 23], "offset": [0, 1], "counts": [[15, 55, 30], [5, 40, 55]]},
+	# Biom 5: 3 gegen 2 ist die Regel
+	{"fights": 7, "level": [24, 33], "offset": [0, 2], "counts": [[5, 35, 60], [0, 20, 80]]},
+]
+
+## Bosse pro Biom: Anzahl und Stufen über der Endstufe des Bioms
+const BOSS_ENCOUNTERS := [
+	{"count": 1, "level_bonus": 2},
+	{"count": 2, "level_bonus": 1},
+	{"count": 2, "level_bonus": 2},
+	{"count": 3, "level_bonus": 1},
+	{"count": 3, "level_bonus": 2},
+]
+
 func _generate_battle():
-	var level = (State.map_level * 10) + State.map_progress_level
-	var dyn = State.map_level * 2
-	if dyn == 0:
-		dyn = 2
-	var rand_dyn_level = randi_range(1, dyn)
-	var progress = clampf(float(State.overall_progress_level + 1) / 40.0, 0.0, 1.0) # oder current_progress_on_current_map
-	var curve_value = difficulty_curve.sample(progress)  # Normalisiere auf 0–1
-	var monster_level = int(curve_value)  # z. B. MAX_MONSTER_LEVEL = 20
-	var rand_m_level = randi_range(0, monster_level)
-	print("monster_level", monster_level)
-	# some logic for progress
+	var depth = clampi(State.map_level, 0, ENCOUNTERS.size() - 1)
+	var encounter: Dictionary = ENCOUNTERS[depth]
+	var count: int
+	var level: int
+	var t = clampf(float(State.biome_fight_index) / max(encounter.fights - 1, 1), 0.0, 1.0)
 	if State.is_boss_fight:
-		# generate boss
-		pass
-	# else:
-	var ms = Helper.generate_mons({"count": randi_range(1, 3), "level": State.overall_progress_level + rand_m_level})
-	var ems = State.enemy_mons
+		var boss: Dictionary = BOSS_ENCOUNTERS[depth]
+		count = boss.count
+		level = encounter.level[1] + boss.level_bonus
+	elif State.is_map_boss:
+		# Boss-Feld auf der Karte: Boss-Anzahl, aber auf der aktuellen Stufe des Bioms
+		var boss: Dictionary = BOSS_ENCOUNTERS[depth]
+		count = boss.count
+		level = roundi(lerpf(encounter.level[0], encounter.level[1], t)) + boss.level_bonus
+		State.is_map_boss = false
+	else:
+		count = _roll_enemy_count(encounter.counts, t)
+		level = roundi(lerpf(encounter.level[0], encounter.level[1], t))
+		State.biome_fight_index += 1
+	var ms = Helper.generate_mons({"count": count})
+	# Stufe direkt setzen: Monster.new(level) ergibt sonst 2 * level + 1
+	for mon in ms:
+		mon._level = max(1, level + randi_range(encounter.offset[0], encounter.offset[1]))
+	print("encounter depth ", depth, " fight ", State.biome_fight_index, ": ", count, "x level ", level)
 	State.enemy_mons = ms
-	#State.enemy_mons = Helper.generate_mons({"count": randi_range(1, 1), "level": State.overall_progress_level + rand_m_level})
-		
+
+## Zieht die Gegneranzahl (1-3) mit zwischen Biom-Anfang und -Ende interpolierten Gewichten.
+func _roll_enemy_count(counts: Array, t: float) -> int:
+	var weights = []
+	for i in 3:
+		weights.append(lerpf(counts[0][i], counts[1][i], t))
+	var roll = randf() * weights.reduce(func(a, b): return a + b, 0.0)
+	for i in 3:
+		roll -= weights[i]
+		if roll < 0.0:
+			return i + 1
+	return 1
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

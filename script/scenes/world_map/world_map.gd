@@ -174,6 +174,9 @@ func call_event_by_type(type) -> void:
 	if type == Map.PATH_TYPE.COMBAT:
 		get_tree().change_scene_to_file("res://script/scenes/battle/battle.tscn")
 		pass
+	if type == Map.PATH_TYPE.BOSS:
+		State.is_map_boss = true
+		get_tree().change_scene_to_file("res://script/scenes/battle/battle.tscn")
 	if type == Map.PATH_TYPE.CAMP:
 		var hcs = heal_camp_scene.instantiate()
 		view_container.add_child(hcs)
@@ -206,7 +209,7 @@ func _on_boss_button_pressed() -> void:
 	if State.current_map.size() > 0:
 		if State.current_map_position.y + 1 == State.current_map[0].size():
 			State.is_boss_fight = true
-			if State.map_level == 4:
+			if State.map_level == Map.map_settings.size() - 1:
 				State.is_final_boss = true
 			get_tree().change_scene_to_file("res://script/scenes/battle/battle.tscn")
 			State.current_map_position = Vector3.ZERO
