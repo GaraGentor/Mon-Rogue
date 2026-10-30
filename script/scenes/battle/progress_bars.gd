@@ -6,6 +6,8 @@ extends Control
 @export var skill_points_label: Label
 
 @export var catch_propability_label: Label
+## nur bei Gegnern sichtbar
+@export var catch_panel: Panel
 
 @export var skill_panel: Panel
 

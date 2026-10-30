@@ -17,8 +17,6 @@ func _catch_animation(mon: Monster) -> void:
 
 func catch_mon(mon: Monster) -> void:
 	catched = Helper.will_catch_mon(mon)
-	#testing
-	catched = true
 	if catched:
 		Events.mon_is_catched.emit(mon)
 		mon.unlock_skills()

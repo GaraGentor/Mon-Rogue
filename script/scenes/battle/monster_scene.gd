@@ -31,6 +31,8 @@ func _ready() -> void:
 		progress_bar.element_panel.self_modulate = Helper.color_by_mon(mon)
 		if home_mons:
 			progress_bar.skill_panel.visible = true
+		# eigene Monster kann man nicht fangen
+		progress_bar.catch_panel.visible = not home_mons
 		printStuff()
 
 func _deal_damage(_mon: Monster) -> void:
@@ -58,6 +60,8 @@ func printStuff() -> void:
 		mon.s_defense(),
 		mon._computed_moves,
 		])
+		if not home_mons:
+			progress_bar.catch_propability_label.text = "%d%%" % roundi(Helper.catch_chance(mon) * 100)
 		#if progress_bar.progress_bar:
 		if get_tree():
 			await get_tree().create_tween().tween_method(progress_bar.progress_bar.set_value, progress_bar.progress_bar.value, mon.hp() - mon._lost_hp, 0.3).finished

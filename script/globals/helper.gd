@@ -6,11 +6,43 @@ func generate_fake_uuid() -> String:
 func points_per_level(bst: int) -> float:
 	return bst / State.SETTING_LEVEL
 
+## Grund-Fangchance pro Seltenheit (bei 0 HP und gleicher Stufe wie das eigene Team)
+const CATCH_RARITY_BASE := {
+	Enums.MON_RARITY.COMMON: 0.9,
+	Enums.MON_RARITY.UNCOMMON: 0.7,
+	Enums.MON_RARITY.RARE: 0.5,
+	Enums.MON_RARITY.EPIC: 0.3,
+	Enums.MON_RARITY.LEGENDARY: 0.15,
+}
+## Anteil der Chance, der bei vollen HP wegfällt (0.75 = volle HP ergeben nur 25 % der Grundchance)
+const CATCH_HP_WEIGHT := 0.75
+## Chance-Abzug pro Stufe, die das Monster über dem eigenen Team liegt (darunter entsprechend Bonus)
+const CATCH_LEVEL_STEP := 0.08
+const CATCH_LEVEL_FACTOR_RANGE := [0.25, 1.3]
+const CATCH_CHANCE_RANGE := [0.02, 0.95]
+
+## Fangchance 0..1: je weniger HP, desto leichter; höhere Stufe und Seltenheit machen es schwerer.
+func catch_chance(mon: Monster) -> float:
+	var rarity: int = Monmap.mon_metainfos_by_name(mon._name).get("rarity", Enums.MON_RARITY.COMMON)
+	# Kopfgeld-Monster sind eine Seltenheitsstufe schwerer zu fangen
+	if mon._bounty != "":
+		rarity = mini(rarity + 1, Enums.MON_RARITY.LEGENDARY)
+	var hp_left = clampf(1.0 - mon._lost_hp / mon.hp(), 0.0, 1.0)
+	var hp_factor = 1.0 - CATCH_HP_WEIGHT * hp_left
+	var level_factor = clampf(1.0 - CATCH_LEVEL_STEP * (mon._level - _team_level()),
+		CATCH_LEVEL_FACTOR_RANGE[0], CATCH_LEVEL_FACTOR_RANGE[1])
+	return clampf(CATCH_RARITY_BASE[rarity] * hp_factor * level_factor,
+		CATCH_CHANCE_RANGE[0], CATCH_CHANCE_RANGE[1])
+
+## Durchschnittsstufe der noch kämpfenden eigenen Monster
+func _team_level() -> float:
+	var alive = State.mons.filter(func(m: Monster): return m.is_alive())
+	if alive.is_empty():
+		return 0.0
+	return alive.reduce(func(sum, m: Monster): return sum + m._level, 0) / float(alive.size())
+
 func will_catch_mon(mon) -> bool:
-	var will_catch = randi_range(0, 100)
-	if will_catch < mon._catch_probability:
-		return true
-	return false
+	return randf() < catch_chance(mon)
 
 func generate_mons(props: Dictionary = {
 	"count": 1,

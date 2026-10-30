@@ -60,7 +60,7 @@ color_ramp = SubResource("GradientTexture1D_3lmu0")
 hue_variation_min = -0.1
 hue_variation_max = 0.18
 
-[node name="ProgressBars" type="BoxContainer" node_paths=PackedStringArray("progress_bar", "element_panel", "level_label", "skill_points_label", "skill_panel")]
+[node name="ProgressBars" type="BoxContainer" node_paths=PackedStringArray("progress_bar", "element_panel", "level_label", "skill_points_label", "catch_propability_label", "catch_panel", "skill_panel")]
 anchors_preset = -1
 anchor_right = 0.212
 anchor_bottom = 0.081
@@ -75,6 +75,8 @@ progress_bar = NodePath("MarginContainer/HBoxContainer/VBoxContainer/HBoxContain
 element_panel = NodePath("MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/Panel3")
 level_label = NodePath("MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/Panel2/Level")
 skill_points_label = NodePath("MarginContainer/HBoxContainer/Panel/Label")
+catch_propability_label = NodePath("MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/Panel4/Label")
+catch_panel = NodePath("MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/Panel4")
 skill_panel = NodePath("MarginContainer/HBoxContainer/Panel")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]

@@ -58,7 +58,9 @@ var boss_shards: int = 0:
 
 var killed_monsters: int = 0
 signal pos_changed(pos)
-var current_map_position: Vector3 = Vector3.ZERO:
+# Linie 0 / Zeile 0 hat die Position (0,0,0), daher braucht "noch nicht gestartet" einen eigenen Wert
+const NO_MAP_POSITION := Vector3(-1, -1, -1)
+var current_map_position: Vector3 = NO_MAP_POSITION:
 	set(vec3):
 		current_map_position = vec3
 		pos_changed.emit(vec3)
@@ -85,7 +87,7 @@ func reset() -> void:
 	fainted_own_mons = []
 	fainted_enemy_mons = []
 	killed_monsters = 0
-	current_map_position = Vector3.ZERO
+	current_map_position = NO_MAP_POSITION
 	shopped = []
 	is_boss_fight = false
 	is_final_boss = false

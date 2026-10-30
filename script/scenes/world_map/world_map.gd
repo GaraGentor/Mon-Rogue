@@ -53,7 +53,7 @@ func _ready() -> void:
 	set_map()
 	# direct from movement...
 	scroll_container_to_bottom()
-	if State.current_map_position == Vector3.ZERO:
+	if State.current_map_position == State.NO_MAP_POSITION:
 		change_position(Vector3.ZERO, true)
 	else:
 		change_position(State.current_map_position)
@@ -161,7 +161,7 @@ func scroll_container_to_bottom() -> void:
 
 func call_map_event(path_type) -> void:
 	if path_type:
-		if State.current_map_position == Vector3.ZERO and path_type._pos.y == 0:
+		if State.current_map_position == State.NO_MAP_POSITION and path_type._pos.y == 0:
 			call_event_by_type(path_type._type)
 			State.current_map_position = path_type._pos
 			#reset_animation_state(path_type)
@@ -212,7 +212,7 @@ func _on_boss_button_pressed() -> void:
 			if State.map_level == Map.map_settings.size() - 1:
 				State.is_final_boss = true
 			get_tree().change_scene_to_file("res://script/scenes/battle/battle.tscn")
-			State.current_map_position = Vector3.ZERO
+			State.current_map_position = State.NO_MAP_POSITION
 
 func change_position(pos, initial = false) -> void:
 	for tween: Tween in tweens:
