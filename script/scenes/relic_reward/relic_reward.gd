@@ -15,10 +15,10 @@ func _ready() -> void:
 	for id in offered.slice(0, RELIC_CHOICES):
 		add_relic_card(self, id)
 
-## Relic-Karte, auch vom Schatz genutzt: Nehmen schließt den Dialog
+## Relic-Karte, auch vom Schatz genutzt: in die Tasche ziehen schließt den Dialog
 static func add_relic_card(dialog: RewardDialog, id: String) -> void:
 	var relic = Relics.get_relic(id)
 	var take := func():
 		Relics.add_relic(id)
 		dialog.close()
-	dialog.add_card(dialog.tr(relic.name), dialog.tr(relic.description), texture_icon(load(relic.icon)), dialog.tr("RELIC_REWARD_TAKE"), take)
+	dialog.add_bag_card(dialog.tr(relic.name), dialog.tr(relic.description), texture_icon(load(relic.icon)), take)

@@ -29,7 +29,7 @@ func _ready() -> void:
 	set_title(tr("TREASURE_CHOOSE"))
 	_depth = clampi(State.map_level, 0, GemField.BONUS_BY_DEPTH.size() - 1)
 	var gold := randi_range(GOLD_MIN, GOLD_MAX) + _depth * GOLD_PER_DEPTH
-	add_card(tr("TREASURE_GOLD"), "$ " + str(gold), texture_icon(gold_icon), tr("TREASURE_TAKE_GOLD"), _on_gold_chosen.bind(gold))
+	add_bag_card(tr("TREASURE_GOLD"), "$ " + str(gold), texture_icon(gold_icon), _on_gold_chosen.bind(gold))
 	_add_bonus_card()
 
 func _on_gold_chosen(gold: int) -> void:
@@ -54,7 +54,7 @@ func _add_bonus_card() -> void:
 	# Fallback, falls kein passendes Relic oder Element übrig ist
 	var stat: String = GemField.STATS.keys().pick_random()
 	var bonus: float = GemField.BONUS_BY_DEPTH[_depth]
-	GemField.add_gem_card(self, stat, bonus, tr("TREASURE_TAKE"), GemField.choose_mon_for_gem.bind(self, stat, bonus))
+	GemField.add_gem_card(self, stat, bonus)
 
 func _roll_bonus() -> String:
 	var total := 0
@@ -72,18 +72,17 @@ func _roll_bonus() -> String:
 func _add_potion_card(element: int) -> void:
 	var element_name = tr(ColorMap.get_combo(element).label)
 	var text = tr("TREASURE_POTION_DESC").format({"element": element_name})
-	add_card(tr("TREASURE_POTION").format({"element": element_name}), text, _potion_icon(element), tr("TREASURE_TAKE"), _on_potion_chosen.bind(element))
-
-func _on_potion_chosen(element: int) -> void:
-	next_step(tr("TREASURE_POTION_CHOOSE_MON"))
-	for mon: Monster in _mons_without(element):
-		var new_type = ColorMap.add_element(mon._type, element)
-		var text = "%s\n%s %s" % [tr(ColorMap.get_combo(mon._type).label), tr("SHOP_CHANGES_TO"), tr(ColorMap.get_combo(new_type).label)]
-		add_card(Helper.mon_display_name(mon._name), text, mon_icon(mon), tr("GEM_GIVE"), _on_potion_given.bind(mon, element))
+	var potion_title = tr("TREASURE_POTION").format({"element": element_name})
+	add_mon_card(potion_title, text, _potion_icon(element), tr("TREASURE_POTION_CHOOSE_MON"), _mons_without(element), _on_potion_given.bind(element), _potion_tooltip.bind(element))
 
 func _on_potion_given(mon: Monster, element: int) -> void:
 	mon._type = ColorMap.add_element(mon._type, element)
 	close()
+
+## Tooltip beim Drüberziehen: altes Element und was daraus wird
+func _potion_tooltip(mon: Monster, element: int) -> String:
+	var new_type = ColorMap.add_element(mon._type, element)
+	return "%s\n%s %s" % [tr(ColorMap.get_combo(mon._type).label), tr("SHOP_CHANGES_TO"), tr(ColorMap.get_combo(new_type).label)]
 
 func _mons_without(element: int) -> Array:
 	return State.mons.filter(func(mon): return not ColorMap.has_element(mon._type, element))

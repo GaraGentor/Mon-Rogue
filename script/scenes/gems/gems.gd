@@ -30,25 +30,17 @@ func _ready() -> void:
 	var stats = STATS.keys()
 	stats.shuffle()
 	for stat in stats.slice(0, GEM_CHOICES):
-		add_gem_card(self, stat, _bonus, tr("GEM_TAKE"), _on_gem_chosen.bind(stat))
+		add_gem_card(self, stat, _bonus)
 
-func _on_gem_chosen(stat: String) -> void:
-	choose_mon_for_gem(self, stat, _bonus)
-
-## Edelstein-Karte, auch vom Schatz genutzt
-static func add_gem_card(dialog: RewardDialog, stat: String, bonus: float, button_text: String, on_pressed: Callable) -> void:
+## Edelstein-Karte, auch vom Schatz genutzt: wird auf ein Monster gezogen, danach schließt der Dialog.
+## Beim Drüberziehen zeigt der Tooltip, wie viel Bonus das Monster schon hat.
+static func add_gem_card(dialog: RewardDialog, stat: String, bonus: float) -> void:
 	var info: Dictionary = STATS[stat]
-	var text = dialog.tr("GEM_DESC").format({"stat": dialog.tr(info.stat).trim_suffix(":"), "value": roundi(bonus * 100)})
-	dialog.add_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), button_text, on_pressed)
-
-## Schritt 2: Monster wählen, das den Edelstein bekommt, danach schließt der Dialog
-static func choose_mon_for_gem(dialog: RewardDialog, stat: String, bonus: float) -> void:
-	dialog.next_step(dialog.tr("GEM_CHOOSE_MON"))
-	var info: Dictionary = STATS[stat]
-	for mon: Monster in State.mons:
-		var stat_name = dialog.tr(info.stat).trim_suffix(":")
-		var text = "%s +%d%%\n%s" % [stat_name, roundi(bonus * 100), dialog.tr("GEM_CURRENT").format({"value": roundi((mon.gem_factor(stat) - 1.0) * 100)})]
-		var give := func():
-			mon.add_gem(stat, bonus)
-			dialog.close()
-		dialog.add_card(Helper.mon_display_name(mon._name), text, mon_icon(mon), dialog.tr("GEM_GIVE"), give)
+	var stat_name = dialog.tr(info.stat).trim_suffix(":")
+	var text = dialog.tr("GEM_DESC").format({"stat": stat_name, "value": roundi(bonus * 100)})
+	var give := func(mon: Monster):
+		mon.add_gem(stat, bonus)
+		dialog.close()
+	var tooltip := func(mon: Monster) -> String:
+		return "%s +%d%%\n%s" % [stat_name, roundi(bonus * 100), dialog.tr("GEM_CURRENT").format({"value": roundi((mon.gem_factor(stat) - 1.0) * 100)})]
+	dialog.add_mon_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, tooltip)

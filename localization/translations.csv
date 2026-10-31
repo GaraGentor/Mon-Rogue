@@ -132,10 +132,8 @@ die Fähigkeit lernen?"
 TRAINER_RECOMMENDED,<Recommended>,<Empfohlen>
 TRAINER_MONSTER_1,Monster 1,Monster 1
 TRAINER_MONSTER_2,Monster 2,Monster 2
-TREASURE_TAKE_GOLD,I Take Gold!,Ich nehme Gold!
 TREASURE_CHOOSE,Choose one prize.,Wähle einen Preis.
 TREASURE_GOLD,Gold,Gold
-TREASURE_TAKE,Take!,Nehmen!
 TREASURE_POTION,{element} Potion,{element}-Trank
 TREASURE_POTION_DESC,Adds the element {element} to one of your monsters.,Fügt einem deiner Monster das Element {element} hinzu.
 TREASURE_POTION_CHOOSE_MON,Which monster drinks the potion?,Welches Monster trinkt den Trank?
@@ -252,14 +250,14 @@ RELIC_LUCKY_CHARM_DESC,Catch chance +25%.,Fangchance +25 %.
 RELIC_GOLDEN_IDOL,Golden Idol,Goldener Götze
 RELIC_GOLDEN_IDOL_DESC,+30% EP from won battles.,+30 % EP aus gewonnenen Kämpfen.
 RELIC_REWARD_CHOOSE,Choose a relic,Wähle ein Relikt
-RELIC_REWARD_TAKE,Take!,Nehmen!
 MAP_NODE_GEM,GEMS,EDELSTEINE
 GEM_CHOOSE,Choose a gem,Wähle einen Edelstein
 GEM_CHOOSE_MON,Which monster gets the gem?,Welches Monster bekommt den Edelstein?
 GEM_DESC,{stat} +{value}% for the rest of the run,{stat} +{value} % für den restlichen Lauf
 GEM_CURRENT,Gems so far: +{value}%,Bisherige Edelsteine: +{value} %
-GEM_TAKE,Choose!,Wählen!
-GEM_GIVE,Give!,Geben!
+REWARD_DRAG_HINT,Drag a prize over here.,Zieh einen Preis hier herüber.
+REWARD_BAG,Bag,Tasche
+REWARD_BAG_HEADER,Into the bag!,Ab in die Tasche!
 GEM_HP,Ruby of Life,Rubin des Lebens
 GEM_ATK,Amber of Strength,Bernstein der Stärke
 GEM_DEF,Granite of Defense,Granit der Abwehr
