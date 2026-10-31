@@ -17,6 +17,7 @@ var mon: Monster
 func _ready() -> void:
 	Events.refresh_ui_for_monster.connect(printStuff)
 	Events.deal_damage_to_monster.connect(_deal_damage)
+	Events.monster_hit_with_element.connect(_show_hit_text)
 	Events.monster_faints.connect(_remove_mon)
 	Events.mon_is_catched.connect(_remove_mon)
 	var mons = State.mons if home_mons else State.enemy_mons
@@ -38,6 +39,41 @@ func _ready() -> void:
 func _deal_damage(_mon: Monster) -> void:
 	if mon == _mon:
 		printStuff()
+
+const SUPER_EFFECTIVE_COLOR := Color(1.0, 0.55, 0.2)
+const NOT_EFFECTIVE_COLOR := Color(0.6, 0.65, 0.7)
+
+# Schwebender Schadenstext über dem Monster, bei Element-Vorteil/-Nachteil mit Hinweis und Faktor.
+func _show_hit_text(_mon: Monster, damage: float, multiplier: float) -> void:
+	if mon != _mon:
+		return
+	var text = str(roundi(damage))
+	var color = Color.WHITE
+	if multiplier > 1.0:
+		text = tr("BATTLE_SUPER_EFFECTIVE") + " x%s\n" % _format_multiplier(multiplier) + text
+		color = SUPER_EFFECTIVE_COLOR
+	elif multiplier < 1.0:
+		text = tr("BATTLE_NOT_EFFECTIVE") + " x%s\n" % _format_multiplier(multiplier) + text
+		color = NOT_EFFECTIVE_COLOR
+	var label := Label.new()
+	label.text = text
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 36 if multiplier > 1.0 else 28)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_outline_color", Color.BLACK)
+	label.add_theme_constant_override("outline_size", 8)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.z_index = 10
+	add_child(label)
+	label.position = _texture_offset() + Vector2((texture_rect.size.x - label.get_minimum_size().x) / 2, texture_rect.size.y * 0.2)
+	var tween := label.create_tween()
+	tween.set_parallel()
+	tween.tween_property(label, "position:y", label.position.y - 60, 1.2)
+	tween.tween_property(label, "modulate:a", 0.0, 0.6).set_delay(0.6)
+	tween.chain().tween_callback(label.queue_free)
+
+func _format_multiplier(multiplier: float) -> String:
+	return String.num(multiplier, 2)
 
 func printStuff() -> void:
 	if mon:
@@ -99,6 +135,37 @@ func _process(_delta: float) -> void:
 	var hovered = drag_data != null and get_global_rect().has_point(get_global_mouse_position()) \
 		and _can_drop_data(Vector2.ZERO, drag_data)
 	modulate = Color(1.3, 1.3, 1.0) if hovered else Color.WHITE
+	_update_drag_preview(drag_data)
+
+# Während eine Angriffskarte gezogen wird, zeigt jedes mögliche Ziel seinen Element-Faktor an.
+var _preview_label: Label
+
+func _update_drag_preview(drag_data) -> void:
+	var show_preview = drag_data != null and not home_mons and _can_drop_data(Vector2.ZERO, drag_data) \
+		and Skills.is_damage_skill(drag_data.skill)
+	if not show_preview:
+		if _preview_label:
+			_preview_label.visible = false
+		return
+	var multiplier = Skills.element_multiplier(drag_data.skill.nature, mon._type)
+	if _preview_label == null:
+		_preview_label = Label.new()
+		_preview_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_preview_label.add_theme_font_size_override("font_size", 26)
+		_preview_label.add_theme_color_override("font_outline_color", Color.BLACK)
+		_preview_label.add_theme_constant_override("outline_size", 8)
+		_preview_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_preview_label.z_index = 10
+		add_child(_preview_label)
+	_preview_label.text = "x" + _format_multiplier(multiplier)
+	var color = Color.WHITE
+	if multiplier > 1.0:
+		color = SUPER_EFFECTIVE_COLOR
+	elif multiplier < 1.0:
+		color = NOT_EFFECTIVE_COLOR
+	_preview_label.add_theme_color_override("font_color", color)
+	_preview_label.visible = true
+	_preview_label.position = _texture_offset() + Vector2((texture_rect.size.x - _preview_label.get_minimum_size().x) / 2, 0)
 
 func _on_gui_input(event: InputEvent) -> void:
 	print(event)
@@ -107,3 +174,7 @@ func _on_gui_input(event: InputEvent) -> void:
 			print("Linke Maustaste losgelassen!")
 			# Events.call_skill_card.emit({"action": selected_skill})
 			Events.mouse_event.emit({"action": Enums.MOUSE_ACTION.SELECT_MONSTER, "mon": mon})
+
+# Position des Monster-Bilds relativ zu dieser Szene (es liegt in einem VBoxContainer).
+func _texture_offset() -> Vector2:
+	return texture_rect.global_position - global_position

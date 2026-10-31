@@ -3,8 +3,63 @@ extends Node
 func deal_damage(props):
 	# für Kopfgelder: wer zuletzt getroffen hat, hat das Monster besiegt
 	props.mon._last_hit_by = props.from
-	print("lose:" + str(props.skill.value) + ":" + str(props.from.attack()) + "::" + str(props.from.attack() * ((props.skill.value / 100))))
-	props.mon._lost_hp += props.from.attack() * ((props.skill.value / 100))
+	var damage = calc_damage(props.from, props.mon, props.skill)
+	var multiplier = element_multiplier(props.skill.nature, props.mon._type)
+	print("lose:" + str(props.skill.value) + ":" + str(damage) + " (Element x" + str(multiplier) + ")")
+	Events.monster_hit_with_element.emit(props.mon, damage, multiplier)
+	props.mon._lost_hp += damage
+
+# ─────────────────────────
+# Schadensformel
+# Physisch: Angriff gegen Verteidigung, Magisch: Sp. Angriff gegen Sp. Verteidigung.
+# Bei gleichen Werten bleibt der Schaden wie vorher (Faktor 1), mehr Angriff -> bis zu x2, mehr Verteidigung -> gegen 0.
+
+func calc_damage(from: Monster, to: Monster, skill: Dictionary) -> float:
+	var physical = skill.get("damage_type", Enums.SKILL_DAMAGE_TYPE.PHYSICAL) == Enums.SKILL_DAMAGE_TYPE.PHYSICAL
+	var atk = from.attack() if physical else from.s_attack()
+	var def = to.defense() if physical else to.s_defense()
+	var stat_factor = 2.0 * atk / max(atk + def, 0.001)
+	return atk * (skill.value / 100) * stat_factor * element_multiplier(skill.nature, to._type)
+
+# ─────────────────────────
+# Element-Kreis: Wasser > Feuer > Luft > Erde > Wasser
+# (Wasser löscht Feuer, Feuer verzehrt Luft, Wind trägt Erde ab, Erde dämmt Wasser ein.)
+# Gegenüberliegende Elemente (Wasser/Luft, Feuer/Erde) sind neutral zueinander.
+const STRONG_AGAINST = {
+	Enums.MON_TYPES.WATER: Enums.MON_TYPES.FIRE,
+	Enums.MON_TYPES.FIRE: Enums.MON_TYPES.AIR,
+	Enums.MON_TYPES.AIR: Enums.MON_TYPES.EARTH,
+	Enums.MON_TYPES.EARTH: Enums.MON_TYPES.WATER,
+}
+const ELEMENT_BONUS := 0.5
+
+# Jedes Element des Skills wird gegen jedes Element des Ziels verglichen:
+# +1 wenn der Skill stark dagegen ist, -1 wenn das Ziel-Element den Skill abwehrt.
+# Kombinierte Monster erben damit alle Schwächen und alle Resistenzen ihrer Elemente, die sich gegenseitig aufheben können.
+func element_score(skill_nature: int, target_type: int) -> int:
+	var score = 0
+	for attack_element in STRONG_AGAINST:
+		if not skill_nature & attack_element:
+			continue
+		for defend_element in STRONG_AGAINST:
+			if not target_type & defend_element:
+				continue
+			if STRONG_AGAINST[attack_element] == defend_element:
+				score += 1
+			elif STRONG_AGAINST[defend_element] == attack_element:
+				score -= 1
+	return score
+
+# Macht der Skill Schaden? (Block-Skills haben zwar einen Wert und ein Gegner-Ziel, aber keinen Schaden.)
+func is_damage_skill(skill: Dictionary) -> bool:
+	return skill.has("value") and not defensive_skills.any(func(block): return block.name == skill.name)
+
+# +1 -> x1.5, +2 -> x2.0, ... / -1 -> x0.5, -2 -> x0.25, ...
+func element_multiplier(skill_nature: int, target_type: int) -> float:
+	var score = element_score(skill_nature, target_type)
+	if score >= 0:
+		return 1.0 + ELEMENT_BONUS * score
+	return pow(1.0 - ELEMENT_BONUS, -score)
 
 func add_shield(props):
 	pass

@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>To the North Wiki</title>
+<!-- Generiert von tools/wiki/build_wiki.js – nicht von Hand bearbeiten, Änderungen gehören ins Template. -->
+<style>
+@font-face {
+	font-family: "Pixelify";
+	src: url("../script/ui/fonts/pxelfont/PixelifySans-VariableFont_wght.ttf");
+}
+:root {
+	--bg: #f4f1ea;
+	--panel: #fffdf8;
+	--panel-2: #f0ebe0;
+	--line: #ddd5c4;
+	--text: #2a2620;
+	--muted: #6f675a;
+	--accent: #2f7f86;
+	--accent-soft: #d8ecec;
+	--good: #2e8b57;
+	--bad: #b8473b;
+	--shadow: 0 1px 2px rgba(40, 30, 10, .08), 0 4px 14px rgba(40, 30, 10, .06);
+	color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--bg: #15181c;
+		--panel: #1d2127;
+		--panel-2: #252a31;
+		--line: #333a43;
+		--text: #e6e2da;
+		--muted: #9a9a94;
+		--accent: #5cc4cc;
+		--accent-soft: #1f3a3d;
+		--good: #5fc48a;
+		--bad: #e57a6c;
+		--shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .25);
+		color-scheme: dark;
+	}
+}
+:root[data-theme="dark"] {
+	--bg: #15181c;
+	--panel: #1d2127;
+	--panel-2: #252a31;
+	--line: #333a43;
+	--text: #e6e2da;
+	--muted: #9a9a94;
+	--accent: #5cc4cc;
+	--accent-soft: #1f3a3d;
+	--good: #5fc48a;
+	--bad: #e57a6c;
+	--shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .25);
+	color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+	background: var(--bg);
+	color: var(--text);
+	font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+h1, h2, h3, .pixel { font-family: "Pixelify", system-ui, sans-serif; font-weight: 600; letter-spacing: .01em; }
+h2 { font-size: 1.6rem; margin: 0 0 .25rem; }
+h3 { font-size: 1.15rem; margin: 0; }
+a { color: var(--accent); }
+.muted { color: var(--muted); }
+.small { font-size: .85rem; }
+
+header {
+	position: sticky; top: 0; z-index: 10;
+	background: color-mix(in srgb, var(--bg) 88%, transparent);
+	backdrop-filter: blur(8px);
+	border-bottom: 1px solid var(--line);
+}
+.bar { max-width: 1200px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.brand { font-size: 1.35rem; margin: 0; white-space: nowrap; }
+.brand span { color: var(--accent); }
+.spacer { flex: 1; }
+input[type="search"], select {
+	background: var(--panel); color: var(--text);
+	border: 1px solid var(--line); border-radius: 8px;
+	padding: 6px 10px; font: inherit; min-width: 0;
+}
+input[type="search"] { width: 220px; max-width: 100%; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { background: var(--panel); color: var(--muted); border: 0; padding: 6px 10px; font: inherit; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+nav.tabs { max-width: 1200px; margin: 0 auto; padding: 0 16px; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+nav.tabs button {
+	background: none; border: 0; border-bottom: 3px solid transparent;
+	color: var(--muted); padding: 8px 10px; font: inherit; cursor: pointer; white-space: nowrap;
+}
+nav.tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+nav.tabs .count { font-size: .75rem; color: var(--muted); margin-left: 4px; }
+
+main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 60px; }
+section[hidden] { display: none; }
+.lead { margin: 0 0 18px; color: var(--muted); max-width: 70ch; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); padding: 14px; min-width: 0; }
+.card.wide { grid-column: 1 / -1; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 10px 0 0; font-size: .9rem; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; }
+
+.chip {
+	display: inline-flex; align-items: center; gap: 5px;
+	border-radius: 999px; padding: 1px 9px 1px 4px; font-size: .8rem; white-space: nowrap;
+	background: var(--panel-2); border: 1px solid var(--line);
+}
+.chip i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
+.tag { display: inline-block; font-size: .72rem; padding: 1px 7px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.tier { font-family: "Pixelify", monospace; color: var(--accent); letter-spacing: 1px; }
+
+.mon-img { width: 112px; height: 112px; object-fit: contain; image-rendering: pixelated; background: var(--panel-2); border-radius: 10px; flex: none; }
+.skill-group { margin-top: 12px; }
+.skill-group h4 { margin: 0 0 4px; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.skill-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 3px; }
+.skill-list li { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; font-size: .9rem; }
+.skill-list .how { color: var(--muted); font-size: .8rem; }
+
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td.wrap { white-space: normal; min-width: 220px; }
+th { background: var(--panel-2); font-weight: 600; position: sticky; top: 0; }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable::after { content: " ↕"; color: var(--muted); font-size: .75rem; }
+th[data-dir="asc"]::after { content: " ↑"; color: var(--accent); }
+th[data-dir="desc"]::after { content: " ↓"; color: var(--accent); }
+tbody tr:hover { background: var(--panel-2); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; align-items: center; }
+
+.matrix td, .matrix th { padding: 4px 6px; text-align: center; font-variant-numeric: tabular-nums; }
+.matrix th.rowh { text-align: left; position: sticky; left: 0; background: var(--panel-2); }
+.m-up { background: color-mix(in srgb, var(--good) calc(var(--s) * 18%), transparent); color: var(--good); font-weight: 600; }
+.m-down { background: color-mix(in srgb, var(--bad) calc(var(--s) * 18%), transparent); color: var(--bad); font-weight: 600; }
+.m-eq { color: var(--muted); }
+.swatch { width: 40px; height: 40px; border-radius: 10px; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.2); }
+.cycle { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 1rem; }
+.icon { width: 40px; height: 40px; padding: 7px; border-radius: 10px; background: var(--panel-2); flex: none; }
+:root[data-theme="dark"] .icon, :root:not([data-theme="light"]) .icon { filter: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: .82rem; background: var(--panel-2); padding: 1px 5px; border-radius: 5px; word-break: break-word; }
+.warn { background: color-mix(in srgb, var(--bad) 14%, var(--panel)); border: 1px solid var(--bad); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; }
+.empty { padding: 30px; text-align: center; color: var(--muted); }
+footer { max-width: 1200px; margin: 0 auto; padding: 0 16px 30px; color: var(--muted); font-size: .8rem; }
+mark { background: color-mix(in srgb, var(--accent) 30%, transparent); color: inherit; border-radius: 3px; }
+
+@media (max-width: 600px) {
+	input[type="search"] { width: 100%; order: 10; }
+	.brand { font-size: 1.15rem; }
+}
+</style>
+</head>
+<body>
+<header>
+	<div class="bar">
+		<h1 class="brand">To the <span>North</span> · Wiki</h1>
+		<div class="spacer"></div>
+		<input type="search" id="search" placeholder="Suchen…" aria-label="Suchen">
+		<div class="seg" id="lang" role="group" aria-label="Sprache"></div>
+		<div class="seg" id="theme" role="group" aria-label="Farbschema">
+			<button data-theme="auto" title="System">◐</button>
+			<button data-theme="light" title="Hell">☀</button>
+			<button data-theme="dark" title="Dunkel">☾</button>
+		</div>
+	</div>
+	<nav class="tabs" id="tabs" role="tablist"></nav>
+</header>
+<main id="main"></main>
+<footer id="footer"></footer>
+
+<script>
+const DATA = {"enums":{"MON_TYPES":{"EARTH":1,"FIRE":2,"WATER":4,"AIR":8,"#MAGMA":9,"#SAND":10,"#MUD":11,"#STEAM":12,"#PLASMA":13,"#ICE":14},"CARD_TARGETS":{"SINGLE_ENEMY":0,"TEAM_ENEMY":1,"SINGLE_FRIEND":2,"TEAM_FRIEND":3},"SKILL_DAMAGE_TYPE":{"PHYSICAL":0,"ABILITY":1},"MON_RARITY":{"COMMON":0,"UNCOMMON":1,"RARE":2,"EPIC":3,"LEGENDARY":4},"Rarity":{"COMMON":0,"RARE":1},"PATH_TYPE":{"COMBAT":0,"BOSS":1,"CAMP":2,"SHOP":3,"TRAINER":4,"JAILER":5,"EVENT":6,"TREASURE":7,"GEM":8}},"elements":{"base":{"EARTH":1,"FIRE":2,"WATER":4,"AIR":8,"#MAGMA":9,"#SAND":10,"#MUD":11,"#STEAM":12,"#PLASMA":13,"#ICE":14},"combos":[{"mask":8,"color":"#CFEFFF","label":"ELEMENT_AIR"},{"mask":4,"color":"#1E90FF","label":"ELEMENT_WATER"},{"mask":2,"color":"#E25822","label":"ELEMENT_FIRE"},{"mask":1,"color":"#6B4F2A","label":"ELEMENT_EARTH"},{"mask":12,"color":"#9AD9FF","label":"ELEMENT_ICE"},{"mask":6,"color":"#B0C4C8","label":"ELEMENT_STEAM"},{"mask":10,"color":"#FFD700","label":"ELEMENT_LIGHTNING"},{"mask":3,"color":"#8B2E1A","label":"ELEMENT_MAGMA"},{"mask":5,"color":"#5A4A3F","label":"ELEMENT_MUD"},{"mask":9,"color":"#C2B280","label":"ELEMENT_DUST"},{"mask":14,"color":"#A9C9FF","label":"ELEMENT_THUNDERSTORM"},{"mask":7,"color":"#7A3E2B","label":"ELEMENT_VOLCANO"},{"mask":11,"color":"#6E6259","label":"ELEMENT_ASH_STORM"},{"mask":13,"color":"#4F6F52","label":"ELEMENT_SWAMP"},{"mask":15,"color":"#7B3FE4","label":"ELEMENT_CHAOS"}],"strongAgainst":{"1":4,"2":8,"4":2,"8":1},"elementBonus":0.5},"skills":[{"cost":1,"name":"SKILL_BASIC_ATTACK_EARTH","nature":1,"value":16,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_BASIC_ATTACK_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"attack_skills"},{"cost":1,"name":"SKILL_BASIC_ATTACK_FIRE","nature":2,"value":24,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_BASIC_ATTACK_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"attack_skills"},{"cost":1,"name":"SKILL_BASIC_ATTACK_WATER","nature":4,"value":20,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_BASIC_ATTACK_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"attack_skills"},{"cost":1,"name":"SKILL_BASIC_ATTACK_AIR","nature":8,"value":22,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_BASIC_ATTACK_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"attack_skills"},{"cost":1,"name":"SKILL_BASIC_BLOCK_EARTH","nature":1,"value":4,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_BASIC_BLOCK_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"defensive_skills"},{"cost":1,"name":"SKILL_BASIC_BLOCK_FIRE","nature":2,"value":1,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_BASIC_BLOCK_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"defensive_skills"},{"cost":1,"name":"SKILL_BASIC_BLOCK_WATER","nature":4,"value":3,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_BASIC_BLOCK_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"defensive_skills"},{"cost":1,"name":"SKILL_BASIC_BLOCK_AIR","nature":8,"value":2,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_BASIC_BLOCK_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"defensive_skills"},{"cost":1,"name":"SKILL_STRENGTH_BLOCK","nature":8,"damage":2,"cooldown":0,"damage_type":"ABILITY","description":"SKILL_STRENGTH_BLOCK_DESC","scouted":false,"shop_cost":{"min":5,"max":15},"target":"SINGLE_ENEMY","list":"buff_skills"},{"cost":1,"name":"SKILL_GUST","nature":8,"value":25,"cooldown":0,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"egg_skills"},{"cost":1,"name":"SKILL_SPLASH","nature":4,"value":25,"cooldown":0,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"egg_skills"},{"cost":1,"name":"SKILL_EMBER","nature":2,"value":25,"cooldown":0,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"egg_skills"},{"cost":1,"name":"SKILL_PEBBLE_THROW","nature":1,"value":25,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"egg_skills"},{"cost":1,"name":"SKILL_WIND_BLADE","nature":8,"value":40,"cooldown":1,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":2,"shop_cost":{"min":10,"max":30},"list":"egg_skills"},{"cost":1,"name":"SKILL_TIDAL_SLAM","nature":4,"value":40,"cooldown":1,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":2,"shop_cost":{"min":10,"max":30},"list":"egg_skills"},{"cost":1,"name":"SKILL_FLAME_CLAW","nature":2,"value":40,"cooldown":1,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":2,"shop_cost":{"min":10,"max":30},"list":"egg_skills"},{"cost":1,"name":"SKILL_ROCK_CRUSH","nature":1,"value":40,"cooldown":1,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":2,"shop_cost":{"min":10,"max":30},"list":"egg_skills"},{"cost":1,"name":"SKILL_THUNDER_STRIKE","nature":10,"value":60,"cooldown":2,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":3,"shop_cost":{"min":15,"max":45},"list":"egg_skills"},{"cost":1,"name":"SKILL_ICE_SPEAR","nature":12,"value":60,"cooldown":2,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":3,"shop_cost":{"min":15,"max":45},"list":"egg_skills"},{"cost":1,"name":"SKILL_MAGMA_BURST","nature":3,"value":60,"cooldown":2,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":3,"shop_cost":{"min":15,"max":45},"list":"egg_skills"},{"cost":1,"name":"SKILL_CHAOS_NOVA","nature":15,"value":90,"cooldown":3,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":4,"shop_cost":{"min":20,"max":60},"list":"egg_skills"},{"cost":1,"name":"SKILL_TAILWIND_STRIKE","nature":8,"value":28,"cooldown":0,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"milestone_skills"},{"cost":1,"name":"SKILL_CYCLONE","nature":8,"value":42,"cooldown":1,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":2,"shop_cost":{"min":10,"max":30},"list":"milestone_skills"},{"cost":1,"name":"SKILL_NORTHERN_GALE","nature":8,"value":55,"cooldown":2,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":3,"shop_cost":{"min":15,"max":45},"list":"milestone_skills"},{"cost":1,"name":"SKILL_UNDERTOW","nature":4,"value":28,"cooldown":0,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":1,"shop_cost":{"min":5,"max":15},"list":"milestone_skills"},{"cost":1,"name":"SKILL_MAELSTROM","nature":4,"value":42,"cooldown":1,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":2,"shop_cost":{"min":10,"max":30},"list":"milestone_skills"},{"cost":1,"name":"SKILL_NORTHERN_TIDE","nature":4,"value":55,"cooldown":2,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":3,"shop_cost":{"min":15,"max":45},"list":"milestone_skills"},{"cost":1,"name":"SKILL_RAPTOR_DIVE","nature":8,"value":42,"cooldown":1,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":2,"shop_cost":{"min":10,"max":30},"list":"bounty_skills"},{"cost":1,"name":"SKILL_HUNTERS_GALE","nature":8,"value":58,"cooldown":2,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":3,"shop_cost":{"min":15,"max":45},"list":"bounty_skills"},{"cost":1,"name":"SKILL_TROPHY_TEMPEST","nature":8,"value":75,"cooldown":3,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":4,"shop_cost":{"min":20,"max":60},"list":"bounty_skills"},{"cost":1,"name":"SKILL_SHARK_BITE","nature":4,"value":42,"cooldown":1,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":2,"shop_cost":{"min":10,"max":30},"list":"bounty_skills"},{"cost":1,"name":"SKILL_HUNTERS_TIDE","nature":4,"value":58,"cooldown":2,"damage_type":"ABILITY","description":"SKILL_DAMAGE_ABILITY_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":3,"shop_cost":{"min":15,"max":45},"list":"bounty_skills"},{"cost":1,"name":"SKILL_TROPHY_TSUNAMI","nature":4,"value":75,"cooldown":3,"damage_type":"PHYSICAL","description":"SKILL_DAMAGE_PHYSICAL_DESC","target":"SINGLE_ENEMY","scouted":false,"tier":4,"shop_cost":{"min":20,"max":60},"list":"bounty_skills"}],"skillLists":["attack_skills","defensive_skills","buff_skills","egg_skills","milestone_skills","bounty_skills"],"tierWeights":{"1":50,"2":25,"3":10,"4":3},"depthTierBonus":0.4,"maxSkills":6,"milestones":[{"key":"boss_1","stat":"biome_boss_kills","count":1,"hint":"MILESTONE_HINT_BOSS_1"},{"key":"boss_5","stat":"biome_boss_kills","count":5,"hint":"MILESTONE_HINT_BOSS_5"},{"key":"game_win","stat":"game_wins","count":1,"hint":"MILESTONE_HINT_GAME_WIN"}],"bounties":[{"key":"alpha_1","mon":"1","level_bonus":2,"min_depth":0,"label":"BOUNTY_ALPHA","hint":"BOUNTY_HINT_ALPHA_1"},{"key":"alpha_2","mon":"2","level_bonus":2,"min_depth":1,"label":"BOUNTY_ALPHA","hint":"BOUNTY_HINT_ALPHA_2"},{"key":"northern_warden","mon":"1","level_bonus":4,"min_depth":3,"label":"BOUNTY_NORTHERN_WARDEN","hint":"BOUNTY_HINT_NORTHERN_WARDEN"}],"bountyChance":0.015,"mons":[{"name":"1","rarity":"COMMON","initial_type":8,"stats":[450,500],"max_upgrades":2,"default_egg_skills":["SKILL_BASIC_ATTACK_AIR","SKILL_BASIC_BLOCK_AIR","SKILL_GUST"],"unlockable_egg_skills":["SKILL_PEBBLE_THROW","SKILL_WIND_BLADE","SKILL_THUNDER_STRIKE"],"milestone_egg_skills":{"boss_1":"SKILL_TAILWIND_STRIKE","boss_5":"SKILL_CYCLONE","game_win":"SKILL_NORTHERN_GALE"},"bounty_egg_skills":{"alpha_1":"SKILL_RAPTOR_DIVE","alpha_2":"SKILL_HUNTERS_GALE","northern_warden":"SKILL_TROPHY_TEMPEST"},"texture_back":"res://assets/mons/1/1_back.png","texture_front":"res://assets/mons/1/1_front.png"},{"name":"2","rarity":"COMMON","initial_type":4,"stats":[450,500],"max_upgrades":2,"default_egg_skills":["SKILL_BASIC_ATTACK_WATER","SKILL_BASIC_BLOCK_WATER","SKILL_SPLASH"],"unlockable_egg_skills":["SKILL_EMBER","SKILL_TIDAL_SLAM","SKILL_MAGMA_BURST"],"milestone_egg_skills":{"boss_1":"SKILL_UNDERTOW","boss_5":"SKILL_MAELSTROM","game_win":"SKILL_NORTHERN_TIDE"},"bounty_egg_skills":{"alpha_1":"SKILL_SHARK_BITE","alpha_2":"SKILL_HUNTERS_TIDE","northern_warden":"SKILL_TROPHY_TSUNAMI"},"texture_back":"res://assets/mons/2/2_back.png","texture_front":"res://assets/mons/2/2_front.png"}],"catch":{"rarityBase":{"COMMON":0.9,"UNCOMMON":0.7,"RARE":0.5,"EPIC":0.3,"LEGENDARY":0.15},"hpWeight":0.75,"levelStep":0.08,"chanceRange":[0.02,0.95]},"relics":{"extra_move":{"name":"RELIC_EXTRA_MOVE","description":"RELIC_EXTRA_MOVE_DESC","icon":"res://assets/ui/icons/sword.svg","rarity":"RARE","hooks":{"moves":"func(value: int, mon: Monster) -> int: return value + 1 if State.mons.has(mon) else value"}},"lucky_charm":{"name":"RELIC_LUCKY_CHARM","description":"RELIC_LUCKY_CHARM_DESC","icon":"res://assets/ui/icons/sparkle.svg","rarity":"COMMON","hooks":{"catch_chance":"func(value: float, _mon: Monster) -> float: return value * 1.25"}},"golden_idol":{"name":"RELIC_GOLDEN_IDOL","description":"RELIC_GOLDEN_IDOL_DESC","icon":"res://assets/ui/icons/firework (1).svg","rarity":"COMMON","hooks":{"battle_ep":"func(value: int, _ctx) -> int: return roundi(value * 1.3)"}}},"relicHooks":[{"key":"moves","desc":"Skillpunkte (Züge) eines Monsters zu Beginn seines Zuges, kontext = Monster"},{"key":"catch_chance","desc":"Fangchance 0..1 vor dem Begrenzen, kontext = gegnerisches Monster"},{"key":"battle_ep","desc":"EP für einen gewonnenen Kampf, kontext = null"}],"gems":{"stats":{"hp":{"name":"GEM_HP","stat":"STAT_HP","color":[0.85,0.25,0.3]},"atk":{"name":"GEM_ATK","stat":"STAT_ATK","color":[0.95,0.55,0.2]},"def":{"name":"GEM_DEF","stat":"STAT_DEF","color":[0.6,0.6,0.65]},"s_atk":{"name":"GEM_S_ATK","stat":"STAT_SPA","color":[0.7,0.35,0.9]},"s_def":{"name":"GEM_S_DEF","stat":"STAT_SPD","color":[0.3,0.55,0.95]},"speed":{"name":"GEM_SPEED","stat":"STAT_SPE","color":[0.35,0.85,0.45]}},"bonusByDepth":[0.06,0.08,0.1,0.12,0.15],"choices":3,"icon":"res://assets/ui/boss_shard/a_rare_crystal_with_some_spark.jpeg"},"map":{"settings":{"0":{"paths":6,"special_nodes":1,"bosses":[],"lines":1,"tresures":[1],"shops":[],"trainers":[],"jailer":[],"gems":[3]},"1":{"paths":8,"special_nodes":2,"bosses":[3],"lines":2,"tresures":[1],"shops":[],"trainers":[5],"jailer":[],"gems":[6]},"2":{"paths":11,"special_nodes":3,"bosses":[5],"lines":2,"tresures":[2],"shops":[6],"trainers":[],"jailer":[0],"gems":[8]},"3":{"paths":14,"special_nodes":4,"bosses":[7],"lines":3,"tresures":[7],"shops":[5],"trainers":[8],"jailer":[2],"gems":[10]},"4":{"paths":17,"special_nodes":6,"bosses":[6,12],"lines":3,"tresures":[2,8],"shops":[9],"trainers":[],"jailer":[],"gems":[4,14]}},"maxRows":8,"maxCols":3},"langs":["en","de"],"tr":{"en":{"COMMON_OK":"OK...","COMMON_CANCEL":"Cancel","SELECTION_TITLE_START":"A new adventure begins...","SELECTION_DRAW_EGG":"Draw Egg...","SELECTION_BEGIN_JOURNEY":"Begin journey...","SELECTION_PICK_WARRIOR":"Now select your preferred warrior...","SELECTION_TIME_TO_GO":"... it's time to go ...","SELECTION_NO_MORE_EGGS":"... no more eggs... Go! ...","BIOME_DEPTH":"Depth {depth}","CONFIGURATOR_TITLE":"Choose 3 egg moves for your journey","CONFIGURATOR_GO":"Set off...","CONFIGURATOR_COUNTER":"{count}/{max} selected","CONFIGURATOR_SKILL_STATS":"Cost {cost} · Power {value} · {type}","CONFIGURATOR_TIER":"Tier {tier}","CONFIGURATOR_LOCKED":"Locked (catch & sacrifice)","CONFIGURATOR_LOCKED_MILESTONE":"Locked (milestone)","CONFIGURATOR_PHYSICAL":"physical","CONFIGURATOR_ABILITY":"magical","EGG_SKILL_TAG":"{skill} (Egg)","EGG_SKILL_HINT":"Egg move: catch this monster and sacrifice it to unlock this move permanently","EGG_SKILL_UNLOCKED":"{skill} unlocked for {mon}!","BATTLE_PHASE":"Battle Phase","BATTLE_HYPNOSIS":"Hypnosis","BATTLE_INSPECT":"Inspect","BATTLE_END_TURN":"End Turn","BATTLE_CATCH_CALL":"Come... Join me...","BATTLE_CATCH_NOT_ON_SIDE":"is not on your side!","BATTLE_CATCH_SUCCESS":"Will now fight for you!","BATTLE_CATCH_FAILED":"Hypnosis failed!","BATTLE_SWITCH":"Switch","BATTLE_NEXT":"next","MONSTER_CLOSE_INFO":"Close Info","MONSTER_STATUS_EFFECTS":"Status effects.","BOSS_REWARD_OK":"OKE!","BOSS_REWARD_DEFEATED":"Boss defeated","BOSS_REWARD_SHARD_DESC":"Boss shard, needed to upgrade your monsters permanently","BOSS_REWARD_CLAIM":"Claim Reward!","BOSS_REWARD_EGG_DESC":"Choose one of your current monsters to appear as eggs in a new run","BOSS_REWARD_CHOOSE_ONE":"Choose wisely one of two rewards","BOSS_REWARD_THANKS":"Thanks for playing","BOSS_REWARD_NEW_RUN":"Start a new run!","HEAL_CAMP_DESC":"Your team feels refreshed and heals 50% of their health!","JAILER_DESC":"Use your Boss Shards to permanently upgrade your Monsters","JAILER_REROLL":"Reroll for ${cost} ({money})","JAILER_FINISH":"Finish","JAILER_BUY":"Buy for Boss Shards","JAILER_SOLD":"SOLD!","JAILER_MAX_UPGRADE":"Max Upgrade","JAILER_MOVES_UPGRADE":"Moves 1 -> 2","JAILER_CURRENT_UPGRADE_LEVEL":"Current Upgrade Level: {level}","JAILER_MAX_UPGRADE_LEVEL":"Maximum Upgrade Level: {level}","JUDGEMENT_LEARN_KNOWN":"Already knows it","JUDGEMENT_NEW_CATCHES":"New catches {i}/{n}","JUDGEMENT_NO_CATCHES_LEFT":"No open catches left","JUDGEMENT_CURRENT_TEAM":"Current team","JUDGEMENT_FREE_SLOT":"Free slot\nDrag a monster here","JUDGEMENT_HINT_IDLE":"Drag monsters onto a team slot or a box below. Or click a monster and then its target.","JUDGEMENT_HINT_HELD":"{mon} selected: click a target. (Esc: cancel)","JUDGEMENT_BADGE_NEW":"NEW","JUDGEMENT_BADGE_STARTER":"Starter","JUDGEMENT_BADGE_BENCHED":"From your team","JUDGEMENT_BADGE_SLOT":"Slot {slot}","JUDGEMENT_ZONE_TEACH":"Teach a move","JUDGEMENT_ZONE_SACRIFICE":"Sacrifice","JUDGEMENT_ZONE_RELEASE":"Release","JUDGEMENT_ZONE_TEACH_IDLE":"A monster passes one move on to your team and leaves afterwards.","JUDGEMENT_ZONE_SACRIFICE_IDLE":"Sacrifice new catches with an egg move to unlock it permanently.","JUDGEMENT_ZONE_RELEASE_IDLE":"Let a monster go without a reward.","JUDGEMENT_ZONE_TEACH_EFFECT":"{mon} passes one move on and leaves afterwards.","JUDGEMENT_ZONE_SACRIFICE_EFFECT":"Permanently unlocks {skill}. {mon} leaves afterwards.","JUDGEMENT_ZONE_RELEASE_EFFECT":"{mon} leaves without a reward.","JUDGEMENT_REASON_LAST":"Your team needs at least one monster.","JUDGEMENT_REASON_OWN":"Your own monsters can't be sacrificed.","JUDGEMENT_REASON_NO_EGG":"{mon} carries no egg move that can be unlocked.","JUDGEMENT_REASON_NOTHING_TO_TEACH":"Your team already knows all of {mon}'s moves.","JUDGEMENT_DROP_SWAP":"{mon} joins the team\n{old} goes to the catches","JUDGEMENT_DROP_FILL":"{mon} joins the team","JUDGEMENT_DROP_REORDER":"Swap places","JUDGEMENT_CONFIRM_KEEP":"Keep current team","JUDGEMENT_CONFIRM_CHANGED":"Take new team","JUDGEMENT_CONFIRM_RELEASES":"Will be released: {mons}","JUDGEMENT_CONFIRM_NOTHING_LEFT":"All catches are taken care of.","JUDGEMENT_RELEASE_STARTER_TITLE":"Release your starter?","JUDGEMENT_TEACH_PICK_SKILL":"Which move should {mon} pass on?","JUDGEMENT_TEACH_PICK_TARGET":"Who should learn {skill}?","JUDGEMENT_TEACH_PICK_REPLACE":"{mon} already knows {max} moves. Which one should {skill} replace?","JUDGEMENT_TEACH_KNOWN_ALL":"Your team already knows it","JUDGEMENT_TEACH_SKILL_COUNT":"{count}/{max} moves","JUDGEMENT_LEARNED":"{mon} learned {skill}!","JUDGEMENT_BACK":"Back","SKILL_NEEDS_ELEMENTS":"Needs: {elements}","CONFIGURATOR_NEED_USABLE":"Pick at least one move your monster can use!","JUDGEMENT_REPLACE_TITLE":"All {max} slots are full. Which move should be forgotten?","JUDGEMENT_REPLACE":"Forget {skill}","BATTLE_UNKNOWN_SKILL":"? (Tier {tier})","BATTLE_UNKNOWN_SKILL_HINT":"Element and tier are known. The details are revealed once the enemy uses this move or you catch it.","LEVEL_UP_TITLE":"Level Up!","LEVEL_UP_KILLED":"Killed Monsters: {count}","SHOP_CHANGES_TO":"Changes to","SHOP_DRAG_HINT":"Drag an Element Potion\nor a Gem onto\nyour Monster","SHOP_FINISH":"Finish Shopping!","SHOP_NOT_ENOUGH_MONEY":"Nope, not enough money!","SKILL_CAN_LEARN":"Can learn","SKILL_CAN_USE":"Can use it","TRAINER_DECIDE_TITLE":"Gratz!\nWhich monster should learn the skill?","TRAINER_WHICH_MONSTER":"Which monster\nshould learn the skill?","TRAINER_RECOMMENDED":"\u003cRecommended>","TRAINER_MONSTER_1":"Monster 1","TRAINER_MONSTER_2":"Monster 2","TREASURE_CHOOSE":"Choose one prize.","TREASURE_GOLD":"Gold","TREASURE_POTION":"{element} Potion","TREASURE_POTION_DESC":"Adds the element {element} to one of your monsters.","TREASURE_POTION_CHOOSE_MON":"Which monster drinks the potion?","WORLDMAP_BOSS":"BOSS","WORLDMAP_BOSS_SHARDS":"Boss Shards: {amount}","WORLDMAP_MONEY":"M: {amount}","SKILL_HEADER_SKILL":"Skill","SKILL_HEADER_COST":"Cost","SKILL_HEADER_CD":"CD","SKILL_HEADER_POWER":"Power","SKILL_BASIC_ATTACK_EARTH":"Earth Strike","SKILL_BASIC_ATTACK_FIRE":"Fire Strike","SKILL_BASIC_ATTACK_WATER":"Water Strike","SKILL_BASIC_ATTACK_AIR":"Air Strike","SKILL_BASIC_ATTACK_DESC":"Deals {value}% physical damage","SKILL_BASIC_BLOCK_EARTH":"Stone Wall","SKILL_BASIC_BLOCK_FIRE":"Ember Guard","SKILL_BASIC_BLOCK_WATER":"Water Shield","SKILL_BASIC_BLOCK_AIR":"Wind Shield","SKILL_BASIC_BLOCK_DESC":"Blocks {value} damage","SKILL_STRENGTH_BLOCK":"strength block","SKILL_STRENGTH_BLOCK_DESC":"?","SKILL_DAMAGE_PHYSICAL_DESC":"Deals {value}% physical damage","SKILL_DAMAGE_ABILITY_DESC":"Deals {value}% magical damage","SKILL_GUST":"gust","SKILL_SPLASH":"splash","SKILL_EMBER":"ember","SKILL_PEBBLE_THROW":"pebble throw","SKILL_WIND_BLADE":"wind blade","SKILL_TIDAL_SLAM":"tidal slam","SKILL_FLAME_CLAW":"flame claw","SKILL_ROCK_CRUSH":"rock crush","SKILL_THUNDER_STRIKE":"thunder strike","SKILL_ICE_SPEAR":"ice spear","SKILL_MAGMA_BURST":"magma burst","SKILL_CHAOS_NOVA":"chaos nova","SKILL_TAILWIND_STRIKE":"tailwind strike","SKILL_CYCLONE":"cyclone","SKILL_NORTHERN_GALE":"northern gale","SKILL_UNDERTOW":"undertow","SKILL_MAELSTROM":"maelstrom","SKILL_NORTHERN_TIDE":"northern tide","MILESTONE_UNLOCKED":"New egg move for {mon}: {skills}","MILESTONE_HINT_BOSS_1":"Milestone egg move: defeat a biome boss with this monster as your starter (it has to still be in your team)","MILESTONE_HINT_BOSS_5":"Milestone egg move: defeat 5 biome bosses with this monster as your starter (it has to still be in your team)","MILESTONE_HINT_GAME_WIN":"Milestone egg move: finish the game with this monster as your starter (it has to still be in your team)","ELEMENT_AIR":"Air","ELEMENT_WATER":"Water","ELEMENT_FIRE":"Fire","ELEMENT_EARTH":"Earth","ELEMENT_ICE":"Ice","ELEMENT_STEAM":"Steam","ELEMENT_LIGHTNING":"Lightning","ELEMENT_MAGMA":"Magma","ELEMENT_MUD":"Mud","ELEMENT_DUST":"Dust","ELEMENT_THUNDERSTORM":"Thunderstorm","ELEMENT_VOLCANO":"Volcano","ELEMENT_ASH_STORM":"Ash Storm","ELEMENT_SWAMP":"Swamp","ELEMENT_CHAOS":"Chaos","ELEMENT_EMPTY":"Empty","ELEMENT_UNKNOWN":"Unknown","STAT_HP":"HP:","STAT_ATK":"ATK:","STAT_DEF":"DEF:","STAT_SPA":"SPA:","STAT_SPD":"SPD:","STAT_SPE":"SPE:","STAT_BST":"BST:","MAP_NODE_COMBAT":"COMBAT","MAP_NODE_BOSS":"BOSS","MAP_NODE_CAMP":"CAMP","MAP_NODE_SHOP":"SHOP","MAP_NODE_TRAINER":"TRAINER","MAP_NODE_JAILER":"JAILER","MAP_NODE_EVENT":"EVENT","MAP_NODE_TREASURE":"TREASURE","MONSTER_1":"1","MONSTER_2":"2","TURN_WHEEL_ROUND":"Round {round}","SKILL_RAPTOR_DIVE":"raptor dive","SKILL_HUNTERS_GALE":"hunter's gale","SKILL_TROPHY_TEMPEST":"trophy tempest","SKILL_SHARK_BITE":"shark bite","SKILL_HUNTERS_TIDE":"hunter's tide","SKILL_TROPHY_TSUNAMI":"trophy tsunami","CONFIGURATOR_LOCKED_BOUNTY":"Locked (bounty hunter)","BOUNTY_ALPHA":"Alpha {mon}","BOUNTY_NORTHERN_WARDEN":"Northern Warden {mon}","BOUNTY_UNLOCKED":"Bounty claimed! New egg move for {mon}: {skill}","BOUNTY_HINT_ALPHA_1":"Bounty hunter: defeat Alpha 1 with this monster (last hit). Catching it or a knockout by a teammate does not count","BOUNTY_HINT_ALPHA_2":"Bounty hunter: defeat Alpha 2 (from biome 2) with this monster (last hit). Catching it or a knockout by a teammate does not count","BOUNTY_HINT_NORTHERN_WARDEN":"Bounty hunter: defeat the Northern Warden (from biome 4) with this monster (last hit). Catching it or a knockout by a teammate does not count","JUDGEMENT_RELEASE_CONFIRM":"Release anyway","JUDGEMENT_STARTER_WARNING":"If you release {mon}, your starter won't collect any milestone progress for the rest of this run.","JUDGEMENT_STARTER_MILESTONE_LINE":"{skill}: {stat} {progress}/{count}","MILESTONE_STAT_BIOME_BOSS_KILLS":"Biome bosses","MILESTONE_STAT_GAME_WINS":"Wins","RUN_END_WIN":"Victory!","RUN_END_LOSE":"Defeat","RUN_END_WIN_SUB":"You made it all the way north. Thanks for playing!","RUN_END_LOSE_SUB":"Your whole team has fallen.","RUN_END_DEPTH":"Biome reached","RUN_END_FIGHTS":"Fights won","RUN_END_KILLS":"Monsters defeated","RUN_END_CATCHES":"Monsters caught","RUN_END_EP":"EP earned","RUN_END_TEAM":"Team: {team}","RELIC_EXTRA_MOVE":"Battle Drum","RELIC_EXTRA_MOVE_DESC":"Your monsters get +1 move each turn.","RELIC_LUCKY_CHARM":"Lucky Charm","RELIC_LUCKY_CHARM_DESC":"Catch chance +25%.","RELIC_GOLDEN_IDOL":"Golden Idol","RELIC_GOLDEN_IDOL_DESC":"+30% EP from won battles.","RELIC_REWARD_CHOOSE":"Choose a relic","MAP_NODE_GEM":"GEMS","GEM_CHOOSE":"Choose a gem","GEM_CHOOSE_MON":"Which monster gets the gem?","GEM_DESC":"{stat} +{value}% for the rest of the run","GEM_CURRENT":"Gems so far: +{value}%","REWARD_DRAG_HINT":"Drag a prize over here.","REWARD_BAG":"Bag","REWARD_BAG_HEADER":"Into the bag!","GEM_HP":"Ruby of Life","GEM_ATK":"Amber of Strength","GEM_DEF":"Granite of Defense","GEM_S_ATK":"Amethyst of Power","GEM_S_DEF":"Sapphire of Warding","GEM_SPEED":"Emerald of Swiftness","SHOP_BUY":"Buy!","SHOP_SOLD":"Sold","SHOP_BOUGHT":"{item} bought!","SHOP_GEM_GIVEN":"{mon} got the gem!","BATTLE_SUPER_EFFECTIVE":"Super effective!","BATTLE_NOT_EFFECTIVE":"Not very effective..."},"de":{"COMMON_OK":"OK...","COMMON_CANCEL":"Abbrechen","SELECTION_TITLE_START":"Ein neues Abenteuer beginnt...","SELECTION_DRAW_EGG":"Ei ziehen...","SELECTION_BEGIN_JOURNEY":"Reise beginnen...","SELECTION_PICK_WARRIOR":"Wähle jetzt deinen Krieger...","SELECTION_TIME_TO_GO":"... es ist Zeit aufzubrechen ...","SELECTION_NO_MORE_EGGS":"... keine Eier mehr... Los! ...","BIOME_DEPTH":"Tiefe {depth}","CONFIGURATOR_TITLE":"Wähle 3 Ei-Attacken für deine Reise","CONFIGURATOR_GO":"Aufbrechen...","CONFIGURATOR_COUNTER":"{count}/{max} gewählt","CONFIGURATOR_SKILL_STATS":"Kosten {cost} · Stärke {value} · {type}","CONFIGURATOR_TIER":"Stufe {tier}","CONFIGURATOR_LOCKED":"Gesperrt (fangen & opfern)","CONFIGURATOR_LOCKED_MILESTONE":"Gesperrt (Meilenstein)","CONFIGURATOR_PHYSICAL":"physisch","CONFIGURATOR_ABILITY":"magisch","EGG_SKILL_TAG":"{skill} (Ei)","EGG_SKILL_HINT":"Ei-Attacke: Fange dieses Monster und opfere es, um die Attacke dauerhaft freizuschalten","EGG_SKILL_UNLOCKED":"{skill} für {mon} freigeschaltet!","BATTLE_PHASE":"Kampfphase","BATTLE_HYPNOSIS":"Hypnose","BATTLE_INSPECT":"Ansehen","BATTLE_END_TURN":"Zugende","BATTLE_CATCH_CALL":"Komm... Schließ dich mir an...","BATTLE_CATCH_NOT_ON_SIDE":"ist nicht auf deiner Seite!","BATTLE_CATCH_SUCCESS":"Kämpft jetzt für dich!","BATTLE_CATCH_FAILED":"Hypnose fehlgeschlagen!","BATTLE_SWITCH":"Wechseln","BATTLE_NEXT":"weiter","MONSTER_CLOSE_INFO":"Info schließen","MONSTER_STATUS_EFFECTS":"Statuseffekte.","BOSS_REWARD_OK":"OKE!","BOSS_REWARD_DEFEATED":"Boss besiegt","BOSS_REWARD_SHARD_DESC":"Boss-Splitter, damit verbesserst du deine Monster dauerhaft","BOSS_REWARD_CLAIM":"Belohnung abholen!","BOSS_REWARD_EGG_DESC":"Wähle eines deiner Monster, das in einem neuen Lauf als Ei erscheint","BOSS_REWARD_CHOOSE_ONE":"Wähle weise eine von zwei Belohnungen","BOSS_REWARD_THANKS":"Danke fürs Spielen","BOSS_REWARD_NEW_RUN":"Neuen Lauf starten!","HEAL_CAMP_DESC":"Dein Team fühlt sich erfrischt und heilt 50% seiner Lebenspunkte!","JAILER_DESC":"Nutze deine Boss-Splitter, um deine Monster dauerhaft zu verbessern","JAILER_REROLL":"Neu würfeln für ${cost} ({money})","JAILER_FINISH":"Fertig","JAILER_BUY":"Für Boss-Splitter kaufen","JAILER_SOLD":"VERKAUFT!","JAILER_MAX_UPGRADE":"Max. Stufe","JAILER_MOVES_UPGRADE":"Attacken 1 -> 2","JAILER_CURRENT_UPGRADE_LEVEL":"Aktuelle Stufe: {level}","JAILER_MAX_UPGRADE_LEVEL":"Maximale Stufe: {level}","JUDGEMENT_LEARN_KNOWN":"Kennt es schon","JUDGEMENT_NEW_CATCHES":"Neue Fänge {i}/{n}","JUDGEMENT_NO_CATCHES_LEFT":"Keine offenen Fänge mehr","JUDGEMENT_CURRENT_TEAM":"Aktuelles Team","JUDGEMENT_FREE_SLOT":"Freier Platz\nZiehe ein Monster hierher","JUDGEMENT_HINT_IDLE":"Ziehe Monster auf einen Team-Platz oder eine Ablage unten. Oder klicke ein Monster an und dann das Ziel.","JUDGEMENT_HINT_HELD":"{mon} ausgewählt: Klicke auf ein Ziel. (Esc: abbrechen)","JUDGEMENT_BADGE_NEW":"NEU","JUDGEMENT_BADGE_STARTER":"Start-Monster","JUDGEMENT_BADGE_BENCHED":"Aus deinem Team","JUDGEMENT_BADGE_SLOT":"Platz {slot}","JUDGEMENT_ZONE_TEACH":"Attacke lehren","JUDGEMENT_ZONE_SACRIFICE":"Opfern","JUDGEMENT_ZONE_RELEASE":"Freilassen","JUDGEMENT_ZONE_TEACH_IDLE":"Ein Monster gibt eine Attacke an dein Team weiter und geht danach.","JUDGEMENT_ZONE_SACRIFICE_IDLE":"Neue Fänge mit Ei-Attacke opfern, um sie dauerhaft freizuschalten.","JUDGEMENT_ZONE_RELEASE_IDLE":"Ein Monster ohne Belohnung gehen lassen.","JUDGEMENT_ZONE_TEACH_EFFECT":"{mon} gibt eine Attacke weiter und geht danach.","JUDGEMENT_ZONE_SACRIFICE_EFFECT":"Schaltet {skill} dauerhaft frei. {mon} geht danach.","JUDGEMENT_ZONE_RELEASE_EFFECT":"{mon} geht ohne Belohnung.","JUDGEMENT_REASON_LAST":"Dein Team braucht mindestens ein Monster.","JUDGEMENT_REASON_OWN":"Eigene Monster können nicht geopfert werden.","JUDGEMENT_REASON_NO_EGG":"{mon} trägt keine Ei-Attacke, die sich freischalten lässt.","JUDGEMENT_REASON_NOTHING_TO_TEACH":"Dein Team kennt schon alle Attacken von {mon}.","JUDGEMENT_DROP_SWAP":"{mon} kommt ins Team\n{old} geht zu den Fängen","JUDGEMENT_DROP_FILL":"{mon} kommt ins Team","JUDGEMENT_DROP_REORDER":"Plätze tauschen","JUDGEMENT_CONFIRM_KEEP":"Jetzige Teamaufstellung behalten","JUDGEMENT_CONFIRM_CHANGED":"Neue Teamaufstellung übernehmen","JUDGEMENT_CONFIRM_RELEASES":"Werden freigelassen: {mons}","JUDGEMENT_CONFIRM_NOTHING_LEFT":"Alle Fänge sind versorgt.","JUDGEMENT_RELEASE_STARTER_TITLE":"Start-Monster freilassen?","JUDGEMENT_TEACH_PICK_SKILL":"Welche Attacke soll {mon} weitergeben?","JUDGEMENT_TEACH_PICK_TARGET":"Wer soll {skill} lernen?","JUDGEMENT_TEACH_PICK_REPLACE":"{mon} kennt schon {max} Attacken. Welche soll {skill} ersetzen?","JUDGEMENT_TEACH_KNOWN_ALL":"Dein Team kennt sie schon","JUDGEMENT_TEACH_SKILL_COUNT":"{count}/{max} Attacken","JUDGEMENT_LEARNED":"{mon} hat {skill} gelernt!","JUDGEMENT_BACK":"Zurück","SKILL_NEEDS_ELEMENTS":"Benötigt: {elements}","CONFIGURATOR_NEED_USABLE":"Wähle mindestens eine Attacke, die dein Monster einsetzen kann!","JUDGEMENT_REPLACE_TITLE":"Alle {max} Plätze sind belegt. Welche Attacke soll vergessen werden?","JUDGEMENT_REPLACE":"{skill} vergessen","BATTLE_UNKNOWN_SKILL":"? (Stufe {tier})","BATTLE_UNKNOWN_SKILL_HINT":"Element und Stufe sind bekannt. Die Details zeigen sich, sobald der Gegner die Attacke einsetzt oder du ihn fängst.","LEVEL_UP_TITLE":"Level Up!","LEVEL_UP_KILLED":"Besiegte Monster: {count}","SHOP_CHANGES_TO":"Wird zu","SHOP_DRAG_HINT":"Zieh einen Element-Trank\noder Edelstein auf\ndein Monster","SHOP_FINISH":"Einkauf beenden!","SHOP_NOT_ENOUGH_MONEY":"Nö, nicht genug Geld!","SKILL_CAN_LEARN":"Kann lernen","SKILL_CAN_USE":"Kann es nutzen","TRAINER_DECIDE_TITLE":"Glückwunsch!\nWelches Monster soll die Fähigkeit lernen?","TRAINER_WHICH_MONSTER":"Welches Monster soll\ndie Fähigkeit lernen?","TRAINER_RECOMMENDED":"\u003cEmpfohlen>","TRAINER_MONSTER_1":"Monster 1","TRAINER_MONSTER_2":"Monster 2","TREASURE_CHOOSE":"Wähle einen Preis.","TREASURE_GOLD":"Gold","TREASURE_POTION":"{element}-Trank","TREASURE_POTION_DESC":"Fügt einem deiner Monster das Element {element} hinzu.","TREASURE_POTION_CHOOSE_MON":"Welches Monster trinkt den Trank?","WORLDMAP_BOSS":"BOSS","WORLDMAP_BOSS_SHARDS":"Boss-Splitter: {amount}","WORLDMAP_MONEY":"M: {amount}","SKILL_HEADER_SKILL":"Fähigkeit","SKILL_HEADER_COST":"Kosten","SKILL_HEADER_CD":"CD","SKILL_HEADER_POWER":"Stärke","SKILL_BASIC_ATTACK_EARTH":"Erdschlag","SKILL_BASIC_ATTACK_FIRE":"Feuerschlag","SKILL_BASIC_ATTACK_WATER":"Wasserschlag","SKILL_BASIC_ATTACK_AIR":"Luftschlag","SKILL_BASIC_ATTACK_DESC":"Verursacht {value}% physischen Schaden","SKILL_BASIC_BLOCK_EARTH":"Steinwall","SKILL_BASIC_BLOCK_FIRE":"Glutschild","SKILL_BASIC_BLOCK_WATER":"Wasserschild","SKILL_BASIC_BLOCK_AIR":"Windschild","SKILL_BASIC_BLOCK_DESC":"Blockt {value} Schaden","SKILL_STRENGTH_BLOCK":"Kraftblock","SKILL_STRENGTH_BLOCK_DESC":"?","SKILL_DAMAGE_PHYSICAL_DESC":"Verursacht {value}% physischen Schaden","SKILL_DAMAGE_ABILITY_DESC":"Verursacht {value}% magischen Schaden","SKILL_GUST":"Windstoß","SKILL_SPLASH":"Platscher","SKILL_EMBER":"Glut","SKILL_PEBBLE_THROW":"Kieselwurf","SKILL_WIND_BLADE":"Windklinge","SKILL_TIDAL_SLAM":"Flutschlag","SKILL_FLAME_CLAW":"Flammenklaue","SKILL_ROCK_CRUSH":"Felsbrecher","SKILL_THUNDER_STRIKE":"Donnerschlag","SKILL_ICE_SPEAR":"Eisspeer","SKILL_MAGMA_BURST":"Magmaausbruch","SKILL_CHAOS_NOVA":"Chaosnova","SKILL_TAILWIND_STRIKE":"Rückenwindhieb","SKILL_CYCLONE":"Zyklon","SKILL_NORTHERN_GALE":"Nordwind","SKILL_UNDERTOW":"Sog","SKILL_MAELSTROM":"Mahlstrom","SKILL_NORTHERN_TIDE":"Nordmeerflut","MILESTONE_UNLOCKED":"Neue Ei-Attacke für {mon}: {skills}","MILESTONE_HINT_BOSS_1":"Meilenstein-Ei-Attacke: Besiege einen Biom-Boss mit diesem Monster als Start-Monster (es muss noch im Team sein)","MILESTONE_HINT_BOSS_5":"Meilenstein-Ei-Attacke: Besiege 5 Biom-Bosse mit diesem Monster als Start-Monster (es muss noch im Team sein)","MILESTONE_HINT_GAME_WIN":"Meilenstein-Ei-Attacke: Beende das Spiel mit diesem Monster als Start-Monster (es muss noch im Team sein)","ELEMENT_AIR":"Luft","ELEMENT_WATER":"Wasser","ELEMENT_FIRE":"Feuer","ELEMENT_EARTH":"Erde","ELEMENT_ICE":"Eis","ELEMENT_STEAM":"Dampf","ELEMENT_LIGHTNING":"Blitz","ELEMENT_MAGMA":"Magma","ELEMENT_MUD":"Schlamm","ELEMENT_DUST":"Staub","ELEMENT_THUNDERSTORM":"Gewitter","ELEMENT_VOLCANO":"Vulkan","ELEMENT_ASH_STORM":"Aschesturm","ELEMENT_SWAMP":"Sumpf","ELEMENT_CHAOS":"Chaos","ELEMENT_EMPTY":"Leer","ELEMENT_UNKNOWN":"Unbekannt","STAT_HP":"KP:","STAT_ATK":"ANG:","STAT_DEF":"VER:","STAT_SPA":"SAN:","STAT_SPD":"SVE:","STAT_SPE":"INI:","STAT_BST":"GES:","MAP_NODE_COMBAT":"KAMPF","MAP_NODE_BOSS":"BOSS","MAP_NODE_CAMP":"LAGER","MAP_NODE_SHOP":"LADEN","MAP_NODE_TRAINER":"TRAINER","MAP_NODE_JAILER":"KERKERMEISTER","MAP_NODE_EVENT":"EREIGNIS","MAP_NODE_TREASURE":"SCHATZ","MONSTER_1":"1","MONSTER_2":"2","TURN_WHEEL_ROUND":"Runde {round}","SKILL_RAPTOR_DIVE":"Raubvogelsturz","SKILL_HUNTERS_GALE":"Jägerböe","SKILL_TROPHY_TEMPEST":"Trophäensturm","SKILL_SHARK_BITE":"Haibiss","SKILL_HUNTERS_TIDE":"Jägerflut","SKILL_TROPHY_TSUNAMI":"Trophäentsunami","CONFIGURATOR_LOCKED_BOUNTY":"Gesperrt (Bounty Hunter)","BOUNTY_ALPHA":"Alpha {mon}","BOUNTY_NORTHERN_WARDEN":"Nordwächter {mon}","BOUNTY_UNLOCKED":"Kopfgeld kassiert! Neue Ei-Attacke für {mon}: {skill}","BOUNTY_HINT_ALPHA_1":"Bounty Hunter: Besiege Alpha 1 mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht","BOUNTY_HINT_ALPHA_2":"Bounty Hunter: Besiege Alpha 2 (ab Biom 2) mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht","BOUNTY_HINT_NORTHERN_WARDEN":"Bounty Hunter: Besiege den Nordwächter (ab Biom 4) mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht","JUDGEMENT_RELEASE_CONFIRM":"Trotzdem freilassen","JUDGEMENT_STARTER_WARNING":"Wenn du {mon} freilässt, sammelt dein Start-Monster in diesem Run keinen Meilenstein-Fortschritt mehr.","JUDGEMENT_STARTER_MILESTONE_LINE":"{skill}: {stat} {progress}/{count}","MILESTONE_STAT_BIOME_BOSS_KILLS":"Biom-Bosse","MILESTONE_STAT_GAME_WINS":"Siege","RUN_END_WIN":"Sieg!","RUN_END_LOSE":"Niederlage","RUN_END_WIN_SUB":"Du hast es bis in den Norden geschafft. Danke fürs Spielen!","RUN_END_LOSE_SUB":"Dein ganzes Team ist gefallen.","RUN_END_DEPTH":"Erreichtes Biom","RUN_END_FIGHTS":"Gewonnene Kämpfe","RUN_END_KILLS":"Besiegte Monster","RUN_END_CATCHES":"Gefangene Monster","RUN_END_EP":"Verdiente EP","RUN_END_TEAM":"Team: {team}","RELIC_EXTRA_MOVE":"Kriegstrommel","RELIC_EXTRA_MOVE_DESC":"Deine Monster haben jeden Zug +1 Aktion.","RELIC_LUCKY_CHARM":"Glücksbringer","RELIC_LUCKY_CHARM_DESC":"Fangchance +25 %.","RELIC_GOLDEN_IDOL":"Goldener Götze","RELIC_GOLDEN_IDOL_DESC":"+30 % EP aus gewonnenen Kämpfen.","RELIC_REWARD_CHOOSE":"Wähle ein Relikt","MAP_NODE_GEM":"EDELSTEINE","GEM_CHOOSE":"Wähle einen Edelstein","GEM_CHOOSE_MON":"Welches Monster bekommt den Edelstein?","GEM_DESC":"{stat} +{value} % für den restlichen Lauf","GEM_CURRENT":"Bisherige Edelsteine: +{value} %","REWARD_DRAG_HINT":"Zieh einen Preis hier herüber.","REWARD_BAG":"Tasche","REWARD_BAG_HEADER":"Ab in die Tasche!","GEM_HP":"Rubin des Lebens","GEM_ATK":"Bernstein der Stärke","GEM_DEF":"Granit der Abwehr","GEM_S_ATK":"Amethyst der Macht","GEM_S_DEF":"Saphir des Schutzes","GEM_SPEED":"Smaragd der Schnelligkeit","SHOP_BUY":"Kaufen!","SHOP_SOLD":"Verkauft","SHOP_BOUGHT":"{item} gekauft!","SHOP_GEM_GIVEN":"{mon} hat den Edelstein bekommen!","BATTLE_SUPER_EFFECTIVE":"Sehr effektiv!","BATTLE_NOT_EFFECTIVE":"Nicht sehr effektiv..."}},"generatedAt":"2026-10-31T01:01:20.085Z","git":"46a0b7e","warnings":[]};
+
+// ─────────────────────────
+// Grundlagen
+
+const UI = {
+	de: {
+		search: "Suchen…", monsters: "Monster", skills: "Skills", elements: "Elemente", gems: "Edelsteine",
+		relics: "Relikte", unlocks: "Freischaltungen", map: "Karte", rarity: "Seltenheit", element: "Element",
+		bst: "Basiswerte (BST)", maxUpgrades: "Max. Upgrades", catchBase: "Grund-Fangchance",
+		defaultSkills: "Start-Ei-Attacken", unlockable: "Durch Fangen & Opfern", milestone: "Meilensteine", bounty: "Kopfgelder",
+		name: "Name", tier: "Stufe", power: "Stärke", type: "Art", cost: "Kosten", cd: "CD", shop: "Shop-Preis",
+		source: "Quelle", usableBy: "Spielbar für", desc: "Beschreibung", target: "Ziel", all: "Alle",
+		physical: "physisch", ability: "magisch", none: "—", generated: "Generiert", commit: "Commit",
+		attacker: "Angriff ↓ / Ziel →", combos: "Element-Kombinationen", matchups: "Effektivität",
+		perDepth: "Bonus pro Biom-Tiefe", depth: "Tiefe", stat: "Wert", choices: "Auswahl pro Feld",
+		hooks: "Effekt-Hooks", hook: "Hook", code: "Code", requirement: "Bedingung", reward: "Belohnung",
+		appearsFrom: "Taucht auf ab Tiefe", levelBonus: "Stufen-Bonus", bountyChance: "Kopfgeld-Chance pro Kampf",
+		paths: "Pfade", special: "Spezialfelder", lines: "Linien", nodeRows: "Zeilen mit festem Feld",
+		components: "Besteht aus", weight: "Spawn-Gewicht", noResults: "Keine Treffer.", warnings: "Warnungen beim Generieren",
+		strongVs: "stark gegen", maxSkills: "Max. Skills pro Monster", tierWeights: "Stufen-Gewichte (Spawn-Häufigkeit)",
+		onlyBase: "Nur Grund-Elemente", allCombos: "Alle Kombinationen", catchHint: "bei 0 HP und gleicher Stufe",
+		mon: "Monster", lists: {
+			attack_skills: "Basis-Angriff", defensive_skills: "Basis-Block", buff_skills: "Buff",
+			egg_skills: "Ei-Attacke", milestone_skills: "Meilenstein", bounty_skills: "Kopfgeld",
+		},
+		leads: {
+			monsters: "Alle Monster-Arten aus <code>Monmap.mons</code> mit ihren Ei-Attacken und wie man sie freischaltet.",
+			skills: "Alle Skills aus <code>Skills</code>. Ein Monster kann einen Skill nur spielen, wenn sein Typ alle Elemente des Skills enthält. Spalten sind sortierbar.",
+			elements: "Element-Kreis und alle Kombinationen aus <code>ColorMap</code>. Jedes Skill-Element wird gegen jedes Ziel-Element verglichen; Kombi-Monster erben alle Schwächen und Resistenzen.",
+			gems: "Edelsteine erhöhen einen Wert eines eigenen Monsters prozentual für den restlichen Run.",
+			relics: "Relikte sind passive Run-Boni. Gewöhnliche gibt es auch in Schätzen, seltene nur als Boss-Belohnung und im Shop.",
+			unlocks: "Meilenstein-Ei-Attacken (mit der Art als Start-Monster) und Kopfgeld-Ei-Attacken (letzter Treffer gegen ein Kopfgeld-Monster).",
+			map: "Aufbau der Weltkarte pro Biom-Tiefe aus <code>Map.map_settings</code>. Zahlen in den Spalten sind die Zeilen, in denen das Feld fest liegt.",
+		},
+	},
+	en: {
+		search: "Search…", monsters: "Monsters", skills: "Skills", elements: "Elements", gems: "Gems",
+		relics: "Relics", unlocks: "Unlocks", map: "Map", rarity: "Rarity", element: "Element",
+		bst: "Base stats (BST)", maxUpgrades: "Max upgrades", catchBase: "Base catch chance",
+		defaultSkills: "Starting egg moves", unlockable: "Catch & sacrifice", milestone: "Milestones", bounty: "Bounties",
+		name: "Name", tier: "Tier", power: "Power", type: "Type", cost: "Cost", cd: "CD", shop: "Shop price",
+		source: "Source", usableBy: "Usable by", desc: "Description", target: "Target", all: "All",
+		physical: "physical", ability: "magical", none: "—", generated: "Generated", commit: "Commit",
+		attacker: "Attack ↓ / Target →", combos: "Element combinations", matchups: "Effectiveness",
+		perDepth: "Bonus per biome depth", depth: "Depth", stat: "Stat", choices: "Choices per node",
+		hooks: "Effect hooks", hook: "Hook", code: "Code", requirement: "Requirement", reward: "Reward",
+		appearsFrom: "Appears from depth", levelBonus: "Level bonus", bountyChance: "Bounty chance per battle",
+		paths: "Paths", special: "Special nodes", lines: "Lines", nodeRows: "Rows with a fixed node",
+		components: "Made of", weight: "Spawn weight", noResults: "No results.", warnings: "Warnings during generation",
+		strongVs: "strong against", maxSkills: "Max skills per monster", tierWeights: "Tier weights (spawn frequency)",
+		onlyBase: "Base elements only", allCombos: "All combinations", catchHint: "at 0 HP and same level",
+		mon: "Monster", lists: {
+			attack_skills: "Basic attack", defensive_skills: "Basic block", buff_skills: "Buff",
+			egg_skills: "Egg move", milestone_skills: "Milestone", bounty_skills: "Bounty",
+		},
+		leads: {
+			monsters: "All monster species from <code>Monmap.mons</code> with their egg moves and how to unlock them.",
+			skills: "All skills from <code>Skills</code>. A monster can only play a skill if its type contains all of the skill's elements. Columns are sortable.",
+			elements: "Element cycle and all combinations from <code>ColorMap</code>. Every skill element is compared with every target element; combined monsters inherit all weaknesses and resistances.",
+			gems: "Gems raise one stat of your own monster by a percentage for the rest of the run.",
+			relics: "Relics are passive run bonuses. Common ones also appear in treasures, rare ones only as boss rewards and in the shop.",
+			unlocks: "Milestone egg moves (with the species as starter) and bounty egg moves (last hit against a bounty monster).",
+			map: "World map layout per biome depth from <code>Map.map_settings</code>. Numbers are the rows where that node is fixed.",
+		},
+	},
+};
+
+const state = {
+	lang: localGet("wiki.lang") || (DATA.langs.includes("de") ? "de" : DATA.langs[0]),
+	tab: (location.hash || "").slice(1) || localGet("wiki.tab") || "monsters",
+	query: "",
+	skillSort: { key: "tier", dir: "asc" },
+	skillElement: "all",
+	skillList: "all",
+	matrixAll: false,
+};
+
+function localGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
+function localSet(key, value) { try { localStorage.setItem(key, value); } catch {} }
+
+const ui = (key) => (UI[state.lang] || UI.en)[key] ?? UI.en[key] ?? key;
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function tr(key, args = {}) {
+	const text = DATA.tr[state.lang]?.[key] || DATA.tr.en?.[key] || key;
+	return text.replace(/\{(\w+)\}/g, (all, k) => (k in args ? args[k] : all));
+}
+const res = (p) => (p || "").replace(/^res:\/\//, "../");
+const pct = (v) => `${Math.round(v * 1000) / 10} %`;
+const fmtNum = (v) => (Number.isInteger(v) ? String(v) : String(Math.round(v * 100) / 100));
+
+// ─────────────────────────
+// Elemente
+
+const BASE = DATA.elements.base;
+const BASE_MASKS = Object.values(BASE);
+const comboByMask = Object.fromEntries(DATA.elements.combos.map((c) => [c.mask, c]));
+const elementsIn = (mask) => BASE_MASKS.filter((e) => mask & e);
+const elementName = (mask) => tr(comboByMask[mask]?.label || "ELEMENT_UNKNOWN");
+const elementColor = (mask) => comboByMask[mask]?.color || "#555555";
+const chip = (mask) => `<span class="chip"><i style="background:${esc(elementColor(mask))}"></i>${esc(elementName(mask))}</span>`;
+
+// Spiegelt Skills.element_score / element_multiplier
+function elementScore(skillNature, targetType) {
+	const strong = DATA.elements.strongAgainst;
+	let score = 0;
+	for (const a of BASE_MASKS) {
+		if (!(skillNature & a)) continue;
+		for (const d of BASE_MASKS) {
+			if (!(targetType & d)) continue;
+			if (strong[a] === d) score++;
+			else if (strong[d] === a) score--;
+		}
+	}
+	return score;
+}
+function elementMultiplier(skillNature, targetType) {
+	const score = elementScore(skillNature, targetType);
+	const bonus = DATA.elements.elementBonus;
+	return score >= 0 ? 1 + bonus * score : Math.pow(1 - bonus, -score);
+}
+const covers = (typeMask, nature) => (nature & ~typeMask) === 0;
+
+// ─────────────────────────
+// Skills
+
+const skillByName = Object.fromEntries(DATA.skills.map((s) => [s.name, s]));
+const tierStars = (t) => "◆".repeat(t || 1) + `<span class="muted">${"◇".repeat(Math.max(0, 4 - (t || 1)))}</span>`;
+const dmgType = (s) => (s.damage_type === "ABILITY" ? ui("ability") : ui("physical"));
+const skillDesc = (s) => tr(s.description, { value: fmtNum(s.value ?? s.damage ?? 0) });
+const skillLabel = (name) => {
+	const s = skillByName[name];
+	return s ? `${chip(s.nature)} <b>${esc(tr(name))}</b> <span class="tier small">${tierStars(s.tier)}</span>` : `<b>${esc(tr(name))}</b>`;
+};
+function skillWeight(s, depth = 0) {
+	const t = s.tier || 1;
+	return DATA.tierWeights[t] * Math.pow(1 + DATA.depthTierBonus * depth, t - 1);
+}
+
+// ─────────────────────────
+// Suche
+
+function matches(...texts) {
+	if (!state.query) return true;
+	const q = state.query.toLowerCase();
+	return texts.some((t) => String(t ?? "").toLowerCase().includes(q));
+}
+function hl(text) {
+	const s = esc(text);
+	if (!state.query) return s;
+	const q = state.query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+	return s.replace(new RegExp(`(${esc(q)})`, "gi"), "<mark>$1</mark>");
+}
+
+// ─────────────────────────
+// Seiten
+
+const SECTIONS = {
+	monsters: { count: () => DATA.mons.length, render: renderMonsters },
+	skills: { count: () => DATA.skills.length, render: renderSkills },
+	elements: { count: () => DATA.elements.combos.length, render: renderElements },
+	gems: { count: () => Object.keys(DATA.gems.stats).length, render: renderGems },
+	relics: { count: () => Object.keys(DATA.relics).length, render: renderRelics },
+	unlocks: { count: () => DATA.milestones.length + DATA.bounties.length, render: renderUnlocks },
+	map: { count: () => Object.keys(DATA.map.settings).length, render: renderMap },
+};
+
+function header(key) {
+	return `<h2>${esc(ui(key))}</h2><p class="lead">${ui("leads")[key] || ""}</p>`;
+}
+
+function renderMonsters() {
+	const bountyByKey = Object.fromEntries(DATA.bounties.map((b) => [b.key, b]));
+	const msByKey = Object.fromEntries(DATA.milestones.map((m) => [m.key, m]));
+	const cards = DATA.mons.filter((m) => {
+		const skills = [...(m.default_egg_skills || []), ...(m.unlockable_egg_skills || []),
+			...Object.values(m.milestone_egg_skills || {}), ...Object.values(m.bounty_egg_skills || {})];
+		return matches(m.name, tr(m.name), elementName(m.initial_type), m.rarity, ...skills.map((s) => tr(s)));
+	}).map((m) => {
+		const list = (names, how) => names.length ? `<ul class="skill-list">${names.map((n, i) =>
+			`<li>${skillLabel(n)}${how ? `<span class="how">· ${esc(how(i))}</span>` : ""}</li>`).join("")}</ul>` : `<span class="muted">${ui("none")}</span>`;
+		const ms = Object.entries(m.milestone_egg_skills || {});
+		const bs = Object.entries(m.bounty_egg_skills || {});
+		const catchBase = DATA.catch.rarityBase?.[m.rarity];
+		return `<article class="card">
+			<div class="row" style="align-items:flex-start">
+				<img class="mon-img" src="${esc(res(m.texture_front))}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+				<div style="min-width:0">
+					<h3>${hl(tr(m.name) === m.name ? `${ui("mon")} ${m.name}` : tr(m.name))}</h3>
+					<div class="row" style="margin-top:4px">${chip(m.initial_type)} <span class="tag">${esc(m.rarity)}</span></div>
+					<dl class="kv">
+						<dt>${ui("bst")}</dt><dd>${(m.stats || []).join(" – ")}</dd>
+						<dt>${ui("maxUpgrades")}</dt><dd>${m.max_upgrades ?? ui("none")}</dd>
+						${catchBase != null ? `<dt>${ui("catchBase")}</dt><dd title="${esc(ui("catchHint"))}">${pct(catchBase)}</dd>` : ""}
+					</dl>
+				</div>
+			</div>
+			<div class="skill-group"><h4>${ui("defaultSkills")}</h4>${list(m.default_egg_skills || [])}</div>
+			<div class="skill-group"><h4>${ui("unlockable")}</h4>${list(m.unlockable_egg_skills || [])}</div>
+			<div class="skill-group"><h4>${ui("milestone")}</h4>${list(ms.map(([, s]) => s), (i) => {
+				const def = msByKey[ms[i][0]];
+				return def ? `${def.count}× ${tr("MILESTONE_STAT_" + def.stat.toUpperCase())}` : ms[i][0];
+			})}</div>
+			<div class="skill-group"><h4>${ui("bounty")}</h4>${list(bs.map(([, s]) => s), (i) => {
+				const def = bountyByKey[bs[i][0]];
+				return def ? tr(def.label, { mon: def.mon }) + ` (${ui("depth")} ${def.min_depth + 1}+)` : bs[i][0];
+			})}</div>
+		</article>`;
+	});
+	return header("monsters") + (cards.length ? `<div class="grid">${cards.join("")}</div>` : `<div class="empty">${ui("noResults")}</div>`);
+}
+
+function renderSkills() {
+	const cols = [
+		{ key: "name", label: ui("name"), get: (s) => tr(s.name) },
+		{ key: "nature", label: ui("element"), get: (s) => elementsIn(s.nature).length * 100 + s.nature },
+		{ key: "tier", label: ui("tier"), get: (s) => s.tier || 1 },
+		{ key: "value", label: ui("power"), get: (s) => s.value ?? s.damage ?? 0, num: true },
+		{ key: "damage_type", label: ui("type"), get: (s) => dmgType(s) },
+		{ key: "cost", label: ui("cost"), get: (s) => s.cost, num: true },
+		{ key: "cooldown", label: ui("cd"), get: (s) => s.cooldown, num: true },
+		{ key: "shop", label: ui("shop"), get: (s) => s.shop_cost?.min ?? 0, num: true },
+		{ key: "list", label: ui("source"), get: (s) => DATA.skillLists.indexOf(s.list) },
+	];
+	const { key, dir } = state.skillSort;
+	const col = cols.find((c) => c.key === key) || cols[2];
+	const rows = DATA.skills
+		.filter((s) => state.skillElement === "all" || (s.nature & Number(state.skillElement)))
+		.filter((s) => state.skillList === "all" || s.list === state.skillList)
+		.filter((s) => matches(tr(s.name), s.name, elementName(s.nature), skillDesc(s), ui("lists")[s.list]))
+		.sort((a, b) => {
+			const x = col.get(a), y = col.get(b);
+			const c = typeof x === "number" ? x - y : String(x).localeCompare(String(y), state.lang);
+			return (dir === "asc" ? c : -c) || (a.tier || 1) - (b.tier || 1) || (a.value ?? 0) - (b.value ?? 0);
+		});
+	const usable = (s) => DATA.mons.filter((m) => covers(m.initial_type, s.nature)).map((m) => tr(m.name) === m.name ? "#" + m.name : tr(m.name));
+	const filters = `<div class="filters">
+		<select id="f-element" aria-label="${ui("element")}">
+			<option value="all">${ui("element")}: ${ui("all")}</option>
+			${BASE_MASKS.map((e) => `<option value="${e}" ${String(e) === state.skillElement ? "selected" : ""}>${esc(elementName(e))}</option>`).join("")}
+		</select>
+		<select id="f-list" aria-label="${ui("source")}">
+			<option value="all">${ui("source")}: ${ui("all")}</option>
+			${DATA.skillLists.map((l) => `<option value="${l}" ${l === state.skillList ? "selected" : ""}>${esc(ui("lists")[l] || l)}</option>`).join("")}
+		</select>
+		<span class="muted small">${rows.length} / ${DATA.skills.length} · ${ui("maxSkills")}: ${DATA.maxSkills ?? "?"}</span>
+	</div>`;
+	const table = `<div class="table-wrap"><table>
+		<thead><tr>${cols.map((c) => `<th class="sortable ${c.num ? "num" : ""}" data-sort="${c.key}" ${c.key === key ? `data-dir="${dir}"` : ""}>${esc(c.label)}</th>`).join("")}
+			<th>${ui("desc")}</th><th>${ui("usableBy")}</th></tr></thead>
+		<tbody>${rows.map((s) => `<tr>
+			<td><b>${hl(tr(s.name))}</b><br><code class="small">${hl(s.name)}</code></td>
+			<td>${chip(s.nature)}</td>
+			<td class="tier" title="${ui("weight")}: ${fmtNum(skillWeight(s))}">${tierStars(s.tier)}</td>
+			<td class="num">${fmtNum(s.value ?? s.damage ?? 0)}</td>
+			<td>${dmgType(s)}</td>
+			<td class="num">${s.cost ?? ""}</td>
+			<td class="num">${s.cooldown ?? ""}</td>
+			<td class="num">${s.shop_cost ? `${s.shop_cost.min}–${s.shop_cost.max}` : ""}</td>
+			<td><span class="tag">${esc(ui("lists")[s.list] || s.list)}</span></td>
+			<td class="wrap">${hl(skillDesc(s))}</td>
+			<td class="wrap small">${esc(usable(s).join(", ") || ui("none"))}</td>
+		</tr>`).join("")}</tbody></table></div>`;
+	const weights = `<p class="small muted" style="margin-top:12px">${ui("tierWeights")}: ${Object.entries(DATA.tierWeights || {}).map(([t, w]) => `${ui("tier")} ${t} = ${w}`).join(" · ")}
+		(+${Math.round((DATA.depthTierBonus || 0) * 100)} % / ${ui("depth")} / ${ui("tier")})</p>`;
+	return header("skills") + filters + (rows.length ? table : `<div class="empty">${ui("noResults")}</div>`) + weights;
+}
+
+function renderElements() {
+	const strong = DATA.elements.strongAgainst;
+	// Kreis ab dem ersten Element ablaufen
+	const cycle = [];
+	let cur = BASE_MASKS[0];
+	while (cur && !cycle.includes(cur)) { cycle.push(cur); cur = strong[cur]; }
+	const cycleHtml = `<div class="card wide"><h3>${ui("strongVs")}</h3><div class="cycle" style="margin-top:8px">${
+		cycle.map(chip).join(" <span class='muted'>→</span> ")} <span class="muted">→</span> ${chip(cycle[0])}</div>
+		<p class="small muted" style="margin:8px 0 0">+1 → ×${1 + DATA.elements.elementBonus}, +2 → ×${1 + 2 * DATA.elements.elementBonus} · −1 → ×${1 - DATA.elements.elementBonus}, −2 → ×${Math.pow(1 - DATA.elements.elementBonus, 2)}</p></div>`;
+
+	const combos = DATA.elements.combos
+		.filter((c) => matches(tr(c.label), c.label, ...elementsIn(c.mask).map(elementName)))
+		.sort((a, b) => elementsIn(a.mask).length - elementsIn(b.mask).length || a.mask - b.mask);
+	const comboHtml = combos.map((c) => {
+		const skills = DATA.skills.filter((s) => s.nature === c.mask);
+		const mons = DATA.mons.filter((m) => m.initial_type === c.mask);
+		return `<article class="card"><div class="row">
+			<div class="swatch" style="background:${esc(c.color)}"></div>
+			<div><h3>${hl(tr(c.label))}</h3><div class="small muted">${elementsIn(c.mask).length > 1 ? `${ui("components")}: ${elementsIn(c.mask).map(elementName).join(" + ")}` : esc(c.color)}</div></div>
+		</div>
+		<dl class="kv">
+			<dt>${ui("skills")}</dt><dd>${skills.length ? skills.map((s) => esc(tr(s.name))).join(", ") : ui("none")}</dd>
+			<dt>${ui("monsters")}</dt><dd>${mons.length ? mons.map((m) => esc(tr(m.name) === m.name ? "#" + m.name : tr(m.name))).join(", ") : ui("none")}</dd>
+		</dl></article>`;
+	}).join("");
+
+	const axis = (state.matrixAll ? DATA.elements.combos.map((c) => c.mask) : BASE_MASKS)
+		.slice().sort((a, b) => elementsIn(a).length - elementsIn(b).length || a - b);
+	const cell = (a, d) => {
+		const m = elementMultiplier(a, d);
+		const s = Math.min(Math.abs(elementScore(a, d)), 4);
+		const cls = m > 1 ? "m-up" : m < 1 ? "m-down" : "m-eq";
+		return `<td class="${cls}" style="--s:${s}" title="${esc(elementName(a))} → ${esc(elementName(d))}">×${fmtNum(m)}</td>`;
+	};
+	const matrix = `<div class="card wide">
+		<div class="row"><h3>${ui("matchups")}</h3><div class="spacer"></div>
+			<div class="seg" id="matrix-mode">
+				<button data-all="0" aria-pressed="${!state.matrixAll}">${ui("onlyBase")}</button>
+				<button data-all="1" aria-pressed="${state.matrixAll}">${ui("allCombos")}</button>
+			</div></div>
+		<div class="table-wrap" style="margin-top:10px;box-shadow:none"><table class="matrix">
+			<thead><tr><th class="rowh small">${ui("attacker")}</th>${axis.map((d) => `<th>${chip(d)}</th>`).join("")}</tr></thead>
+			<tbody>${axis.map((a) => `<tr><th class="rowh">${chip(a)}</th>${axis.map((d) => cell(a, d)).join("")}</tr>`).join("")}</tbody>
+		</table></div></div>`;
+
+	return header("elements") + `<div class="grid">${cycleHtml}${matrix}</div>
+		<h3 style="margin:24px 0 10px">${ui("combos")}</h3>
+		${combos.length ? `<div class="grid">${comboHtml}</div>` : `<div class="empty">${ui("noResults")}</div>`}`;
+}
+
+function renderGems() {
+	const rgb = (c) => `rgb(${c.slice(0, 3).map((v) => Math.round(v * 255)).join(",")})`;
+	const depths = DATA.gems.bonusByDepth;
+	const cards = Object.entries(DATA.gems.stats)
+		.filter(([key, g]) => matches(key, tr(g.name), tr(g.stat)))
+		.map(([key, g]) => `<article class="card"><div class="row">
+			<div class="swatch" style="background:${rgb(g.color)};background-image:url('${esc(res(DATA.gems.icon))}');background-size:cover;background-blend-mode:multiply"></div>
+			<div><h3>${hl(tr(g.name))}</h3><div class="small muted">${esc(tr(g.stat).replace(/:$/, ""))} · <code>${esc(key)}</code></div></div>
+		</div>
+		<p class="small" style="margin:10px 0 0">${esc(tr("GEM_DESC", { stat: tr(g.stat).replace(/:$/, ""), value: `${Math.round(depths[0] * 100)}–${Math.round(depths[depths.length - 1] * 100)}` }))}</p>
+		</article>`);
+	const table = `<div class="card wide"><h3>${ui("perDepth")}</h3>
+		<div class="table-wrap" style="margin-top:10px;box-shadow:none"><table>
+			<thead><tr><th>${ui("depth")}</th>${depths.map((_, i) => `<th class="num">${i + 1}</th>`).join("")}</tr></thead>
+			<tbody><tr><td>Bonus</td>${depths.map((b) => `<td class="num">+${Math.round(b * 100)} %</td>`).join("")}</tr></tbody>
+		</table></div>
+		<p class="small muted" style="margin:8px 0 0">${ui("choices")}: ${DATA.gems.choices ?? "?"}</p></div>`;
+	return header("gems") + `<div class="grid">${cards.join("")}${table}</div>`;
+}
+
+function renderRelics() {
+	const cards = Object.entries(DATA.relics)
+		.filter(([id, r]) => matches(id, tr(r.name), tr(r.description), r.rarity))
+		.map(([id, r]) => `<article class="card"><div class="row" style="align-items:flex-start">
+			<img class="icon" src="${esc(res(r.icon))}" alt="" onerror="this.style.visibility='hidden'">
+			<div style="min-width:0"><h3>${hl(tr(r.name))}</h3>
+				<div class="row small" style="margin-top:2px"><span class="tag">${esc(r.rarity)}</span><code>${esc(id)}</code></div>
+				<p style="margin:8px 0 0">${hl(tr(r.description))}</p>
+			</div></div>
+			${Object.entries(r.hooks || {}).map(([hook, code]) => `<p class="small" style="margin:10px 0 0"><span class="muted">${ui("hook")} <b>${esc(hook)}</b>:</span><br><code>${esc(code)}</code></p>`).join("")}
+		</article>`);
+	const hooks = DATA.relicHooks.length ? `<div class="card wide"><h3>${ui("hooks")}</h3><dl class="kv">${
+		DATA.relicHooks.map((h) => `<dt><code>${esc(h.key)}</code></dt><dd>${esc(h.desc)}</dd>`).join("")}</dl></div>` : "";
+	return header("relics") + (cards.length ? `<div class="grid">${cards.join("")}${hooks}</div>` : `<div class="empty">${ui("noResults")}</div>`);
+}
+
+function renderUnlocks() {
+	const monName = (n) => (tr(n) === n ? `${ui("mon")} ${n}` : tr(n));
+	const ms = DATA.milestones.filter((m) => matches(m.key, tr(m.hint), ...DATA.mons.map((mon) => tr(mon.milestone_egg_skills?.[m.key]))));
+	const bs = DATA.bounties.filter((b) => matches(b.key, tr(b.label, { mon: b.mon }), tr(b.hint), ...DATA.mons.map((mon) => tr(mon.bounty_egg_skills?.[b.key]))));
+	const rewards = (field, key) => DATA.mons.filter((m) => m[field]?.[key])
+		.map((m) => `<li>${esc(monName(m.name))}: ${skillLabel(m[field][key])}</li>`).join("");
+	const msHtml = ms.map((m) => `<article class="card">
+		<h3>${esc(m.count)}× ${esc(tr("MILESTONE_STAT_" + m.stat.toUpperCase()))}</h3>
+		<p class="small muted" style="margin:4px 0 0">${hl(tr(m.hint))}</p>
+		<div class="skill-group"><h4>${ui("reward")}</h4><ul class="skill-list">${rewards("milestone_egg_skills", m.key) || ui("none")}</ul></div>
+	</article>`).join("");
+	const bsHtml = bs.map((b) => `<article class="card">
+		<h3>${hl(tr(b.label, { mon: monName(b.mon) }))}</h3>
+		<dl class="kv">
+			<dt>${ui("appearsFrom")}</dt><dd>${b.min_depth + 1}</dd>
+			<dt>${ui("levelBonus")}</dt><dd>+${b.level_bonus}</dd>
+		</dl>
+		<p class="small muted" style="margin:8px 0 0">${hl(tr(b.hint))}</p>
+		<div class="skill-group"><h4>${ui("reward")}</h4><ul class="skill-list">${rewards("bounty_egg_skills", b.key) || ui("none")}</ul></div>
+	</article>`).join("");
+	return header("unlocks") +
+		`<h3 style="margin:0 0 10px">${ui("milestone")}</h3>${msHtml ? `<div class="grid">${msHtml}</div>` : `<div class="empty">${ui("noResults")}</div>`}
+		<h3 style="margin:24px 0 4px">${ui("bounty")}</h3>
+		<p class="small muted" style="margin:0 0 10px">${ui("bountyChance")}: ${pct(DATA.bountyChance || 0)}</p>
+		${bsHtml ? `<div class="grid">${bsHtml}</div>` : `<div class="empty">${ui("noResults")}</div>`}`;
+}
+
+function renderMap() {
+	const settings = Object.entries(DATA.map.settings);
+	// Spalten aus den Daten, damit neue Feldtypen automatisch auftauchen
+	const keys = [...new Set(settings.flatMap(([, s]) => Object.keys(s)))];
+	const scalar = keys.filter((k) => settings.every(([, s]) => !Array.isArray(s[k])));
+	const lists = keys.filter((k) => !scalar.includes(k));
+	const nodeLabel = { bosses: "BOSS", tresures: "TREASURE", shops: "SHOP", trainers: "TRAINER", jailer: "JAILER", gems: "GEM", camps: "CAMP", events: "EVENT" };
+	const label = (k) => ({ paths: ui("paths"), special_nodes: ui("special"), lines: ui("lines") }[k] ||
+		(nodeLabel[k] ? tr("MAP_NODE_" + nodeLabel[k]) : k));
+	const biomeTier = (i) => i === settings.length - 1 ? 4 : Math.min(1 + Math.round(i * 3 / Math.max(settings.length - 1, 1)), 3);
+	const table = `<div class="table-wrap"><table>
+		<thead><tr><th>${ui("depth")}</th><th>${ui("element")}</th>${scalar.map((k) => `<th class="num">${esc(label(k))}</th>`).join("")}${lists.map((k) => `<th>${esc(label(k))}</th>`).join("")}</tr></thead>
+		<tbody>${settings.map(([d, s], i) => `<tr>
+			<td><b>${Number(d) + 1}</b></td>
+			<td class="small">${biomeTier(i)} ${biomeTier(i) === 1 ? ui("element") : ui("elements")}</td>
+			${scalar.map((k) => `<td class="num">${s[k] ?? ""}</td>`).join("")}
+			${lists.map((k) => `<td>${(s[k] || []).length ? s[k].join(", ") : `<span class="muted">${ui("none")}</span>`}</td>`).join("")}
+		</tr>`).join("")}</tbody></table></div>`;
+	return header("map") + table + `<p class="small muted" style="margin-top:12px">${ui("nodeRows")} · max_rows ${DATA.map.maxRows ?? "?"} · max_cols ${DATA.map.maxCols ?? "?"}</p>`;
+}
+
+// ─────────────────────────
+// Rahmen
+
+function renderChrome() {
+	document.documentElement.lang = state.lang;
+	document.getElementById("search").placeholder = ui("search");
+	document.getElementById("lang").innerHTML = DATA.langs.map((l) =>
+		`<button data-lang="${l}" aria-pressed="${l === state.lang}">${l.toUpperCase()}</button>`).join("");
+	document.getElementById("tabs").innerHTML = Object.entries(SECTIONS).map(([key, s]) =>
+		`<button role="tab" data-tab="${key}" aria-selected="${key === state.tab}">${esc(ui(key))}<span class="count">${s.count()}</span></button>`).join("");
+	const date = new Date(DATA.generatedAt);
+	document.getElementById("footer").innerHTML = `${ui("generated")}: ${date.toLocaleString(state.lang)}${DATA.git ? ` · ${ui("commit")} <code>${esc(DATA.git)}</code>` : ""} · <code>node tools/wiki/build_wiki.js</code>`;
+}
+
+function render() {
+	if (!SECTIONS[state.tab]) state.tab = "monsters";
+	renderChrome();
+	const warn = DATA.warnings?.length ? `<div class="warn"><b>${ui("warnings")}</b><ul>${DATA.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : "";
+	document.getElementById("main").innerHTML = warn + `<section>${SECTIONS[state.tab].render()}</section>`;
+}
+
+function applyTheme(theme) {
+	if (theme === "auto") delete document.documentElement.dataset.theme;
+	else document.documentElement.dataset.theme = theme;
+	document.querySelectorAll("#theme button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.theme === theme)));
+	localSet("wiki.theme", theme);
+}
+
+document.addEventListener("click", (e) => {
+	const t = e.target.closest("button, th.sortable");
+	if (!t) return;
+	if (t.dataset.tab) {
+		state.tab = t.dataset.tab;
+		localSet("wiki.tab", state.tab);
+		history.replaceState(null, "", "#" + state.tab);
+		render();
+		window.scrollTo({ top: 0 });
+	} else if (t.dataset.lang) {
+		state.lang = t.dataset.lang;
+		localSet("wiki.lang", state.lang);
+		render();
+	} else if (t.dataset.theme) {
+		applyTheme(t.dataset.theme);
+	} else if (t.dataset.sort) {
+		const s = state.skillSort;
+		state.skillSort = { key: t.dataset.sort, dir: s.key === t.dataset.sort && s.dir === "asc" ? "desc" : "asc" };
+		render();
+	} else if (t.dataset.all !== undefined) {
+		state.matrixAll = t.dataset.all === "1";
+		render();
+	}
+});
+document.addEventListener("change", (e) => {
+	if (e.target.id === "f-element") state.skillElement = e.target.value;
+	else if (e.target.id === "f-list") state.skillList = e.target.value;
+	else return;
+	render();
+});
+document.getElementById("search").addEventListener("input", (e) => {
+	state.query = e.target.value.trim();
+	const pos = e.target.selectionStart;
+	render();
+	e.target.focus();
+	e.target.setSelectionRange(pos, pos);
+});
+window.addEventListener("hashchange", () => { state.tab = location.hash.slice(1); render(); });
+
+applyTheme(localGet("wiki.theme") || "auto");
+render();
+</script>
+</body>
+</html>

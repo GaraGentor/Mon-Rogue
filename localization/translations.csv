@@ -268,3 +268,5 @@ SHOP_BUY,Buy!,Kaufen!
 SHOP_SOLD,Sold,Verkauft
 SHOP_BOUGHT,{item} bought!,{item} gekauft!
 SHOP_GEM_GIVEN,{mon} got the gem!,{mon} hat den Edelstein bekommen!
+BATTLE_SUPER_EFFECTIVE,Super effective!,Sehr effektiv!
+BATTLE_NOT_EFFECTIVE,Not very effective...,Nicht sehr effektiv...

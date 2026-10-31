@@ -23,6 +23,8 @@ signal mon_is_catched(mon)
 
 # battle
 signal deal_damage_to_monster(mon)
+# Treffer mit Schaden und Element-Faktor (für die schwebende Anzeige "Sehr effektiv!")
+signal monster_hit_with_element(mon, damage, multiplier)
 
 # monster widget
 signal skill_label_pressed(skill)
