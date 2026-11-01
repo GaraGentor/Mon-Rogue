@@ -212,6 +212,7 @@ func _generate_battle():
 		mon._level = max(1, level + randi_range(encounter.offset[0], encounter.offset[1]))
 		if mon._bounty != "":
 			mon._level += Skills.get_bounty(mon._bounty).level_bonus
+		State.record_sighting(mon, depth)
 	print("encounter depth ", depth, " fight ", State.biome_fight_index, ": ", count, "x level ", level)
 	State.enemy_mons = ms
 

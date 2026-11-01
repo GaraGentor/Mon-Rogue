@@ -17,6 +17,11 @@ const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 @export var physical_texture: Texture2D
 @export var magic_texture: Texture2D
 
+## optionales Bild des Monsters (Ei-Auswahl), im Kampf steht es auf dem Feld
+@export var monster_texture: TextureRect
+## Werte und Skills immer zeigen (Start-Monster, die noch nicht im Team sind)
+@export var reveal_all := false
+
 var monster: Monster:
 	set(mon):
 		monster = mon
@@ -34,8 +39,10 @@ func refresh() -> void:
 	name_label.text = "%s  Lv. %d" % [Helper.mon_battle_name(monster), monster._level]
 	name_label.self_modulate = Helper.color_by_mon(monster)
 	element_chip._init_color(monster)
+	if monster_texture:
+		monster_texture.texture = Monmap.texture(monster._name, Monmap.MEDIUM)
 	# eigene Stats sind bekannt, gegnerische erst nachdem die Art in diesem Run besiegt wurde
-	var stats_known := State.mons.has(monster) or State.is_mon_defeated(monster._name)
+	var stats_known := reveal_all or State.mons.has(monster) or State.is_mon_defeated(monster._name)
 	stats_grid.init_with_mon(monster, not stats_known)
 	_build_skill_list()
 
@@ -46,7 +53,7 @@ func _build_skill_list() -> void:
 	for header in SKILL_COLUMNS:
 		skill_grid.add_child(_label(tr(header), Color(0.7, 0.7, 0.7)))
 	# eigene Skills sind bekannt, gegnerische erst nachdem sie eingesetzt wurden
-	var known_all := State.mons.has(monster)
+	var known_all := reveal_all or State.mons.has(monster)
 	for skill in monster._skills:
 		var known: bool = known_all or skill.scouted
 		# Ei-Attacken, die durch Fangen + Opfern freigeschaltet werden können, sind immer markiert

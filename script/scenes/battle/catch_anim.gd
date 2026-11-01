@@ -7,8 +7,8 @@ var catched: bool = false
 func _catch_animation(mon: Monster) -> void:
 	print(mon)
 	print(mon._name)
-	print(Monmap.mon_metainfos_by_name(mon._name).texture_front)
-	$TextureRect/MonTexture.texture = Monmap.mon_metainfos_by_name(mon._name).texture_front
+	print(Monmap.texture(mon._name, Monmap.MEDIUM))
+	$TextureRect/MonTexture.texture = Monmap.texture(mon._name, Monmap.MEDIUM)
 	visible = true
 	# create timer and decide catch.
 	await get_tree().create_timer(3.0).timeout

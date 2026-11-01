@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dp31mv1lmyood"]
 
-[ext_resource type="Texture2D" uid="uid://cc0iba7o70h8m" path="res://assets/mons/4/ChatGPT Image 25. Juni 2025, 14_39_12.png" id="1_oxh2b"]
+[ext_resource type="Texture2D" uid="uid://cc0iba7o70h8m" path="res://assets/mons/4/4_front.png" id="1_oxh2b"]
 [ext_resource type="Script" path="res://script/scenes/battle/monster_scene.gd" id="1_qfx22"]
 [ext_resource type="PackedScene" uid="uid://coyny15w4ca7j" path="res://script/scenes/battle/progress_bars.tscn" id="2_rg2b2"]
 

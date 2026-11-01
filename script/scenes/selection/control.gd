@@ -15,7 +15,8 @@ var common_egg_crack = preload("res://assets/ui/eggs/common_2.png")
 @export var title_label: Label
 @export var go_button: Button
 
-@export var monster_widget: Control
+## Ansicht des gewählten Eis wie im Kampf: Name, Bild, Typ, Werte, Skills
+@export var info_panel: Control
 @export var biome_path: Control
 
 var selected_egg: int = 0
@@ -35,7 +36,8 @@ func select_egg(index):
 	$Selection.get_node("HBoxContainer/ColorRect"+str(index+1)+"/TextureRect" + str(index+1)).material = select_egg_material
 
 	selected_egg = index
-	monster_widget.monster = mons[index]
+	info_panel.visible = true
+	info_panel.monster = mons[index]
 
 func select_mon(mon):
 	State.mons = [mon]

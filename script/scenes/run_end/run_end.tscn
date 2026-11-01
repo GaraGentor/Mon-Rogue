@@ -20,7 +20,7 @@ shader_parameter/total_phases = 8
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_bg"]
 
-[node name="RunEnd" type="Control" node_paths=PackedStringArray("background", "title_label", "subtitle_label", "biome_path", "stats_grid", "team_label", "unlock_label")]
+[node name="RunEnd" type="Control" node_paths=PackedStringArray("background", "title_label", "subtitle_label", "biome_path", "stats_grid", "team_label", "unlock_label", "killer_label", "fallen_label", "search_edit", "mon_list", "detail_box", "biome_tabs")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,9 +33,15 @@ background = NodePath("Background")
 title_label = NodePath("MarginContainer/VBoxContainer/Title")
 subtitle_label = NodePath("MarginContainer/VBoxContainer/Subtitle")
 biome_path = NodePath("MarginContainer/VBoxContainer/BiomePath")
-stats_grid = NodePath("MarginContainer/VBoxContainer/CenterContainer/StatsPanel/MarginContainer/VBoxContainer/StatsGrid")
-team_label = NodePath("MarginContainer/VBoxContainer/CenterContainer/StatsPanel/MarginContainer/VBoxContainer/TeamLabel")
+stats_grid = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/StatsGrid")
+team_label = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/TeamLabel")
 unlock_label = NodePath("MarginContainer/VBoxContainer/UnlockLabel")
+killer_label = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/KillerLabel")
+fallen_label = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/FallenLabel")
+search_edit = NodePath("MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/SearchEdit")
+mon_list = NodePath("MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer/MonList")
+detail_box = NodePath("MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer/Detail")
+biome_tabs = NodePath("MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/BiomeTabs")
 
 [node name="Background" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_bg")
@@ -61,7 +67,7 @@ theme_override_constants/margin_bottom = 40
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 14
 alignment = 1
 
 [node name="Title" type="Label" parent="MarginContainer/VBoxContainer"]
@@ -81,35 +87,97 @@ mouse_filter = 2
 script = ExtResource("6_biome")
 font = ExtResource("7_font")
 
-[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/VBoxContainer"]
+[node name="Panels" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
 
-[node name="StatsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/CenterContainer"]
+[node name="StatsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/Panels"]
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_override_styles/panel = ExtResource("4_box")
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/CenterContainer/StatsPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/Panels/StatsPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/CenterContainer/StatsPanel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="StatsGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/CenterContainer/StatsPanel/MarginContainer/VBoxContainer"]
+[node name="StatsGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/h_separation = 32
 theme_override_constants/v_separation = 6
 columns = 2
 
-[node name="TeamLabel" type="Label" parent="MarginContainer/VBoxContainer/CenterContainer/StatsPanel/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(328, 0)
+[node name="TeamLabel" type="Label" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
+theme_override_font_sizes/font_size = 18
 autowrap_mode = 2
+
+[node name="KillerLabel" type="Label" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.55, 0.5, 1)
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
+
+[node name="FallenLabel" type="Label" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.7)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 2
+
+[node name="SearchPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/Panels"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("4_box")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/Panels/SearchPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SearchTitle" type="Label" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "RUN_END_SEARCH_TITLE"
+
+[node name="SearchEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "RUN_END_SEARCH_PLACEHOLDER"
+clear_button_enabled = true
+
+[node name="BiomeTabs" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MonList" type="ItemList" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(220, 200)
+layout_mode = 2
+fixed_icon_size = Vector2i(28, 28)
+
+[node name="Detail" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
 
 [node name="UnlockLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 visible = false

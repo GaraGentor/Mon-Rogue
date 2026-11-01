@@ -23,14 +23,14 @@ func _start(needs_to_select: bool = false, _mon: Monster = null):
 	var m: Array[Monster] = State.mons.filter(func(mon: Monster): return mon.is_alive())
 	if m.size() == 0:
 		return
-	mon1.texture = Monmap.mon_metainfos_by_name(m[0]._name).texture_front
+	mon1.texture = Monmap.texture(m[0]._name, Monmap.SMALL)
 	if needs_to_select:
 		var index = State.mons.find(m[0])
-		mon2.texture = Monmap.mon_metainfos_by_name(m[0]._name).texture_front
+		mon2.texture = Monmap.texture(m[0]._name, Monmap.SMALL)
 		Events.select_mon.emit(index+1)
 	if m.size() == 2:
 		mon2.visible = true
-		mon2.texture = Monmap.mon_metainfos_by_name(m[1]._name).texture_front
+		mon2.texture = Monmap.texture(m[1]._name, Monmap.SMALL)
 	if debug:
 		btn.disabled = false
 		mon2.visible = true

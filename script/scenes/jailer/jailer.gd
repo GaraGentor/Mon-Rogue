@@ -335,11 +335,11 @@ func affordable(mon_name: String) -> bool:
 func _chained(mon_name: String) -> bool:
 	return not is_free(mon_name)
 
-## Bis zu MON_OFFERS Arten, die schon verbessert wurden oder Start-Monster sind,
+## Bis zu MON_OFFERS Arten, die schon verbessert wurden, Start-Monster sind oder gefangen wurden,
 ## jede an einem anderen Fundort gefangen
 func _roll_offers() -> void:
 	var pool: Array = SaveManager.save_data.monsters.keys()
-	for mon_name in State.TEST_INITIAL_MONS:
+	for mon_name in Helper.get_all_owned_monster_names():
 		if not pool.has(mon_name):
 			pool.append(mon_name)
 	pool = pool.filter(_chained)

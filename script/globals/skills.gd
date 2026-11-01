@@ -7,6 +7,8 @@ func deal_damage(props):
 	var multiplier = element_multiplier(props.skill.nature, props.mon._type)
 	print("lose:" + str(props.skill.value) + ":" + str(damage) + " (Element x" + str(multiplier) + ")")
 	Events.monster_hit_with_element.emit(props.mon, damage, multiplier)
+	if State.mons.has(props.mon) and props.mon.is_alive() and props.mon._lost_hp + damage > props.mon.hp():
+		State.record_own_faint(props.mon, props.from, props.skill, damage, multiplier)
 	props.mon._lost_hp += damage
 
 # ─────────────────────────
@@ -358,6 +360,30 @@ var milestone_skills = [
 	_egg_skill("SKILL_UNDERTOW", Enums.MON_TYPES.WATER, 28.0, 1, Enums.SKILL_DAMAGE_TYPE.ABILITY),
 	_egg_skill("SKILL_MAELSTROM", Enums.MON_TYPES.WATER, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.ABILITY),
 	_egg_skill("SKILL_NORTHERN_TIDE", Enums.MON_TYPES.WATER, 55.0, 3, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	# Monster 3 (Luft)
+	_egg_skill("SKILL_PLUME_FLURRY", Enums.MON_TYPES.AIR, 28.0, 1, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_PHANTOM_DRAFT", Enums.MON_TYPES.AIR, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_SHADOW_SQUALL", Enums.MON_TYPES.AIR, 55.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	# Monster 4 (Feuer)
+	_egg_skill("SKILL_SCORCHING_CHOP", Enums.MON_TYPES.FIRE, 28.0, 1, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_BLAZING_CLEAVE", Enums.MON_TYPES.FIRE, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_INFERNO_EXECUTION", Enums.MON_TYPES.FIRE, 55.0, 3, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	# Monster 5 (Luft)
+	_egg_skill("SKILL_DUST_WHIRR", Enums.MON_TYPES.AIR, 28.0, 1, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_STARING_GAZE", Enums.MON_TYPES.AIR, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_MUDWING_DIVE", Enums.MON_TYPES.AIR, 55.0, 3, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	# Monster 6 (Erde)
+	_egg_skill("SKILL_ROOT_LASH", Enums.MON_TYPES.EARTH, 28.0, 1, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_TWIN_AXE_SWEEP", Enums.MON_TYPES.EARTH, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_ANCIENT_TIMBER", Enums.MON_TYPES.EARTH, 55.0, 3, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	# Monster 7 (Erde)
+	_egg_skill("SKILL_POLLEN_DRIFT", Enums.MON_TYPES.EARTH, 28.0, 1, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_BLOSSOM_CHORUS", Enums.MON_TYPES.EARTH, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_FOURFOLD_BLOOM", Enums.MON_TYPES.EARTH, 55.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	# Monster 8 (Feuer)
+	_egg_skill("SKILL_SPARK_SPIT", Enums.MON_TYPES.FIRE, 28.0, 1, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_LAVA_TAIL", Enums.MON_TYPES.FIRE, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_EMBER_SPIRAL", Enums.MON_TYPES.FIRE, 55.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
 ]
 
 # Bounty-Hunter-Ei-Attacken pro Art, wie die Meilenstein-Skills nur im Grund-Element der Art.
@@ -371,6 +397,30 @@ var bounty_skills = [
 	_egg_skill("SKILL_SHARK_BITE", Enums.MON_TYPES.WATER, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
 	_egg_skill("SKILL_HUNTERS_TIDE", Enums.MON_TYPES.WATER, 58.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
 	_egg_skill("SKILL_TROPHY_TSUNAMI", Enums.MON_TYPES.WATER, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	# Monster 3 (Luft)
+	_egg_skill("SKILL_SILENT_SWOOP", Enums.MON_TYPES.AIR, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_HUNTERS_HAUNT", Enums.MON_TYPES.AIR, 58.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_TROPHY_PHANTASM", Enums.MON_TYPES.AIR, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	# Monster 4 (Feuer)
+	_egg_skill("SKILL_HOT_HATCHET", Enums.MON_TYPES.FIRE, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_HUNTERS_BLAZE", Enums.MON_TYPES.FIRE, 58.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_TROPHY_PYRE", Enums.MON_TYPES.FIRE, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	# Monster 5 (Luft)
+	_egg_skill("SKILL_STINGER_DART", Enums.MON_TYPES.AIR, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_HUNTERS_GAZE", Enums.MON_TYPES.AIR, 58.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_TROPHY_SWARM", Enums.MON_TYPES.AIR, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	# Monster 6 (Erde)
+	_egg_skill("SKILL_SAP_CLEAVER", Enums.MON_TYPES.EARTH, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_HUNTERS_GROVE", Enums.MON_TYPES.EARTH, 58.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_TROPHY_TIMBERFALL", Enums.MON_TYPES.EARTH, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	# Monster 7 (Erde)
+	_egg_skill("SKILL_THORN_EMBRACE", Enums.MON_TYPES.EARTH, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_HUNTERS_BLOOM", Enums.MON_TYPES.EARTH, 58.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_TROPHY_WILDWOOD", Enums.MON_TYPES.EARTH, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	# Monster 8 (Feuer)
+	_egg_skill("SKILL_CINDER_BITE", Enums.MON_TYPES.FIRE, 42.0, 2, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_egg_skill("SKILL_HUNTERS_FLAME", Enums.MON_TYPES.FIRE, 58.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_egg_skill("SKILL_TROPHY_ERUPTION", Enums.MON_TYPES.FIRE, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.ABILITY),
 ]
 
 func _egg_skill(skill_name: String, nature: int, value: float, tier: int, damage_type: int) -> Dictionary:

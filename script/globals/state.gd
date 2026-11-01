@@ -6,9 +6,7 @@ var current_map: Array = []
 var SETTING_LEVEL = 35
 # 500 / State.SETTING_LEVEL
 var INITIAL_LEVEL = 1
-var INITIAL_MONS = ["1", "2", "1"]
-# until more than 3 exist.
-var TEST_INITIAL_MONS = ["1", "2"]
+var INITIAL_MONS = ["2", "4", "5", "8"]
 
 var mons: Array[Monster] = []
 # Art des Start-Monsters (Ei), sammelt den Meilenstein-Fortschritt
@@ -28,6 +26,8 @@ var map_level := 0
 var biome_fight_index := 0
 # Element-Masken der Biome pro Tiefe, einmal pro Run gewürfelt (siehe Map.generate_biome_path)
 var biome_path: Array[int] = []
+# Monster-Arten, die pro Tiefe wild auftauchen können, zusammen mit biome_path gewürfelt (siehe Map.generate_biome_pools)
+var biome_pools: Array = []
 
 
 # Stats pro Monster-Art, einmal pro Run gewürfelt: name -> {"best_points": int, "growth": Growth}
@@ -69,6 +69,12 @@ var run_catches := 0
 var run_ep_earned := 0
 # Monster-Arten im Team beim Run-Ende (bei einer Niederlage stehen sie danach nicht mehr in mons)
 var run_team: Array[String] = []
+# K.O.s eigener Monster in Reihenfolge, der letzte Eintrag hat den Run beendet (siehe record_own_faint)
+var run_deaths: Array[Dictionary] = []
+# gegnerische Monster pro Tiefe: Art -> letzte Sichtung (Stufe, Element, Werte), siehe record_sighting
+var run_sightings: Array = []
+# Stufe der Team-Monster beim Run-Ende: Art -> höchste Stufe
+var run_team_levels: Dictionary = {}
 signal pos_changed(pos)
 # Linie 0 / Zeile 0 hat die Position (0,0,0), daher braucht "noch nicht gestartet" einen eigenen Wert
 const NO_MAP_POSITION := Vector3(-1, -1, -1)
@@ -111,6 +117,10 @@ func reset() -> void:
 	run_catches = 0
 	run_ep_earned = 0
 	run_team = []
+	run_deaths = []
+	biome_pools = []
+	run_sightings = []
+	run_team_levels = {}
 
 # Element-Maske des aktuellen Bioms, 0 wenn kein Biom-Pfad gewürfelt wurde.
 func current_biome() -> int:
@@ -143,10 +153,51 @@ func mark_mon_defeated(mon_name: String) -> void:
 func is_mon_defeated(mon_name: String) -> bool:
 	return defeated_mon_names.has(mon_name)
 
+# Merkt sich den Treffer, der ein eigenes Monster K.O. schlägt (für den Endbildschirm).
+# Aufruf vor dem Abziehen der HP, hp_left ist also der Rest vor dem tödlichen Treffer.
+func record_own_faint(victim: Monster, killer: Monster, skill: Dictionary, damage: float, multiplier: float) -> void:
+	run_deaths.append({
+		"victim": victim._name,
+		"victim_level": victim._level,
+		"killer": killer._name,
+		"killer_display": Helper.mon_battle_name(killer),
+		"killer_level": killer._level,
+		"skill": skill.name,
+		"damage": damage,
+		"multiplier": multiplier,
+		"hp_left": maxf(victim.hp() - victim._lost_hp, 0.0),
+		"max_hp": victim.hp(),
+	})
+
+# Merkt sich ein gegnerisches Monster für die Monster-Suche, spätere Sichtungen derselben Art überschreiben frühere.
+func record_sighting(mon: Monster, depth: int) -> void:
+	while run_sightings.size() <= depth:
+		run_sightings.append({})
+	var previous = run_sightings[depth].get(mon._name, {})
+	run_sightings[depth][mon._name] = {
+		"level": mon._level,
+		"type": mon._type,
+		"count": previous.get("count", 0) + 1,
+		"stats": {
+			"hp": mon.hp(), "atk": mon.attack(), "def": mon.defense(),
+			"s_atk": mon.s_attack(), "s_def": mon.s_defense(), "speed": mon.speed(),
+		},
+		"skills": mon._skills.map(func(skill): return {"name": skill.name, "egg": skill.get("egg_skill", false)}),
+	}
+
+# Wurde die Art in diesem Run als Gegner gesehen? depth -1 = in irgendeinem Biom
+func is_mon_seen(mon_name: String, depth := -1) -> bool:
+	if depth >= 0:
+		return depth < run_sightings.size() and run_sightings[depth].has(mon_name)
+	return run_sightings.any(func(sightings): return sightings.has(mon_name))
+
 # Beendet den Run und merkt sich das Team, die Szene wechselt der Aufrufer (run_end.tscn).
 func end_run(won: bool) -> void:
 	run_won = won
 	run_team.assign(mons.map(func(mon: Monster): return mon._name))
+	run_team_levels = {}
+	for mon in mons:
+		run_team_levels[mon._name] = maxi(run_team_levels.get(mon._name, 0), mon._level)
 
 func stage_clear(progress: int = 1) -> void:
 	#for mon in mons:

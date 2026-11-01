@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://cjvfj6dpk3y2n" path="res://assets/ui/eggs/common_1.png" id="4_4snxg"]
 [ext_resource type="FontFile" uid="uid://cbavibkhidesl" path="res://script/ui/fonts/pxelfont/PixelifySans-VariableFont_wght.ttf" id="4_tpsnj"]
 [ext_resource type="Script" uid="uid://degyfi6ckr318" path="res://script/scenes/selection/ui.gd" id="5_aea4x"]
-[ext_resource type="PackedScene" uid="uid://bqa8vtcwoin5c" path="res://script/scenes/battle/monster_widget.tscn" id="7_f6ddp"]
+[ext_resource type="PackedScene" path="res://script/scenes/selection/starter_info_panel.tscn" id="7_f6ddp"]
 [ext_resource type="Script" path="res://script/scenes/selection/biome_path.gd" id="8_biome"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cjs1n"]
@@ -35,7 +35,7 @@ gradient = SubResource("Gradient_7ag31")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0.196581, 1)
 
-[node name="Control" type="Control" unique_id=114657079 node_paths=PackedStringArray("title_label", "go_button", "monster_widget", "biome_path")]
+[node name="Control" type="Control" unique_id=114657079 node_paths=PackedStringArray("title_label", "go_button", "info_panel", "biome_path")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -47,7 +47,7 @@ size_flags_vertical = 3
 script = ExtResource("1_7et7b")
 title_label = NodePath("Selection/ChatGptImage26_Juni2025,124247/Label")
 go_button = NodePath("Selection/MarginContainer/VBoxContainer/Button2")
-monster_widget = NodePath("UI/MonsterWidget")
+info_panel = NodePath("UI/StarterInfoPanel")
 biome_path = NodePath("Selection/BiomePath")
 
 [node name="Selection" type="Control" parent="." unique_id=224124060]
@@ -224,7 +224,8 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("GradientTexture2D_p4ys2")
 
-[node name="MonsterWidget" parent="UI" unique_id=525460248 instance=ExtResource("7_f6ddp")]
+[node name="StarterInfoPanel" parent="UI" unique_id=525460248 instance=ExtResource("7_f6ddp")]
+visible = false
 layout_mode = 1
 
 [connection signal="gui_input" from="Selection/HBoxContainer/ColorRect1/TextureRect1" to="." method="_on_gui_input1"]

@@ -134,7 +134,7 @@ func _create_icon(mon: Monster) -> Control:
 
 	var texture := TextureRect.new()
 	texture.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	texture.texture = Monmap.mon_metainfos_by_name(mon._name).texture_front
+	texture.texture = Monmap.texture(mon._name, Monmap.ICON)
 	texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.add_child(texture)

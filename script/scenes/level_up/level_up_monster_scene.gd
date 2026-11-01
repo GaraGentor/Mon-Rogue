@@ -13,7 +13,7 @@ var mon: Monster:
 	set(_mon):
 		mon = _mon
 		grid.init_with_mon(mon)
-		monster_texture.texture = Monmap.mon_metainfos_by_name(mon._name).texture_front
+		monster_texture.texture = Monmap.texture(mon._name, Monmap.MEDIUM)
 		name_label.text = "\n" + Helper.mon_display_name(mon._name)
 
 func init_with_mon(_mon: Monster):

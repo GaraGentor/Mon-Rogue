@@ -53,7 +53,7 @@ func _build() -> void:
 	mon_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	content.add_child(mon_box)
 	var texture := TextureRect.new()
-	texture.texture = Monmap.mon_metainfos_by_name(_mon._name).texture_front
+	texture.texture = Monmap.texture(_mon._name, Monmap.MEDIUM)
 	texture.custom_minimum_size = Vector2(260, 260)
 	texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

@@ -58,17 +58,16 @@ func generate_mons(props: Dictionary = {
 	}
 	default_props.merge(props, true)
 	print(OS.get_user_data_dir())
-	var mons_to_pick = ["1", "2"]
+	# wilde Monster: Pool des aktuellen Bioms, ohne gewürfelte Pools alle Arten aus Monmap
+	var mons_to_pick = Monmap.mons.map(func(meta): return meta.name)
+	if State.map_level < State.biome_pools.size() and not State.biome_pools[State.map_level].is_empty():
+		mons_to_pick = State.biome_pools[State.map_level]
 	var mons: Array[Monster] = []
 	if default_props.initial:
-		var initial_mons = []
-		var comp_mons = State.INITIAL_MONS.duplicate()
-		#print("SaveManager.save_data", SaveManager.save_data)
-		comp_mons.append_array(SaveManager.save_data.catched_monsters.duplicate(true))
-		for j in 3:
-			var rand = comp_mons.pick_random()
-			initial_mons.append(comp_mons.pick_random())
-			comp_mons.erase(rand)
+		# jede Art höchstens einmal zur Wahl
+		var comp_mons = get_all_owned_monster_names()
+		comp_mons.shuffle()
+		var initial_mons = comp_mons.slice(0, default_props.count)
 		for i in initial_mons:
 			var mon_meta_data = Monmap.mon_metainfos_by_name(i)
 			var newMon = Monster.new(default_props.level, mon_meta_data)
@@ -184,9 +183,11 @@ func between(v, min, max) -> bool:
 	return v >= min and v <= max
 
 func get_all_owned_monster_names() -> Array:
+	# Start-Monster und gefangene Arten, jede Art nur einmal
 	var all_mons = []
-	all_mons.append_array(State.INITIAL_MONS.duplicate())
-	all_mons.append_array(SaveManager.save_data.catched_monsters)
+	for mon_name in State.INITIAL_MONS + SaveManager.save_data.catched_monsters:
+		if not all_mons.has(mon_name):
+			all_mons.append(mon_name)
 	return all_mons
 #func balance_growth_rate(max_level) -> Dictionary:
 	

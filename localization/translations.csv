@@ -212,8 +212,14 @@ MAP_NODE_TRAINER,TRAINER,TRAINER
 MAP_NODE_JAILER,JAILER,KERKERMEISTER
 MAP_NODE_EVENT,EVENT,EREIGNIS
 MAP_NODE_TREASURE,TREASURE,SCHATZ
-MONSTER_1,1,1
-MONSTER_2,2,2
+MONSTER_1,Gustmane,Böenmähne
+MONSTER_2,Beaconclaw,Leuchtkrabbe
+MONSTER_3,Shadeplume,Schattflaum
+MONSTER_4,Axescale,Hackschupp
+MONSTER_5,Gogglefly,Glotzlibelle
+MONSTER_6,Barkcleaver,Borkenhieb
+MONSTER_7,Grovesisters,Hainschwestern
+MONSTER_8,Cindernewt,Glutmolch
 TURN_WHEEL_ROUND,Round {round},Runde {round}
 SKILL_RAPTOR_DIVE,raptor dive,Raubvogelsturz
 SKILL_HUNTERS_GALE,hunter's gale,Jägerböe
@@ -221,12 +227,48 @@ SKILL_TROPHY_TEMPEST,trophy tempest,Trophäensturm
 SKILL_SHARK_BITE,shark bite,Haibiss
 SKILL_HUNTERS_TIDE,hunter's tide,Jägerflut
 SKILL_TROPHY_TSUNAMI,trophy tsunami,Trophäentsunami
+SKILL_PLUME_FLURRY,plume flurry,Federwirbel
+SKILL_PHANTOM_DRAFT,phantom draft,Phantomzug
+SKILL_SHADOW_SQUALL,shadow squall,Schattenbö
+SKILL_SCORCHING_CHOP,scorching chop,Sengender Hieb
+SKILL_BLAZING_CLEAVE,blazing cleave,Lodernder Spalter
+SKILL_INFERNO_EXECUTION,inferno execution,Infernohinrichtung
+SKILL_DUST_WHIRR,dust whirr,Staubschwirren
+SKILL_STARING_GAZE,staring gaze,Glotzblick
+SKILL_MUDWING_DIVE,mudwing dive,Schlammflügelsturz
+SKILL_ROOT_LASH,root lash,Wurzelpeitsche
+SKILL_TWIN_AXE_SWEEP,twin axe sweep,Doppelaxtschwung
+SKILL_ANCIENT_TIMBER,ancient timber,Uraltes Gehölz
+SKILL_POLLEN_DRIFT,pollen drift,Pollenflug
+SKILL_BLOSSOM_CHORUS,blossom chorus,Blütenchor
+SKILL_FOURFOLD_BLOOM,fourfold bloom,Vierfache Blüte
+SKILL_SPARK_SPIT,spark spit,Funkenspucke
+SKILL_LAVA_TAIL,lava tail,Lavaschweif
+SKILL_EMBER_SPIRAL,ember spiral,Glutspirale
+SKILL_SILENT_SWOOP,silent swoop,Lautloser Sturzflug
+SKILL_HUNTERS_HAUNT,hunter's haunt,Jägerspuk
+SKILL_TROPHY_PHANTASM,trophy phantasm,Trophäenphantasma
+SKILL_HOT_HATCHET,hot hatchet,Glühendes Beil
+SKILL_HUNTERS_BLAZE,hunter's blaze,Jägerlohe
+SKILL_TROPHY_PYRE,trophy pyre,Trophäenscheiterhaufen
+SKILL_STINGER_DART,stinger dart,Stachelpfeil
+SKILL_HUNTERS_GAZE,hunter's gaze,Jägerblick
+SKILL_TROPHY_SWARM,trophy swarm,Trophäenschwarm
+SKILL_SAP_CLEAVER,sap cleaver,Harzspalter
+SKILL_HUNTERS_GROVE,hunter's grove,Jägerhain
+SKILL_TROPHY_TIMBERFALL,trophy timberfall,Trophäenbaumfall
+SKILL_THORN_EMBRACE,thorn embrace,Dornenumarmung
+SKILL_HUNTERS_BLOOM,hunter's bloom,Jägerblüte
+SKILL_TROPHY_WILDWOOD,trophy wildwood,Trophäenwildwald
+SKILL_CINDER_BITE,cinder bite,Glutbiss
+SKILL_HUNTERS_FLAME,hunter's flame,Jägerflamme
+SKILL_TROPHY_ERUPTION,trophy eruption,Trophäeneruption
 CONFIGURATOR_LOCKED_BOUNTY,Locked (bounty hunter),Gesperrt (Bounty Hunter)
 BOUNTY_ALPHA,Alpha {mon},Alpha {mon}
 BOUNTY_NORTHERN_WARDEN,Northern Warden {mon},Nordwächter {mon}
 BOUNTY_UNLOCKED,Bounty claimed! New egg move for {mon}: {skill},Kopfgeld kassiert! Neue Ei-Attacke für {mon}: {skill}
-BOUNTY_HINT_ALPHA_1,"Bounty hunter: defeat Alpha 1 with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege Alpha 1 mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
-BOUNTY_HINT_ALPHA_2,"Bounty hunter: defeat Alpha 2 (from biome 2) with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege Alpha 2 (ab Biom 2) mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
+BOUNTY_HINT_ALPHA_1,"Bounty hunter: defeat Alpha Gustmane with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege Alpha Böenmähne mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
+BOUNTY_HINT_ALPHA_2,"Bounty hunter: defeat Alpha Beaconclaw (from biome 2) with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege Alpha Leuchtkrabbe (ab Biom 2) mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
 BOUNTY_HINT_NORTHERN_WARDEN,"Bounty hunter: defeat the Northern Warden (from biome 4) with this monster (last hit). Catching it or a knockout by a teammate does not count","Bounty Hunter: Besiege den Nordwächter (ab Biom 4) mit diesem Monster (letzter Treffer). Fangen oder ein K.O. durch ein Team-Mitglied zählt nicht"
 JUDGEMENT_RELEASE_CONFIRM,Release anyway,Trotzdem freilassen
 JUDGEMENT_STARTER_WARNING,"If you release {mon}, your starter won't collect any milestone progress for the rest of this run.","Wenn du {mon} freilässt, sammelt dein Start-Monster in diesem Run keinen Meilenstein-Fortschritt mehr."
@@ -311,3 +353,25 @@ JAILER_SAY_FREED,The door is open. {mon} is free! Make something of it.,Die Tür
 JAILER_SAY_CANCEL,Changed your mind? Keep your shard then.,"Doch nicht? Dann behalt deinen Splitter."
 JAILER_SAY_POOR,"No Boss Shards, no keys. That's how it works down here.","Ohne Boss-Splitter keine Schlüssel. So läuft das hier unten."
 JAILER_SAY_EMPTY,All my prisoners are free. Bad for business.,Alle meine Gefangenen sind frei. Schlecht fürs Geschäft.
+RUN_END_KILLED_BY,Killing blow:,Tödlicher Treffer:
+RUN_END_FALLEN,Fallen along the way:,Unterwegs gefallen:
+RUN_END_DEATH_LINE,"{killer} (Lv. {killer_level}) took out {victim} (Lv. {victim_level}) with {skill}: -{damage} HP ({hp_left}/{max_hp} HP left)","{killer} (Lv. {killer_level}) besiegte {victim} (Lv. {victim_level}) mit {skill}: -{damage} KP ({hp_left}/{max_hp} KP übrig)"
+RUN_END_ELEMENT,[Element x{mult}],[Element x{mult}]
+RUN_END_SEARCH_TITLE,Monster search per biome,Monster-Suche pro Biom
+RUN_END_SEARCH_PLACEHOLDER,Search monster...,Monster suchen...
+RUN_END_SEARCH_KILLS,"Knocked out {count} of your monsters, hardest hit: {skill} (-{damage} HP)","Hat {count} deiner Monster besiegt, härtester Treffer: {skill} (-{damage} KP)"
+RUN_END_SEARCH_ALL,All,Alle
+RUN_END_SEARCH_BIOME,Biome {n}: {element},Biom {n}: {element}
+RUN_END_SEARCH_LOCKED,"Not in your collection yet. Keep it as an egg after a biome boss to see its stats.","Noch nicht in deinem Besitz. Sichere es dir nach einem Biom-Boss als Ei, um seine Werte zu sehen."
+RUN_END_SEARCH_BASE,Base,Basis
+RUN_END_SEARCH_IN_TEAM,In your team: Lv. {level},In deinem Team: Lv. {level}
+RUN_END_SEARCH_LAST_SEEN,Last seen: Lv. {level} in biome {n} ({count}x encountered),Zuletzt gesehen: Lv. {level} in Biom {n} ({count}x getroffen)
+RUN_END_SEARCH_NOT_SEEN,Not encountered as an enemy this run.,In diesem Run nicht als Gegner getroffen.
+RUN_END_VIEW_STATS,Stats,Werte
+RUN_END_VIEW_SKILLS,Skills,Fähigkeiten
+RUN_END_SKILLS_SEEN,Last seen with (Lv. {level} in biome {n}):,Zuletzt gesehen mit (Lv. {level} in Biom {n}):
+RUN_END_SKILLS_EGG,(egg move),(Ei-Attacke)
+RUN_END_EGG_DEFAULT,Egg moves:,Ei-Attacken:
+RUN_END_EGG_UNLOCKABLE,Sacrifice:,Opfern:
+RUN_END_EGG_MILESTONE,Milestones:,Meilensteine:
+RUN_END_EGG_BOUNTY,Bounties:,Kopfgelder:

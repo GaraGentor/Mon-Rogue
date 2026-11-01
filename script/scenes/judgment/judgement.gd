@@ -490,7 +490,7 @@ func _make_frame(area: Control) -> Panel:
 func _drag_preview(mon: Monster) -> Control:
 	var holder := Control.new()
 	var picture := TextureRect.new()
-	picture.texture = Monmap.mon_metainfos_by_name(mon._name).texture_front
+	picture.texture = Monmap.texture(mon._name, Monmap.ICON)
 	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	picture.size = Vector2(120, 120)

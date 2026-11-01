@@ -71,7 +71,36 @@ func generate_biome_path() -> Array[int]:
 		prev = candidates.pick_random()
 		biomes.append(prev)
 	State.biome_path = biomes
+	generate_biome_pools(biomes)
 	return biomes
+
+# Arten, die pro Biom wild auftauchen können
+const BIOME_POOL_SIZE = 4
+# Arten mit einem Element des Bioms werden so viel häufiger gezogen
+const BIOME_ELEMENT_WEIGHT = 3.0
+
+# Würfelt für jede Tiefe einen Pool an Monster-Arten (State.biome_pools).
+# Seltene Arten sind am Anfang unwahrscheinlicher (episch in Tiefe 1: 1/7), in der letzten Tiefe zählt nur noch das Element.
+func generate_biome_pools(biomes: Array[int]) -> void:
+	State.biome_pools = []
+	for i in biomes.size():
+		var t = float(i) / max(biomes.size() - 1, 1)
+		var candidates = Monmap.mons.filter(func(meta): return not meta.has("bounty_target"))
+		var weights = []
+		for meta in candidates:
+			var element = BIOME_ELEMENT_WEIGHT if biomes[i] & meta.initial_type else 1.0
+			weights.append(element / (1.0 + 2.0 * meta.rarity * (1.0 - t)))
+		var pool: Array[String] = []
+		while pool.size() < BIOME_POOL_SIZE and not candidates.is_empty():
+			var roll = randf() * weights.reduce(func(a, b): return a + b, 0.0)
+			var index = 0
+			while index < weights.size() - 1 and roll >= weights[index]:
+				roll -= weights[index]
+				index += 1
+			pool.append(candidates[index].name)
+			candidates.remove_at(index)
+			weights.remove_at(index)
+		State.biome_pools.append(pool)
 
 func get_biomes_of_tier(tier: int) -> Array:
 	var all_elements = Enums.MON_TYPES.values().reduce(func(acc, e): return acc | e, 0)
