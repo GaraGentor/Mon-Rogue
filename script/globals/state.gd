@@ -29,7 +29,6 @@ var biome_fight_index := 0
 # Element-Masken der Biome pro Tiefe, einmal pro Run gewürfelt (siehe Map.generate_biome_path)
 var biome_path: Array[int] = []
 
-var shopped: Array = []
 
 # Stats pro Monster-Art, einmal pro Run gewürfelt: name -> {"best_points": int, "growth": Growth}
 var rolled_mon_stats: Dictionary = {}
@@ -101,7 +100,6 @@ func reset() -> void:
 	fainted_enemy_mons = []
 	killed_monsters = 0
 	current_map_position = NO_MAP_POSITION
-	shopped = []
 	is_boss_fight = false
 	is_final_boss = false
 	is_map_boss = false

@@ -1,7 +1,8 @@
 class_name RewardDialog
 extends Control
 
-## Gemeinsamer Belohnungs-Dialog über der Karte (Schatz, Edelstein-Feld, Relic-Belohnung, Shop):
+## Gemeinsamer Belohnungs-Dialog über der Karte (Schatz, Edelstein-Feld, Relic-Belohnung, Shop,
+## Trainer, Jailer):
 ## abgedunkelter Hintergrund, mittiges Panel mit Überschrift. Links stehen die Preise,
 ## rechts erscheinen beim Ziehen eines Preises die Ziele: eigene Monster oder die Tasche.
 ## Ablegen auf einem Ziel bestätigt die Wahl, Fallenlassen woanders bricht ab.
@@ -23,6 +24,7 @@ const BOX = preload("res://script/ui/materials/monster_widget_boxes.tres")
 const LABEL_THEME = preload("res://script/ui/materials/battle_labels.tres")
 const BAG_ICON = preload("res://assets/ui/icons/bag.svg")
 const HOVER_COLOR := Color(1.3, 1.3, 1.0)
+const LOCKED_COLOR := Color(0.45, 0.45, 0.45)
 const SOLD_ALPHA := 0.35
 
 ## Preis auf der linken Seite, lässt sich auf die Ziele ziehen
@@ -57,13 +59,15 @@ class RewardCard extends PanelContainer:
 		dialog._show_targets(self)
 		return drag
 
-## Ziel auf der rechten Seite: ein Monster oder (mon == null) die Tasche
+## Ziel auf der rechten Seite: ein Monster, eine Monster-Art (String) oder (mon == null) die Tasche
 class DropTarget extends PanelContainer:
 	var dialog: RewardDialog
-	var mon: Monster
+	var mon: Variant
+	## gesperrt (drag.can_drop), z. B. zu teuer: ausgegraut, Ablegen nicht möglich
+	var locked := false
 
 	func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
-		return dialog._dragged != null and is_same(data, dialog._dragged.drag)
+		return not locked and dialog._dragged != null and is_same(data, dialog._dragged.drag)
 
 	func _drop_data(_at_position: Vector2, data: Variant) -> void:
 		var card := dialog._dragged
@@ -78,7 +82,7 @@ var _center: CenterContainer
 var _panel: PanelContainer
 var _title: Label
 var _content: VBoxContainer
-var _columns: HBoxContainer
+var _columns: BoxContainer
 ## Spalte mit den Kartengruppen, neue Karten landen immer in der letzten Gruppe
 var _card_groups: VBoxContainer
 var _card_grid: GridContainer
@@ -119,7 +123,7 @@ func _init() -> void:
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_content.add_child(_title)
 
-	_columns = HBoxContainer.new()
+	_columns = BoxContainer.new()
 	_columns.add_theme_constant_override("separation", 30)
 	_content.add_child(_columns)
 	_card_groups = VBoxContainer.new()
@@ -198,6 +202,10 @@ func use_scene_layout(background: Control) -> void:
 	_target_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_fill_targets = true
 
+## Eigener Inhalt unter den Zielen, z. B. die Auswahl, welcher Skill vergessen wird (Trainer)
+func add_side_content(control: Control) -> void:
+	_target_side.add_child(control)
+
 ## Text rechts, solange nichts gezogen wird (Übersetzungs-Key)
 func set_drag_hint(key: String) -> void:
 	_drag_hint = key
@@ -233,9 +241,13 @@ static func texture_icon(texture: Texture2D, color: Color = Color.WHITE) -> Cont
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	return icon
 
-## Bild eines eigenen Monsters, als Ziel für Edelsteine und Tränke
-static func mon_icon(mon: Monster) -> Control:
-	return texture_icon(Monmap.mon_metainfos_by_name(mon._name).texture_front)
+## Art eines Ziels: eigene Monster oder Arten als String
+static func mon_name(mon: Variant) -> String:
+	return mon if mon is String else mon._name
+
+## Bild eines eigenen Monsters bzw. einer Art, als Ziel für Edelsteine, Tränke und Boss-Splitter
+static func mon_icon(mon: Variant) -> Control:
+	return texture_icon(Monmap.mon_metainfos_by_name(mon_name(mon)).texture_front)
 
 ## Preis, der in die Tasche gezogen wird (Gold, Relic)
 func add_bag_card(card_title: String, text: String, icon: Control, on_taken: Callable) -> RewardCard:
@@ -245,8 +257,12 @@ func add_bag_card(card_title: String, text: String, icon: Control, on_taken: Cal
 ## tooltip(mon) liefert den Text, der beim Drüberziehen erscheint.
 ## mons darf auch ein Callable sein, dann wird die Liste erst beim Ziehen bestimmt
 ## (im Shop ändert sich nach einem Kauf, wer einen Trank noch trinken kann).
-func add_mon_card(card_title: String, text: String, icon: Control, header: String, mons: Variant, on_given: Callable, tooltip: Callable) -> RewardCard:
-	return _add_card(card_title, text, icon, {"header": header, "mons": mons, "on_drop": on_given, "tooltip": tooltip})
+## extra: target_title(mon) beschriftet die Ziele, can_drop(mon) sperrt einzelne Ziele,
+## no_target ersetzt den Text, wenn kein Ziel übrig ist.
+func add_mon_card(card_title: String, text: String, icon: Control, header: String, mons: Variant, on_given: Callable, tooltip: Callable, extra := {}) -> RewardCard:
+	var drag := {"header": header, "mons": mons, "on_drop": on_given, "tooltip": tooltip}
+	drag.merge(extra)
+	return _add_card(card_title, text, icon, drag)
 
 func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary) -> RewardCard:
 	var card := RewardCard.new()
@@ -291,10 +307,12 @@ func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary
 	_card_grid.add_child(card)
 	return card
 
-func _add_target(target_title: String, icon: Control, mon: Monster) -> void:
+func _add_target(target_title: String, icon: Control, mon: Variant, locked := false) -> void:
 	var target := DropTarget.new()
 	target.dialog = self
 	target.mon = mon
+	target.locked = locked
+	target.modulate = LOCKED_COLOR if locked else Color.WHITE
 	target.custom_minimum_size = TARGET_SIZE
 	target.add_theme_stylebox_override("panel", BOX)
 
@@ -317,10 +335,14 @@ static func ignore_mouse_below(control: Control) -> void:
 		child.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _show_targets(card: RewardCard) -> void:
-	_clear_targets()
 	_dragged = card
 	card.modulate.a = 0.4
 	_target_header.text = card.drag.header
+	_build_targets(card)
+
+## Ziele der Karte anlegen: die Tasche oder die Monster aus drag.mons
+func _build_targets(card: RewardCard) -> void:
+	_clear_targets()
 	if card.drag.get("bag", false):
 		_target_grid.columns = 1
 		_add_target(tr("REWARD_BAG"), texture_icon(BAG_ICON), null)
@@ -332,11 +354,14 @@ func _show_targets(card: RewardCard) -> void:
 		return
 	var mons: Array = card.drag.mons.call() if card.drag.mons is Callable else card.drag.mons
 	if mons.is_empty():
-		_target_header.text = tr("REWARD_NO_TARGET")
+		_target_header.text = card.drag.get("no_target", tr("REWARD_NO_TARGET"))
 		return
 	_target_grid.columns = 1 if _fill_targets else mini(mons.size(), TARGET_COLUMNS)
-	for mon: Monster in mons:
-		_add_target(Helper.mon_display_name(mon._name), mon_icon(mon), mon)
+	var title_of: Callable = card.drag.get("target_title", Callable())
+	var can_drop: Callable = card.drag.get("can_drop", Callable())
+	for mon in mons:
+		var target_title: String = title_of.call(mon) if title_of.is_valid() else Helper.mon_display_name(mon_name(mon))
+		_add_target(target_title, mon_icon(mon), mon, can_drop.is_valid() and not can_drop.call(mon))
 	if _fill_targets:
 		# Monster übereinander, zusammen so groß wie die ganze rechte Seite
 		_target_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -371,7 +396,10 @@ func _process(_delta: float) -> void:
 	var hovered: DropTarget = null
 	for target: DropTarget in _target_grid.get_children():
 		var over := target.get_global_rect().has_point(mouse)
-		target.modulate = HOVER_COLOR if over else Color.WHITE
+		if target.locked:
+			target.modulate = LOCKED_COLOR
+		else:
+			target.modulate = HOVER_COLOR if over else Color.WHITE
 		if over:
 			hovered = target
 	var tooltip: Callable = _dragged.drag.get("tooltip", Callable())

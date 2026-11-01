@@ -54,9 +54,9 @@ func _init(level: int, meta_data: Dictionary) -> void:
 		_upgrades = filtered.upgrade
 
 func mon_upgraded(mon_name):
-	if SaveManager.save_data.monsters.has(mon_name):
+	if mon_name == _name and SaveManager.save_data.monsters.has(mon_name):
 		var filtered = SaveManager.save_data.monsters[mon_name]
-		_upgrades = filtered.upgrades
+		_upgrades = filtered.upgrade
 
 func upgrade_by_level(level: int = 0):
 	_level += level
