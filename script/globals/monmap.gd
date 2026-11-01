@@ -5,12 +5,12 @@ func mon_metainfos_by_name(name: String) -> Dictionary:
 
 ## Vorhandene Bildgrößen unter assets/mons/<name>/ (<name>_front.png ist 1024, kleinere heißen <name>_frontx512.png usw.)
 const FRONT_SIZES := [128, 256, 512, 1024]
-const BACK_SIZES := [512, 1024]
+const BACK_SIZES := [256, 512, 1024]
 
 ## Typische Platzhaltergrößen, damit die Aufrufer nicht raten müssen
 const ICON := 128     # Initiative-Rad, kleine Portraits
-const SMALL := 256    # Karten, Ziele, Widgets
-const MEDIUM := 512   # Kampffeld, große Panels
+const SMALL := 256    # Kampffeld, Karten, Ziele, Widgets
+const MEDIUM := 512   # große Panels
 const LARGE := 1024
 
 ## Bild einer Monster-Art in der kleinsten Auflösung, die `display_size` Pixel noch scharf füllt.

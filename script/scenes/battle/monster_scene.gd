@@ -25,7 +25,7 @@ func _ready() -> void:
 		mon = mons[mon_slot]
 		visible = true
 		# eigene Monster stehen mit dem Rücken zur Kamera, Gegner schauen her
-		texture_rect.texture = Monmap.texture(mon._name, Monmap.MEDIUM, home_mons)
+		texture_rect.texture = Monmap.texture(mon._name, Monmap.SMALL, home_mons)
 		progress_bar.progress_bar.max_value = mon.hp()
 		progress_bar.progress_bar.value = mon.hp()
 		progress_bar.level_label.text = str(mon._level)
