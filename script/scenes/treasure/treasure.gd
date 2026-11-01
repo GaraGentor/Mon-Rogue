@@ -3,6 +3,7 @@ extends RewardDialog
 ## Schatz: Gold oder ein Bonus-Preis, einer davon darf genommen werden.
 ## Der Bonus ist meist ein Edelstein, sonst ein Element-Trank oder selten ein gewöhnliches Relic.
 ## Edelstein und Trank werden danach einem eigenen Monster gegeben.
+## Die Trank-Karte nutzt auch der Shop.
 
 const GemField = preload("res://script/scenes/gems/gems.gd")
 const RelicReward = preload("res://script/scenes/relic_reward/relic_reward.gd")
@@ -20,7 +21,7 @@ const BONUS_WEIGHTS := {"gem": 60, "potion": 30, "relic": 10}
 const ELEMENTS := [Enums.MON_TYPES.EARTH, Enums.MON_TYPES.AIR, Enums.MON_TYPES.WATER, Enums.MON_TYPES.FIRE]
 
 var gold_icon = preload("res://assets/ui/boss_shard/ChatGPT Image 26. Dez. 2025, 16_38_12.png")
-var element_pill = preload("res://script/scenes/shop/element_pill.tscn")
+const ELEMENT_PILL = preload("res://script/scenes/shop/element_pill.tscn")
 
 var _depth: int
 
@@ -34,7 +35,6 @@ func _ready() -> void:
 
 func _on_gold_chosen(gold: int) -> void:
 	State.ep += gold
-	close()
 
 func _add_bonus_card() -> void:
 	if State.mons.is_empty():
@@ -47,9 +47,9 @@ func _add_bonus_card() -> void:
 				return
 		"potion":
 			# nur Elemente, die noch mindestens einem Monster fehlen
-			var elements = ELEMENTS.filter(func(e): return _mons_without(e).size() > 0)
+			var elements = ELEMENTS.filter(func(e): return mons_without(e).size() > 0)
 			if not elements.is_empty():
-				_add_potion_card(elements.pick_random())
+				add_potion_card(self, elements.pick_random())
 				return
 	# Fallback, falls kein passendes Relic oder Element übrig ist
 	var stat: String = GemField.STATS.keys().pick_random()
@@ -69,27 +69,26 @@ func _roll_bonus() -> String:
 
 # ── Element-Trank ─────────────────────────
 
-func _add_potion_card(element: int) -> void:
-	var element_name = tr(ColorMap.get_combo(element).label)
-	var text = tr("TREASURE_POTION_DESC").format({"element": element_name})
-	var potion_title = tr("TREASURE_POTION").format({"element": element_name})
-	add_mon_card(potion_title, text, _potion_icon(element), tr("TREASURE_POTION_CHOOSE_MON"), _mons_without(element), _on_potion_given.bind(element), _potion_tooltip.bind(element))
+## Trank-Karte: wird auf ein Monster gezogen, dem das Element noch fehlt.
+## Die Liste wird erst beim Ziehen bestimmt, damit sie im Shop nach jedem Kauf stimmt.
+static func add_potion_card(dialog: RewardDialog, element: int) -> RewardDialog.RewardCard:
+	var element_name = dialog.tr(ColorMap.get_combo(element).label)
+	var text = dialog.tr("TREASURE_POTION_DESC").format({"element": element_name})
+	var potion_title = dialog.tr("TREASURE_POTION").format({"element": element_name})
+	var give := func(mon: Monster):
+		mon._type = ColorMap.add_element(mon._type, element)
+	# Tooltip beim Drüberziehen: altes Element und was daraus wird
+	var tooltip := func(mon: Monster) -> String:
+		var new_type = ColorMap.add_element(mon._type, element)
+		return "%s\n%s %s" % [dialog.tr(ColorMap.get_combo(mon._type).label), dialog.tr("SHOP_CHANGES_TO"), dialog.tr(ColorMap.get_combo(new_type).label)]
+	return dialog.add_mon_card(potion_title, text, _potion_icon(element), dialog.tr("TREASURE_POTION_CHOOSE_MON"), func(): return mons_without(element), give, tooltip)
 
-func _on_potion_given(mon: Monster, element: int) -> void:
-	mon._type = ColorMap.add_element(mon._type, element)
-	close()
-
-## Tooltip beim Drüberziehen: altes Element und was daraus wird
-func _potion_tooltip(mon: Monster, element: int) -> String:
-	var new_type = ColorMap.add_element(mon._type, element)
-	return "%s\n%s %s" % [tr(ColorMap.get_combo(mon._type).label), tr("SHOP_CHANGES_TO"), tr(ColorMap.get_combo(new_type).label)]
-
-func _mons_without(element: int) -> Array:
+static func mons_without(element: int) -> Array:
 	return State.mons.filter(func(mon): return not ColorMap.has_element(mon._type, element))
 
 ## Trank-Kugel aus dem Shop, ohne Preis, nicht ziehbar und rund (quadratisch eingepasst)
-func _potion_icon(type: int) -> Control:
-	var pill = element_pill.instantiate()
+static func _potion_icon(type: int) -> Control:
+	var pill = ELEMENT_PILL.instantiate()
 	pill._init_pill(type)
 	pill.money_label.visible = false
 	pill.element_label.visible = false

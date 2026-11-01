@@ -32,15 +32,14 @@ func _ready() -> void:
 	for stat in stats.slice(0, GEM_CHOICES):
 		add_gem_card(self, stat, _bonus)
 
-## Edelstein-Karte, auch vom Schatz genutzt: wird auf ein Monster gezogen, danach schließt der Dialog.
+## Edelstein-Karte, auch von Schatz und Shop genutzt: wird auf ein Monster gezogen.
 ## Beim Drüberziehen zeigt der Tooltip, wie viel Bonus das Monster schon hat.
-static func add_gem_card(dialog: RewardDialog, stat: String, bonus: float) -> void:
+static func add_gem_card(dialog: RewardDialog, stat: String, bonus: float) -> RewardDialog.RewardCard:
 	var info: Dictionary = STATS[stat]
 	var stat_name = dialog.tr(info.stat).trim_suffix(":")
 	var text = dialog.tr("GEM_DESC").format({"stat": stat_name, "value": roundi(bonus * 100)})
 	var give := func(mon: Monster):
 		mon.add_gem(stat, bonus)
-		dialog.close()
 	var tooltip := func(mon: Monster) -> String:
 		return "%s +%d%%\n%s" % [stat_name, roundi(bonus * 100), dialog.tr("GEM_CURRENT").format({"value": roundi((mon.gem_factor(stat) - 1.0) * 100)})]
-	dialog.add_mon_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, tooltip)
+	return dialog.add_mon_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, tooltip)

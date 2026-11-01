@@ -264,9 +264,9 @@ GEM_DEF,Granite of Defense,Granit der Abwehr
 GEM_S_ATK,Amethyst of Power,Amethyst der Macht
 GEM_S_DEF,Sapphire of Warding,Saphir des Schutzes
 GEM_SPEED,Emerald of Swiftness,Smaragd der Schnelligkeit
-SHOP_BUY,Buy!,Kaufen!
-SHOP_SOLD,Sold,Verkauft
 SHOP_BOUGHT,{item} bought!,{item} gekauft!
-SHOP_GEM_GIVEN,{mon} got the gem!,{mon} hat den Edelstein bekommen!
+SHOP_TITLE,Shop,Laden
+SHOP_HINT,Drag an item over here to buy it.,"Zieh eine Ware hier herüber, um sie zu kaufen."
+REWARD_NO_TARGET,None of your monsters can use this.,Keins deiner Monster kann das gebrauchen.
 BATTLE_SUPER_EFFECTIVE,Super effective!,Sehr effektiv!
 BATTLE_NOT_EFFECTIVE,Not very effective...,Nicht sehr effektiv...
