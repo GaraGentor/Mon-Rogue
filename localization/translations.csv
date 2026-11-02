@@ -233,6 +233,14 @@ MONSTER_5,Gogglefly,Glotzlibelle
 MONSTER_6,Barkcleaver,Borkenhieb
 MONSTER_7,Grovesisters,Hainschwestern
 MONSTER_8,Cindernewt,Glutmolch
+MONSTER_9,Jellylotl,Quallolotl
+MONSTER_10,Magmacolossus,Glutkoloss
+MONSTER_11,Puffowl,Wolkenkauz
+MONSTER_12,Stormgryph,Sturmgreif
+MONSTER_13,Crystalback,Kristallwühler
+MONSTER_14,Frostvixen,Frostfähe
+MONSTER_15,Mistwraith,Nebelspuk
+MONSTER_16,Sparkhog,Funkenigel
 TURN_WHEEL_ROUND,Round {round},Runde {round}
 SKILL_RAPTOR_DIVE,raptor dive,Raubvogelsturz
 SKILL_HUNTERS_GALE,hunter's gale,Jägerböe
@@ -258,6 +266,30 @@ SKILL_FOURFOLD_BLOOM,fourfold bloom,Vierfache Blüte
 SKILL_SPARK_SPIT,spark spit,Funkenspucke
 SKILL_LAVA_TAIL,lava tail,Lavaschweif
 SKILL_EMBER_SPIRAL,ember spiral,Glutspirale
+SKILL_BUBBLE_SPRAY,bubble spray,Blasenschauer
+SKILL_TENTACLE_LASH,tentacle lash,Tentakelpeitsche
+SKILL_TIDE_HEART,tide heart,Gezeitenherz
+SKILL_MAGMA_FIST,magma fist,Magmafaust
+SKILL_SMOLDER_STOMP,smolder stomp,Schwelstampfer
+SKILL_CORE_BLAST,core blast,Kernglut
+SKILL_FEATHER_PUFF,feather puff,Federpuff
+SKILL_CLOUD_BURST,cloud burst,Wolkenbruch
+SKILL_SKY_TWISTER,sky twister,Himmelswirbel
+SKILL_STATIC_TALON,static talon,Statikkralle
+SKILL_THUNDER_WINGS,thunder wings,Donnerschwingen
+SKILL_SKYFALL_STORM,skyfall storm,Himmelssturz
+SKILL_SHARD_SWIPE,shard swipe,Splitterhieb
+SKILL_CRYSTAL_SPIKES,crystal spikes,Kristallstacheln
+SKILL_GEODE_CRASH,geode crash,Geodenschlag
+SKILL_SNOW_FLURRY,snow flurry,Schneegestöber
+SKILL_FROST_TAILS,frost tails,Frostschweife
+SKILL_GLACIAL_GRACE,glacial grace,Gletscheranmut
+SKILL_MIST_TOUCH,mist touch,Nebelhauch
+SKILL_VAPOR_COIL,vapor coil,Dunstschlinge
+SKILL_PHANTOM_FOG,phantom fog,Phantomnebel
+SKILL_STATIC_ROLL,static roll,Statikrolle
+SKILL_VOLT_QUILLS,volt quills,Voltstacheln
+SKILL_BALL_LIGHTNING,ball lightning,Kugelblitz
 SKILL_SILENT_SWOOP,silent swoop,Lautloser Sturzflug
 SKILL_HUNTERS_HAUNT,hunter's haunt,Jägerspuk
 SKILL_TROPHY_PHANTASM,trophy phantasm,Trophäenphantasma
@@ -276,6 +308,30 @@ SKILL_TROPHY_WILDWOOD,trophy wildwood,Trophäenwildwald
 SKILL_CINDER_BITE,cinder bite,Glutbiss
 SKILL_HUNTERS_FLAME,hunter's flame,Jägerflamme
 SKILL_TROPHY_ERUPTION,trophy eruption,Trophäeneruption
+SKILL_JELLY_STING,jelly sting,Gallertstich
+SKILL_HUNTERS_CURRENT,hunter's current,Jägerströmung
+SKILL_TROPHY_TORRENT,trophy torrent,Trophäensturzflut
+SKILL_BOULDER_PUNCH,boulder punch,Felsenhieb
+SKILL_HUNTERS_EMBER,hunter's ember,Jägerglut
+SKILL_TROPHY_CALDERA,trophy caldera,Trophäencaldera
+SKILL_DOWNDRAFT,downdraft,Fallwind
+SKILL_HUNTERS_BREEZE,hunter's breeze,Jägerbrise
+SKILL_TROPHY_TYPHOON,trophy typhoon,Trophäentaifun
+SKILL_GRYPH_STRIKE,gryph strike,Greifenhieb
+SKILL_HUNTERS_THUNDER,hunter's thunder,Jägerdonner
+SKILL_TROPHY_HURRICANE,trophy hurricane,Trophäenorkan
+SKILL_QUARRY_CLAW,quarry claw,Steinbruchklaue
+SKILL_HUNTERS_BOULDER,hunter's boulder,Jägerfels
+SKILL_TROPHY_AVALANCHE,trophy avalanche,Trophäenlawine
+SKILL_ICICLE_FANG,icicle fang,Eiszapfenbiss
+SKILL_HUNTERS_FROST,hunter's frost,Jägerfrost
+SKILL_TROPHY_BLIZZARD,trophy blizzard,Trophäenblizzard
+SKILL_WISP_GRASP,wisp grasp,Irrlichtgriff
+SKILL_HUNTERS_MIST,hunter's mist,Jägernebel
+SKILL_TROPHY_DELUGE,trophy deluge,Trophäensintflut
+SKILL_SHOCK_NIP,shock nip,Schockbiss
+SKILL_HUNTERS_SPARK,hunter's spark,Jägerfunke
+SKILL_TROPHY_SURGE,trophy surge,Trophäenentladung
 CONFIGURATOR_LOCKED_BOUNTY,Locked (bounty hunter),Gesperrt (Bounty Hunter)
 BOUNTY_ALPHA,Alpha {mon},Alpha {mon}
 BOUNTY_NORTHERN_WARDEN,Northern Warden {mon},Nordwächter {mon}
