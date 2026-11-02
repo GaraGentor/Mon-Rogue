@@ -47,6 +47,20 @@ var map_settings = {
 	4: {"paths":17, "special_nodes": 6, "bosses": [6,12], "lines": 3, "tresures": [2,8], "shops": [9], "trainers": [], "jailer": [], "gems": [4,14]},
 }
 
+enum EVENT_TYPE {
+	CAMP = 0,
+}
+
+# Was ein EVENT-Feld auslöst, Wahrscheinlichkeit in Prozent (alle zusammen sollten 100 ergeben)
+var event_chances = {
+	EVENT_TYPE.CAMP: 100,
+}
+
+# Würfelt anhand von event_chances, welches Ereignis ein EVENT-Feld auslöst.
+func roll_event() -> EVENT_TYPE:
+	var events = event_chances.keys()
+	return events[pick_weighted_index(range(events.size()), event_chances.values())]
+
 var all_nodes = []
 var starting_nodes = []
 
@@ -76,31 +90,38 @@ func generate_biome_path() -> Array[int]:
 
 # Arten, die pro Biom wild auftauchen können
 const BIOME_POOL_SIZE = 4
-# Arten mit einem Element des Bioms werden so viel häufiger gezogen
-const BIOME_ELEMENT_WEIGHT = 3.0
-
 # Würfelt für jede Tiefe einen Pool an Monster-Arten (State.biome_pools).
+# Die Plätze werden reihum auf die Elemente des Bioms verteilt (Dampf: 2x Wasser, 2x Feuer), damit die Basis-Arten
+# des Bioms auftauchen. Gibt es für ein Element keine Art mehr, wird mit beliebigen Arten aufgefüllt.
 # Seltene Arten sind am Anfang unwahrscheinlicher (episch in Tiefe 1: 1/7), in der letzten Tiefe zählt nur noch das Element.
 func generate_biome_pools(biomes: Array[int]) -> void:
 	State.biome_pools = []
 	for i in biomes.size():
 		var t = float(i) / max(biomes.size() - 1, 1)
 		var candidates = Monmap.mons.filter(func(meta): return not meta.has("bounty_target"))
-		var weights = []
-		for meta in candidates:
-			var element = BIOME_ELEMENT_WEIGHT if biomes[i] & meta.initial_type else 1.0
-			weights.append(element / (1.0 + 2.0 * meta.rarity * (1.0 - t)))
+		var weights = candidates.map(func(meta): return 1.0 / (1.0 + 2.0 * meta.rarity * (1.0 - t)))
+		var elements = Enums.MON_TYPES.values().filter(func(element): return biomes[i] & element)
+		elements.shuffle()
 		var pool: Array[String] = []
 		while pool.size() < BIOME_POOL_SIZE and not candidates.is_empty():
-			var roll = randf() * weights.reduce(func(a, b): return a + b, 0.0)
-			var index = 0
-			while index < weights.size() - 1 and roll >= weights[index]:
-				roll -= weights[index]
-				index += 1
+			var element = elements[pool.size() % elements.size()] if not elements.is_empty() else 0
+			var indices = range(candidates.size()).filter(func(index): return candidates[index].initial_type & element)
+			if indices.is_empty():
+				indices = range(candidates.size())
+			var index = pick_weighted_index(indices, weights)
 			pool.append(candidates[index].name)
 			candidates.remove_at(index)
 			weights.remove_at(index)
 		State.biome_pools.append(pool)
+
+# Zieht einen der Indizes, gewichtet nach weights[index].
+func pick_weighted_index(indices: Array, weights: Array) -> int:
+	var roll = randf() * indices.reduce(func(sum, index): return sum + weights[index], 0.0)
+	for index in indices:
+		roll -= weights[index]
+		if roll < 0.0:
+			return index
+	return indices.back()
 
 func get_biomes_of_tier(tier: int) -> Array:
 	var all_elements = Enums.MON_TYPES.values().reduce(func(acc, e): return acc | e, 0)

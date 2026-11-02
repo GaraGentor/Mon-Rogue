@@ -135,7 +135,7 @@ func roll_mon_stats() -> void:
 	for meta_data in Monmap.mons:
 		rolled_mon_stats[meta_data.name] = {
 			"best_points": randi_range(meta_data["stats"][0], meta_data["stats"][1]),
-			"growth": Growth.new(),
+			"growth": Growth.new(meta_data["preferred_stats"]),
 		}
 
 # Liefert die für diesen Run festen Stats einer Monster-Art (würfelt beim ersten Zugriff).

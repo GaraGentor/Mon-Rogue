@@ -97,17 +97,23 @@ func generate_mons(props: Dictionary = {
 		mons.append(newMon)
 	return mons
 
-# Ab Biomen mit so vielen Elementen nehmen wilde Monster zwei Biom-Elemente an statt einem.
-const DEEP_BIOME_ELEMENTS := 3
+# So viele wilde Monster tragen das volle Element des Bioms, der Rest liegt eine Ebene darunter.
+const FULL_BIOME_TYPE_CHANCE := 0.25
 
-# Wilde Monster nehmen Elemente des aktuellen Bioms an, die sie noch nicht haben (Luft im Feuer-Biom -> Blitz).
-# In tiefen Biomen zwei, damit auch Skills mit drei oder vier Elementen in freier Wildbahn auftauchen.
+# Wilde Monster nehmen Elemente des aktuellen Bioms an: meist eine Ebene unter dem Biom, ab und zu das Biom selbst.
+# Dampf (Wasser+Feuer) -> Wasser und Feuer, ein paar Dampf. Gewitter (Luft+Wasser+Feuer) -> Dampf, Eis und Blitz,
+# ein paar Gewitter. Einzelelement-Biome ändern nichts, dort tauchen die Arten des Elements selbst auf.
 func add_biome_element(mon: Monster) -> void:
 	var biome = State.current_biome()
-	var count = 2 if Map.count_elements(biome) >= DEEP_BIOME_ELEMENTS else 1
+	var size = Map.count_elements(biome)
+	if size <= 1:
+		return
+	if randf() < FULL_BIOME_TYPE_CHANCE:
+		mon._type |= biome
+		return
 	var candidates = Enums.MON_TYPES.values().filter(func(element): return biome & element and not mon._type & element)
 	candidates.shuffle()
-	for element in candidates.slice(0, count):
+	for element in candidates.slice(0, maxi(size - 1 - Map.count_elements(mon._type & biome), 0)):
 		mon._type |= element
 
 const WILD_SKILL_COUNT := 3

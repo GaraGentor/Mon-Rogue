@@ -8,29 +8,18 @@ var s_atk: float
 var s_def: float
 var speed: float
 
-func _init() -> void:
-	var min_v := 0.05
-	var attrs := ["hp", "atk", "def", "s_atk", "s_def", "speed"]
-	
-	# Schritt 1: Mindestwerte setzen
-	for a in attrs:
-		self[a] = min_v
-	
-	# Schritt 2: Rest berechnen
-	var rest := 1.0 - min_v * attrs.size()
-	
-	# Schritt 3: Zufällige Gewichte erzeugen
-	var weights := []
-	var sum_w := 0.0
-	for a in attrs:
-		var w := randf()   # gleichverteilte Zufallszahl 0..1
-		weights.append(w)
-		sum_w += w
-	
-	# Schritt 4: Rest proportional verteilen
-	for i in range(attrs.size()):
-		var adden = rest * (weights[i] / sum_w)
-		self[attrs[i]] += adden
-	
-	print("hp:", hp, " atk:", atk, " def:", def, " s_atk:", s_atk, " s_def:", s_def, " speed:", speed)
-	print("sum =", hp + atk + def + s_atk + s_def + speed)
+const ATTRS := ["hp", "atk", "def", "s_atk", "s_def", "speed"]
+# Wie stark jeder Anteil pro Run vom Profil der Art abweichen darf (0.15 = ±15 %)
+const MAX_DEVIATION := 0.15
+
+# preferred: bevorzugte Anteile der Art in Prozent (Monmap "preferred_stats"), Summe 100
+func _init(preferred: Dictionary) -> void:
+	# Schritt 1: jeden Anteil zufällig um bis zu ±MAX_DEVIATION verschieben
+	var sum := 0.0
+	for a in ATTRS:
+		self[a] = preferred[a] * (1.0 + randf_range(-MAX_DEVIATION, MAX_DEVIATION))
+		sum += self[a]
+
+	# Schritt 2: wieder auf Summe 1 bringen, damit die Basiswerte-Summe (best_points) erhalten bleibt
+	for a in ATTRS:
+		self[a] /= sum

@@ -182,10 +182,9 @@ func call_event_by_type(type) -> void:
 		State.is_map_boss = true
 		get_tree().change_scene_to_file("res://script/scenes/battle/battle.tscn")
 	if type == Map.PATH_TYPE.CAMP:
-		var hcs = heal_camp_scene.instantiate()
-		view_container.add_child(hcs)
-		hcs.visible = true
-		pass
+		open_heal_camp()
+	if type == Map.PATH_TYPE.EVENT:
+		call_random_event()
 	if type == Map.PATH_TYPE.SHOP:
 		var shops = shop_scene.instantiate()
 		view_container.add_child(shops)
@@ -209,6 +208,19 @@ func call_event_by_type(type) -> void:
 		jailer.visible = true
 		pass
 	print("call event", type)
+
+# EVENT-Feld: welches Ereignis kommt, wird über Map.event_chances ausgewürfelt
+func call_random_event() -> void:
+	var event = Map.roll_event()
+	print("random event", event)
+	match event:
+		Map.EVENT_TYPE.CAMP:
+			open_heal_camp()
+
+func open_heal_camp() -> void:
+	var hcs = heal_camp_scene.instantiate()
+	view_container.add_child(hcs)
+	hcs.visible = true
 
 
 func _on_boss_button_pressed() -> void:
