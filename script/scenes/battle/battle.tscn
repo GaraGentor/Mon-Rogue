@@ -235,6 +235,7 @@ offset_bottom = 725.0
 
 [node name="Catch_anim" type="Control" parent="." node_paths=PackedStringArray("msg")]
 visible = false
+z_index = 20
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

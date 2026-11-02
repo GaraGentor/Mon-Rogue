@@ -4,6 +4,9 @@ extends PanelContainer
 ## nach oben ziehen startet Drag & Drop auf ein Monster.
 
 const DRAG_THRESHOLD := 12.0
+## so weit nach oben gezogen wird aus einem Wischen doch noch Drag & Drop,
+## damit ein seitliches Zucken am Anfang den Drag nicht verhindert
+const SWIPE_TO_DRAG := 40.0
 
 @export var name_label: Label
 @export var cost_label: Label
@@ -74,9 +77,15 @@ func _gui_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and _pressed:
 		var delta: Vector2 = event.global_position - _press_pos
 		if _swiping:
-			hand.swipe_by(-event.relative.x)
+			if -delta.y > SWIPE_TO_DRAG:
+				_pressed = false
+				_swiping = false
+				_start_drag()
+			else:
+				hand.swipe_by(-event.relative.x)
 		elif delta.length() > DRAG_THRESHOLD:
-			if absf(delta.x) > absf(delta.y):
+			# nur eindeutig seitliche Bewegungen scrollen, schräg nach oben ist ein Drag
+			if absf(delta.x) > absf(delta.y) * 1.5:
 				_swiping = true
 				hand.swipe_by(-delta.x)
 			else:

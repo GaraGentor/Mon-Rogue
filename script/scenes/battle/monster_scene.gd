@@ -60,77 +60,125 @@ const SUPER_EFFECTIVE_COLOR := Color(1.0, 0.55, 0.2)
 const NOT_EFFECTIVE_COLOR := Color(0.6, 0.65, 0.7)
 
 const STATUS_COLOR := Color(0.55, 0.8, 1.0)
+## Sp.-Angriffe und Sp.-Schilde sind violett, physische Schilde blau: so passt man den Schild zum Angriff
+const SPECIAL_COLOR := Color(0.85, 0.6, 1.0)
+
+const ICON_ATTACK := preload("res://assets/ui/icons/sword.svg")
+const ICON_S_ATTACK := preload("res://assets/ui/icons/battle/s_attack.svg")
+const ICON_SHIELD := preload("res://assets/ui/icons/battle/shield.svg")
+const ICON_S_SHIELD := preload("res://assets/ui/icons/battle/s_shield.svg")
+const ICON_BUFF := preload("res://assets/ui/icons/battle/buff.svg")
+
+## Kurznamen der Werte, die ein Buff erhöhen kann
+const BUFF_STAT_KEYS := {"hp": "STAT_HP", "atk": "STAT_ATK", "def": "STAT_DEF", "s_atk": "STAT_SPA",
+	"s_def": "STAT_SPD", "speed": "STAT_SPE"}
 
 # Schwebender Schadenstext über dem Monster, bei Element-Vorteil/-Nachteil mit Hinweis und Faktor,
-# vom Schild abgefangener Schaden steht darunter.
+# vom Schild abgefangener Schaden steht mit Schild-Symbol darunter.
 func _show_hit_text(_mon: Monster, damage: float, multiplier: float, blocked: float = 0.0) -> void:
 	if mon != _mon:
 		return
-	var text = str(roundi(damage))
-	if blocked > 0:
-		text += "\n" + tr("BATTLE_BLOCKED").format({"value": roundi(blocked)})
 	var color = Color.WHITE
+	var font_size = 36 if multiplier > 1.0 else 28
+	var box := _new_row_box(true)
 	if multiplier > 1.0:
-		text = tr("BATTLE_SUPER_EFFECTIVE") + " x%s\n" % _format_multiplier(multiplier) + text
 		color = SUPER_EFFECTIVE_COLOR
+		box.add_child(_icon_row([tr("BATTLE_SUPER_EFFECTIVE") + " x" + _format_multiplier(multiplier)], color, font_size))
 	elif multiplier < 1.0:
-		text = tr("BATTLE_NOT_EFFECTIVE") + " x%s\n" % _format_multiplier(multiplier) + text
 		color = NOT_EFFECTIVE_COLOR
-	var label := Label.new()
-	label.text = text
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 36 if multiplier > 1.0 else 28)
-	label.add_theme_color_override("font_color", color)
-	label.add_theme_color_override("font_outline_color", Color.BLACK)
-	label.add_theme_constant_override("outline_size", 8)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.z_index = 10
-	add_child(label)
-	label.position = _texture_offset() + Vector2((texture_rect.size.x - label.get_minimum_size().x) / 2, texture_rect.size.y * 0.2)
-	var tween := label.create_tween()
+		box.add_child(_icon_row([tr("BATTLE_NOT_EFFECTIVE") + " x" + _format_multiplier(multiplier)], color, font_size))
+	box.add_child(_icon_row(["-%d" % roundi(damage)], color, font_size))
+	if blocked > 0:
+		box.add_child(_icon_row([ICON_SHIELD, "-%d" % roundi(blocked)], STATUS_COLOR, 24))
+	box.z_index = 10
+	add_child(box)
+	box.size = box.get_combined_minimum_size()
+	box.position = _texture_offset() + Vector2((texture_rect.size.x - box.size.x) / 2, texture_rect.size.y * 0.2)
+	var tween := box.create_tween()
 	tween.set_parallel()
-	tween.tween_property(label, "position:y", label.position.y - 60, 1.2)
-	tween.tween_property(label, "modulate:a", 0.0, 0.6).set_delay(0.6)
-	tween.chain().tween_callback(label.queue_free)
+	tween.tween_property(box, "position:y", box.position.y - 60, 1.2)
+	tween.tween_property(box, "modulate:a", 0.0, 0.6).set_delay(0.6)
+	tween.chain().tween_callback(box.queue_free)
+
+## Zeile aus Symbolen und Text: Texture2D = Symbol in der Zeilenfarbe, String = Text,
+## Monster = kleines Bild des Monsters (als Ziel einer Absicht).
+func _icon_row(items: Array, color: Color, font_size: int) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 3)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for item in items:
+		if item is String:
+			var label := Label.new()
+			label.text = item
+			label.add_theme_font_size_override("font_size", font_size)
+			label.add_theme_color_override("font_color", color)
+			label.add_theme_color_override("font_outline_color", Color.BLACK)
+			label.add_theme_constant_override("outline_size", 6)
+			label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			row.add_child(label)
+			continue
+		var icon := TextureRect.new()
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if item is Monster:
+			icon.texture = Monmap.texture(item._name, Monmap.SMALL)
+			icon.custom_minimum_size = Vector2.ONE * font_size * 1.8
+		else:
+			icon.texture = item
+			icon.self_modulate = color
+			icon.custom_minimum_size = Vector2.ONE * font_size * 1.1
+		row.add_child(icon)
+	return row
+
+func _new_row_box(vertical: bool) -> BoxContainer:
+	var box: BoxContainer
+	if vertical:
+		box = VBoxContainer.new()
+	else:
+		box = HBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 0 if vertical else 10)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return box
+
+func _clear_box(box: BoxContainer) -> void:
+	for child in box.get_children():
+		box.remove_child(child)
+		child.queue_free()
 
 func _format_multiplier(multiplier: float) -> String:
 	return String.num(multiplier, 2)
 
-# Status unter dem Monster-Bild: Schilde mit ihrem Wert, Buffs nur als "Buff".
-var _status_label: Label
+# Status unter dem Monster-Bild: Schild-Symbole mit ihrem Wert, Buffs als Pfeil.
+var _status_box: BoxContainer
 
 func _on_status_changed(_mon: Monster) -> void:
 	# Schilde und Buffs jedes Monsters können den angekündigten Schaden ändern
 	_refresh_intent()
 	if mon != _mon:
 		return
-	var parts = []
+	if _status_box == null:
+		_status_box = _new_row_box(false)
+		_status_box.z_index = 5
+		add_child(_status_box)
+	_clear_box(_status_box)
 	if mon._shield > 0:
-		parts.append(tr("BATTLE_STATUS_SHIELD").format({"value": roundi(mon._shield)}))
+		_status_box.add_child(_icon_row([ICON_SHIELD, str(roundi(mon._shield))], STATUS_COLOR, 20))
 	if mon._s_shield > 0:
-		parts.append(tr("BATTLE_STATUS_S_SHIELD").format({"value": roundi(mon._s_shield)}))
+		_status_box.add_child(_icon_row([ICON_S_SHIELD, str(roundi(mon._s_shield))], SPECIAL_COLOR, 20))
 	if mon.is_buffed():
-		parts.append(tr("BATTLE_STATUS_BUFF"))
-	if _status_label == null:
-		_status_label = Label.new()
-		_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_status_label.add_theme_font_size_override("font_size", 20)
-		_status_label.add_theme_color_override("font_color", STATUS_COLOR)
-		_status_label.add_theme_color_override("font_outline_color", Color.BLACK)
-		_status_label.add_theme_constant_override("outline_size", 6)
-		_status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_status_label.z_index = 5
-		add_child(_status_label)
-	_status_label.text = "  ".join(PackedStringArray(parts))
-	_status_label.visible = not parts.is_empty()
+		_status_box.add_child(_icon_row([ICON_BUFF], BUFF_COLOR, 20))
+	_status_box.visible = _status_box.get_child_count() > 0
 	_place_status_label()
 
 func _place_status_label() -> void:
-	if _status_label == null or not _status_label.visible:
+	if _status_box == null or not _status_box.visible:
 		return
-	_status_label.size = _status_label.get_minimum_size()
-	_status_label.position = _texture_offset() + Vector2((texture_rect.size.x - _status_label.size.x) / 2,
-		texture_rect.size.y - _status_label.size.y)
+	_status_box.size = _status_box.get_combined_minimum_size()
+	_status_box.position = _texture_offset() + Vector2((texture_rect.size.x - _status_box.size.x) / 2,
+		texture_rect.size.y - _status_box.size.y)
 
 func printStuff() -> void:
 	if mon:
@@ -192,7 +240,7 @@ func _update_drag_preview(drag_data) -> void:
 		and Skills.is_damage_skill(drag_data.skill)
 	# Absicht und Element-Faktor stehen an derselben Stelle, beim Ziehen hat der Faktor Vorrang
 	if _intent_label:
-		_intent_label.self_modulate.a = 0.0 if show_preview else 1.0
+		_intent_label.modulate.a = 0.0 if show_preview else 1.0
 	if not show_preview:
 		if _preview_label:
 			_preview_label.visible = false
@@ -217,68 +265,71 @@ func _update_drag_preview(drag_data) -> void:
 	_preview_label.visible = true
 	_preview_label.position = _texture_offset() + Vector2((texture_rect.size.x - _preview_label.get_minimum_size().x) / 2, 0)
 
-# Absichten über dem Monster-Bild:
-# Gegner zeigen ihren geplanten Zug (Angriff mit Schaden und Ziel, Schild, Buff),
-# eigene Monster den Schaden, der im nächsten Zug der Gegner auf sie zukommt, mit und ohne Schild ("12 -> 4").
+# Absichten über dem Monster-Bild, als Symbole:
+# Gegner zeigen ihren geplanten Zug (Schwert = Angriff, Stern = Sp.-Angriff, Schild, Buff-Pfeil, dahinter das Bild des Ziels),
+# eigene Monster den Schaden, der im nächsten Zug der Gegner auf sie zukommt, mit und ohne Schild ("-12 -> -4").
 const INTENT_COLOR := Color(1.0, 0.45, 0.4)
 const INTENT_BLOCKED_COLOR := Color(0.55, 0.8, 1.0)
+const BUFF_COLOR := Color(0.55, 1.0, 0.55)
+const INTENT_FONT_SIZE := 24
 
-var _intent_label: Label
+var _intent_label: BoxContainer
 
 func _refresh_intent() -> void:
 	if mon == null or not is_inside_tree():
 		return
 	if _intent_label == null:
-		_intent_label = Label.new()
-		_intent_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_intent_label.add_theme_font_size_override("font_size", 20)
-		_intent_label.add_theme_color_override("font_outline_color", Color.BLACK)
-		_intent_label.add_theme_constant_override("outline_size", 6)
-		_intent_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_intent_label = _new_row_box(true)
 		_intent_label.z_index = 6
 		add_child(_intent_label)
-	# setzt auch die Farbe, das Label muss also schon existieren
-	var lines = _own_intent_lines() if home_mons else _enemy_intent_lines()
-	_intent_label.text = "\n".join(PackedStringArray(lines))
-	_intent_label.visible = mon.is_alive() and not lines.is_empty()
+	_clear_box(_intent_label)
+	for row in (_own_intent_rows() if home_mons else _enemy_intent_rows()):
+		_intent_label.add_child(row)
+	_intent_label.visible = mon.is_alive() and _intent_label.get_child_count() > 0
 	_place_intent_label()
 
-func _own_intent_lines() -> Array:
+func _own_intent_rows() -> Array:
 	var incoming = Skills.incoming_damage(mon, State.enemy_mons)
 	if incoming.full <= 0:
 		return []
 	var full = roundi(incoming.full)
 	var after = roundi(incoming.after)
 	# Blau, wenn der Schild etwas abfängt: so sieht man direkt, dass sich Blocken gelohnt hat
-	_set_intent_color(INTENT_BLOCKED_COLOR if after < full else INTENT_COLOR)
 	if after < full:
-		return [tr("BATTLE_INCOMING_BLOCKED").format({"full": full, "after": after})]
-	return [tr("BATTLE_INCOMING").format({"full": full})]
+		return [_icon_row([ICON_ATTACK, "-%d" % full, "->", ICON_SHIELD, "-%d" % after], INTENT_BLOCKED_COLOR, INTENT_FONT_SIZE)]
+	return [_icon_row([ICON_ATTACK, "-%d" % full], INTENT_COLOR, INTENT_FONT_SIZE)]
 
-func _enemy_intent_lines() -> Array:
-	_set_intent_color(INTENT_COLOR)
-	var lines = []
+func _enemy_intent_rows() -> Array:
+	var rows = []
 	for action in mon._intent:
 		var target: Monster = action.target
 		if target == null:
 			continue
-		var target_name = tr("BATTLE_INTENT_SELF") if target == mon else Helper.mon_battle_name(target)
-		if Skills.is_damage_skill(action.skill):
-			var key = "BATTLE_INTENT_AREA" if Skills.targets_team(action.skill) else "BATTLE_INTENT_ATTACK"
-			lines.append(tr(key).format({"damage": roundi(Skills.calc_damage(mon, target, action.skill)), "target": target_name}))
-		elif action.skill.get("effect", "") == "buff":
-			lines.append(tr("BATTLE_INTENT_BUFF").format({"target": target_name}))
+		var skill: Dictionary = action.skill
+		var physical = Skills.is_physical(skill)
+		# Flächen-Skills zeigen alle Monster, die sie treffen
+		var targets = [target]
+		if Skills.targets_team(skill):
+			var side = State.mons if State.mons.has(target) else State.enemy_mons
+			targets = side.filter(func(m: Monster): return m.is_alive())
+		if Skills.is_damage_skill(skill):
+			var items = [ICON_ATTACK if physical else ICON_S_ATTACK, "-%d" % roundi(Skills.calc_damage(mon, target, skill)), "->"]
+			rows.append(_icon_row(items + targets, INTENT_COLOR if physical else SPECIAL_COLOR, INTENT_FONT_SIZE))
+		elif skill.get("effect", "") == "buff":
+			var stat = tr(BUFF_STAT_KEYS.get(skill.buff_stat, "")).trim_suffix(":")
+			rows.append(_icon_row([ICON_BUFF, "+%d%% %s" % [roundi(skill.value), stat], "->"] + targets, BUFF_COLOR, INTENT_FONT_SIZE))
 		else:
-			lines.append(tr("BATTLE_INTENT_SHIELD").format({"target": target_name}))
-	return lines
-
-func _set_intent_color(color: Color) -> void:
-	_intent_label.add_theme_color_override("font_color", color)
+			# gleiche Rechnung wie Skills.add_shield, für das erste Ziel
+			var def = target.defense() if physical else target.s_defense()
+			var amount = ceilf(def * skill.value / 100)
+			rows.append(_icon_row([ICON_SHIELD if physical else ICON_S_SHIELD, "+%d" % amount, "->"] + targets,
+				INTENT_BLOCKED_COLOR if physical else SPECIAL_COLOR, INTENT_FONT_SIZE))
+	return rows
 
 func _place_intent_label() -> void:
 	if _intent_label == null or not _intent_label.visible:
 		return
-	_intent_label.size = _intent_label.get_minimum_size()
+	_intent_label.size = _intent_label.get_combined_minimum_size()
 	_intent_label.position = _texture_offset() + Vector2((texture_rect.size.x - _intent_label.size.x) / 2, 0)
 
 func _on_gui_input(event: InputEvent) -> void:
