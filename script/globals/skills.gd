@@ -86,11 +86,7 @@ func element_multiplier(skill_nature: int, target_type: int) -> float:
 # Schilde halten den ganzen Kampf, bis sie aufgebraucht sind (siehe Monster.absorb_damage).
 # Physische Schilde fangen nur physischen Schaden ab, magische nur magischen.
 
-# Basis-Blocks: fester Schild gegen physischen Schaden.
-func add_flat_shield(props):
-	props.mon.add_shield(props.skill.value, true)
-
-# Physischer Block: value % der Verteidigung, magischer Block: value % der Sp. Verteidigung.
+# Physischer Block (auch die Basis-Blocks): value % der Verteidigung, magischer Block: value % der Sp. Verteidigung.
 func add_shield(props):
 	var physical = is_physical(props.skill)
 	var def = props.mon.defense() if physical else props.mon.s_defense()
@@ -99,6 +95,36 @@ func add_shield(props):
 # Buff: value % mehr auf buff_stat für buff_turns eigene Züge des Ziels.
 func add_buff(props):
 	props.mon.add_buff(props.skill.buff_stat, props.skill.value / 100, props.skill.buff_turns)
+
+# ─────────────────────────
+# Absichten: Gegner planen ihren nächsten Zug im Voraus (Monster._intent, battle.gd _plan_intent),
+# der Spieler sieht vorher, wen sie mit wie viel Schaden treffen werden.
+
+# Trifft eine geplante Aktion dieses Monster? Flächen-Skills treffen alle auf der Seite des Ziels.
+func action_hits(action: Dictionary, mon: Monster) -> bool:
+	if action.target == mon:
+		return true
+	return targets_team(action.skill) and action.target != null and State.mons.has(action.target) == State.mons.has(mon)
+
+# Schaden, den die geplanten Angriffe der attackers bei target anrichten werden:
+# {"full": ohne Schild, "after": nach Abzug der aktuellen Schilde}. Physisch und magisch zählen getrennt gegen ihren Schild.
+func incoming_damage(target: Monster, attackers: Array) -> Dictionary:
+	var physical = 0.0
+	var ability = 0.0
+	for attacker: Monster in attackers:
+		if not attacker.is_alive():
+			continue
+		for action in attacker._intent:
+			if not is_damage_skill(action.skill) or not action_hits(action, target):
+				continue
+			if is_physical(action.skill):
+				physical += calc_damage(attacker, target, action.skill)
+			else:
+				ability += calc_damage(attacker, target, action.skill)
+	return {
+		"full": physical + ability,
+		"after": maxf(physical - target._shield, 0.0) + maxf(ability - target._s_shield, 0.0),
+	}
 
 # Bonus aller passiven Skills im Team auf einen Wert (z. B. +5 KP für jedes Monster im Team).
 # Es gilt die Element-Regel: nur Monster, die den Skill einsetzen könnten, geben den Bonus.
@@ -366,13 +392,13 @@ var attack_skills = [
 	_basic_skill("SKILL_BASIC_ATTACK_AIR", Enums.MON_TYPES.AIR, 22.0, "SKILL_BASIC_ATTACK_DESC", func(props): deal_damage(props)),
 ]
 
-# Basis-Blocks: fester Schild auf ein eigenes Monster.
+# Basis-Blocks: value % der Verteidigung als Schild gegen physischen Schaden, ohne Abklingzeit.
 # Die beiden Schild-Skills: value % der (Sp.) Verteidigung als Schild, mit Abklingzeit.
 var defensive_skills = [
-	_basic_skill("SKILL_BASIC_BLOCK_EARTH", Enums.MON_TYPES.EARTH, 4.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_flat_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
-	_basic_skill("SKILL_BASIC_BLOCK_FIRE", Enums.MON_TYPES.FIRE, 1.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_flat_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
-	_basic_skill("SKILL_BASIC_BLOCK_WATER", Enums.MON_TYPES.WATER, 3.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_flat_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
-	_basic_skill("SKILL_BASIC_BLOCK_AIR", Enums.MON_TYPES.AIR, 2.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_flat_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
+	_basic_skill("SKILL_BASIC_BLOCK_EARTH", Enums.MON_TYPES.EARTH, 40.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
+	_basic_skill("SKILL_BASIC_BLOCK_FIRE", Enums.MON_TYPES.FIRE, 10.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
+	_basic_skill("SKILL_BASIC_BLOCK_WATER", Enums.MON_TYPES.WATER, 30.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
+	_basic_skill("SKILL_BASIC_BLOCK_AIR", Enums.MON_TYPES.AIR, 20.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
 	_effect_skill("SKILL_STONE_GUARD", Enums.MON_TYPES.EARTH, 50.0, 1, Enums.SKILL_DAMAGE_TYPE.PHYSICAL, "shield",
 		"SKILL_SHIELD_PHYSICAL_DESC", Enums.CARD_TARGETS.SINGLE_FRIEND, 2, func(props): add_shield(props)),
 	_effect_skill("SKILL_MIST_VEIL", Enums.MON_TYPES.WATER, 50.0, 1, Enums.SKILL_DAMAGE_TYPE.ABILITY, "shield",
@@ -414,8 +440,9 @@ var passive_skills = [
 var area_skills = [
 	_effect_skill("SKILL_SQUALL", Enums.MON_TYPES.AIR, 15.0, 1, Enums.SKILL_DAMAGE_TYPE.ABILITY, "damage",
 		"SKILL_AREA_ABILITY_DESC", Enums.CARD_TARGETS.TEAM_ENEMY, 1, func(props): deal_damage(props)),
-	_effect_skill("SKILL_FIRESTORM", Enums.MON_TYPES.FIRE, 40.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY, "damage",
+	_with(_effect_skill("SKILL_FIRESTORM", Enums.MON_TYPES.FIRE, 40.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY, "damage",
 		"SKILL_AREA_ABILITY_DESC", Enums.CARD_TARGETS.TEAM_ENEMY, 3, func(props): deal_damage(props)),
+		{"cost": 2}),
 ]
 
 func _effect_skill(skill_name: String, nature: int, value: float, tier: int, damage_type: int, effect: String,
@@ -594,9 +621,16 @@ var bounty_skills = [
 	_egg_skill("SKILL_TROPHY_SURGE", Enums.MON_TYPES.FIRE, 75.0, 4, Enums.SKILL_DAMAGE_TYPE.ABILITY),
 ]
 
+# Aktionen, die ein Schadens-Skill kostet: ab dem ersten Wert 2, ab dem zweiten 3 (sonst 1).
+# Pro Aktion bleiben starke Skills damit etwa gleich stark wie schwache, brauchen aber mehr vom Zug.
+const COST_THRESHOLDS := [50.0, 80.0]
+
+func _skill_cost(value: float) -> int:
+	return 1 + COST_THRESHOLDS.filter(func(threshold): return value >= threshold).size()
+
 func _egg_skill(skill_name: String, nature: int, value: float, tier: int, damage_type: int) -> Dictionary:
 	return {
-		"cost": 1,
+		"cost": _skill_cost(value),
 		"name": skill_name,
 		"nature": nature,
 		"value": value,

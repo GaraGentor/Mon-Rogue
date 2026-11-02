@@ -29,8 +29,9 @@ var _lost_hp: float = 0:
 			Events.monster_faints.emit(self)
 
 var _skills: Array
-var _initial_moves: int = 1
-var _computed_moves: int = 1:
+# Aktionen pro Zug ohne Kerkermeister-Verbesserung (jede gesprengte Kette gibt +1, siehe jailer.gd)
+var _initial_moves: int = 3
+var _computed_moves: int = 3:
 	set(value):
 		_computed_moves = value
 		Events.refresh_ui_for_monster.emit()
@@ -44,6 +45,8 @@ var _shield: float = 0
 var _s_shield: float = 0
 # Buffs: Stat-Key (wie bei _gems) -> {"factor": 0.3 = +30 %, "turns": übrige eigene Züge}
 var _buffs: Dictionary = {}
+# Nur Gegner: geplanter nächster Zug als [{"skill": Dictionary, "target": Monster}], im Kampf als Absicht sichtbar (battle.gd _plan_intent)
+var _intent: Array = []
 
 func _init(level: int, meta_data: Dictionary) -> void:
 	## get saved data and apply.
@@ -82,6 +85,7 @@ func reset_battle_state() -> void:
 	_shield = 0
 	_s_shield = 0
 	_buffs = {}
+	_intent = []
 	for skill in _skills:
 		skill.erase("_cooldown_left")
 	Events.monster_status_changed.emit(self)
@@ -143,9 +147,13 @@ func get_unlockable_egg_skill() -> Dictionary:
 			return skill
 	return {}
 
+# Mit mehreren Aktionen pro Zug teilen Monster ein Vielfaches an Schaden aus. Die HP ziehen mit,
+# damit ein Kampf nicht nach einer Runde vorbei ist.
+const HP_FACTOR := 2.5
+
 func hp():
 	# passive Skills im Team (z. B. +5 KP) kommen obendrauf
-	return (_growth.hp * _level) * Helper.points_per_level(_best_points) * gem_factor("hp") + Skills.passive_bonus(self, "hp")
+	return (_growth.hp * _level) * Helper.points_per_level(_best_points) * gem_factor("hp") * HP_FACTOR + Skills.passive_bonus(self, "hp")
 
 func attack():
 	return (_growth.atk * _level) * Helper.points_per_level(_best_points) * gem_factor("atk") * buff_factor("atk")

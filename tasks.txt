@@ -21,7 +21,8 @@ Tasks:
 		> Rückansichten für Monster 10-16 generieren (aktuell ist <n>_back*.png nur eine Kopie der Frontansicht)
 	> Mehr Skills
 		> Skill-System mit Effekt-Bausteinen, Synergien und Passiven (siehe skill_system_idee.txt)
-
+	> KI ist noch zu blöd
+	> 
 	> Status Effekte
 
 	> Relics

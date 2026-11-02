@@ -27,6 +27,7 @@ func _ready() -> void:
 	Events.monster_status_changed.connect(_on_status_changed)
 	Events.monster_faints.connect(_remove_mon)
 	Events.mon_is_catched.connect(_remove_mon)
+	Events.intents_changed.connect(_refresh_intent)
 	var mons = State.mons if home_mons else State.enemy_mons
 	if mons.size() > mon_slot:
 		mon = mons[mon_slot]
@@ -99,6 +100,8 @@ func _format_multiplier(multiplier: float) -> String:
 var _status_label: Label
 
 func _on_status_changed(_mon: Monster) -> void:
+	# Schilde und Buffs jedes Monsters können den angekündigten Schaden ändern
+	_refresh_intent()
 	if mon != _mon:
 		return
 	var parts = []
@@ -179,6 +182,7 @@ func _process(_delta: float) -> void:
 	_update_drag_preview(drag_data)
 	# das Layout kann sich verschieben (z. B. wenn ein Monster ausscheidet)
 	_place_status_label()
+	_place_intent_label()
 
 # Während eine Angriffskarte gezogen wird, zeigt jedes mögliche Ziel seinen Element-Faktor an.
 var _preview_label: Label
@@ -186,6 +190,9 @@ var _preview_label: Label
 func _update_drag_preview(drag_data) -> void:
 	var show_preview = drag_data != null and not home_mons and _can_drop_data(Vector2.ZERO, drag_data) \
 		and Skills.is_damage_skill(drag_data.skill)
+	# Absicht und Element-Faktor stehen an derselben Stelle, beim Ziehen hat der Faktor Vorrang
+	if _intent_label:
+		_intent_label.self_modulate.a = 0.0 if show_preview else 1.0
 	if not show_preview:
 		if _preview_label:
 			_preview_label.visible = false
@@ -209,6 +216,70 @@ func _update_drag_preview(drag_data) -> void:
 	_preview_label.add_theme_color_override("font_color", color)
 	_preview_label.visible = true
 	_preview_label.position = _texture_offset() + Vector2((texture_rect.size.x - _preview_label.get_minimum_size().x) / 2, 0)
+
+# Absichten über dem Monster-Bild:
+# Gegner zeigen ihren geplanten Zug (Angriff mit Schaden und Ziel, Schild, Buff),
+# eigene Monster den Schaden, der im nächsten Zug der Gegner auf sie zukommt, mit und ohne Schild ("12 -> 4").
+const INTENT_COLOR := Color(1.0, 0.45, 0.4)
+const INTENT_BLOCKED_COLOR := Color(0.55, 0.8, 1.0)
+
+var _intent_label: Label
+
+func _refresh_intent() -> void:
+	if mon == null or not is_inside_tree():
+		return
+	if _intent_label == null:
+		_intent_label = Label.new()
+		_intent_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_intent_label.add_theme_font_size_override("font_size", 20)
+		_intent_label.add_theme_color_override("font_outline_color", Color.BLACK)
+		_intent_label.add_theme_constant_override("outline_size", 6)
+		_intent_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_intent_label.z_index = 6
+		add_child(_intent_label)
+	# setzt auch die Farbe, das Label muss also schon existieren
+	var lines = _own_intent_lines() if home_mons else _enemy_intent_lines()
+	_intent_label.text = "\n".join(PackedStringArray(lines))
+	_intent_label.visible = mon.is_alive() and not lines.is_empty()
+	_place_intent_label()
+
+func _own_intent_lines() -> Array:
+	var incoming = Skills.incoming_damage(mon, State.enemy_mons)
+	if incoming.full <= 0:
+		return []
+	var full = roundi(incoming.full)
+	var after = roundi(incoming.after)
+	# Blau, wenn der Schild etwas abfängt: so sieht man direkt, dass sich Blocken gelohnt hat
+	_set_intent_color(INTENT_BLOCKED_COLOR if after < full else INTENT_COLOR)
+	if after < full:
+		return [tr("BATTLE_INCOMING_BLOCKED").format({"full": full, "after": after})]
+	return [tr("BATTLE_INCOMING").format({"full": full})]
+
+func _enemy_intent_lines() -> Array:
+	_set_intent_color(INTENT_COLOR)
+	var lines = []
+	for action in mon._intent:
+		var target: Monster = action.target
+		if target == null:
+			continue
+		var target_name = tr("BATTLE_INTENT_SELF") if target == mon else Helper.mon_battle_name(target)
+		if Skills.is_damage_skill(action.skill):
+			var key = "BATTLE_INTENT_AREA" if Skills.targets_team(action.skill) else "BATTLE_INTENT_ATTACK"
+			lines.append(tr(key).format({"damage": roundi(Skills.calc_damage(mon, target, action.skill)), "target": target_name}))
+		elif action.skill.get("effect", "") == "buff":
+			lines.append(tr("BATTLE_INTENT_BUFF").format({"target": target_name}))
+		else:
+			lines.append(tr("BATTLE_INTENT_SHIELD").format({"target": target_name}))
+	return lines
+
+func _set_intent_color(color: Color) -> void:
+	_intent_label.add_theme_color_override("font_color", color)
+
+func _place_intent_label() -> void:
+	if _intent_label == null or not _intent_label.visible:
+		return
+	_intent_label.size = _intent_label.get_minimum_size()
+	_intent_label.position = _texture_offset() + Vector2((texture_rect.size.x - _intent_label.size.x) / 2, 0)
 
 func _on_gui_input(event: InputEvent) -> void:
 	print(event)

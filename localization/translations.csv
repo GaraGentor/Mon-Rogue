@@ -157,7 +157,7 @@ SKILL_BASIC_BLOCK_EARTH,Stone Wall,Steinwall
 SKILL_BASIC_BLOCK_FIRE,Ember Guard,Glutschild
 SKILL_BASIC_BLOCK_WATER,Water Shield,Wasserschild
 SKILL_BASIC_BLOCK_AIR,Wind Shield,Windschild
-SKILL_BASIC_BLOCK_DESC,Blocks {value} damage,Blockt {value} Schaden
+SKILL_BASIC_BLOCK_DESC,Shields an ally with {value}% of its DEF against physical damage,Schützt ein eigenes Monster mit {value}% seiner VER vor physischem Schaden
 SKILL_DAMAGE_PHYSICAL_DESC,Deals {value}% physical damage,Verursacht {value}% physischen Schaden
 SKILL_DAMAGE_ABILITY_DESC,Deals {value}% magical damage,Verursacht {value}% magischen Schaden
 SKILL_STONE_GUARD,Stone Guard,Felsenpanzer
@@ -386,6 +386,13 @@ BATTLE_BLOCKED,{value} blocked,{value} geblockt
 BATTLE_STATUS_SHIELD,Shield {value},Schild {value}
 BATTLE_STATUS_S_SHIELD,Sp. Shield {value},Sp.-Schild {value}
 BATTLE_STATUS_BUFF,Buff,Buff
+BATTLE_INTENT_ATTACK,Attack {damage} -> {target},Angriff {damage} -> {target}
+BATTLE_INTENT_AREA,Area {damage} -> all,Fläche {damage} -> alle
+BATTLE_INTENT_SHIELD,Shield -> {target},Schild -> {target}
+BATTLE_INTENT_BUFF,Buff -> {target},Buff -> {target}
+BATTLE_INTENT_SELF,itself,sich selbst
+BATTLE_INCOMING,Incoming: {full},Eingehend: {full}
+BATTLE_INCOMING_BLOCKED,Incoming: {full} -> {after} after shield,Eingehend: {full} -> {after} nach Schild
 TRAINER_TITLE,Trainer,Trainer
 TRAINER_HINT,Drag a skill onto a monster to teach it.,"Zieh einen Skill auf ein Monster, um ihn ihm beizubringen."
 TRAINER_CHOOSE_MON,Who should learn it?,Wer soll ihn lernen?

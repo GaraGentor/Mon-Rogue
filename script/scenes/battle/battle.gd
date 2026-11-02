@@ -39,6 +39,10 @@ func _ready() -> void:
 	# Schilde, Buffs und Abklingzeiten gelten nur für einen Kampf
 	for mon in State.mons + State.enemy_mons:
 		mon.reset_battle_state()
+	# Gegner zeigen ihren ersten Zug schon vor Kampfbeginn
+	for emon in State.enemy_mons:
+		_plan_intent(emon)
+	Events.intents_changed.emit()
 	_refresh_skill_points()
 	Events.mouse_event.emit({"action": Enums.MOUSE_ACTION.SELECT_MONSTER, "mon": State.enemy_mons[0]})
 
@@ -73,13 +77,18 @@ func _on_turn_for(mon: Monster) -> void:
 	await get_tree().create_timer(ENEMY_THINK_TIME).timeout
 	if not is_inside_tree():
 		return
-	_ki_turn(mon)
-	# eingesetzte Skills sind jetzt aufgedeckt
-	if selected_mon == mon:
-		battle_info.refresh()
-	await get_tree().create_timer(ENEMY_ACTION_TIME).timeout
-	if not is_inside_tree():
-		return
+	# der angekündigte Zug wird Aktion für Aktion ausgeführt, die Anzeige schrumpft mit
+	while not mon._intent.is_empty() and mon.is_alive() and not _opponents_of(mon).is_empty():
+		_ki_action(mon, mon._intent.pop_front())
+		Events.intents_changed.emit()
+		# eingesetzte Skills sind jetzt aufgedeckt
+		if selected_mon == mon:
+			battle_info.refresh()
+		await get_tree().create_timer(ENEMY_ACTION_TIME).timeout
+		if not is_inside_tree():
+			return
+	_plan_intent(mon)
+	Events.intents_changed.emit()
 	turn_wheel.next_mon()
 
 func _monster_scenes() -> Array:
@@ -121,6 +130,9 @@ func _exit_tree() -> void:
 	# Buffs sollen nach dem Kampf nicht in den Werten auf der Karte stehen bleiben
 	for mon in State.mons:
 		mon.reset_battle_state()
+	# keine Absichten außerhalb des Kampfes (z. B. als "Eingehend" im Lager)
+	for emon in State.enemy_mons:
+		emon._intent = []
 
 func _catch_mouse_event(event) -> void:
 	if event.action == Enums.MOUSE_ACTION.SELECT_MONSTER and event.mon != null:
@@ -288,6 +300,7 @@ func upgrade_mons():
 func _check_game_over(last_fainted:Monster) -> void:
 	turn_wheel.remove_mon(last_fainted)
 	_reselect_if_gone(last_fainted)
+	_retarget_intents()
 	var is_enemy = true if State.enemy_mons.find(last_fainted) > -1 else false
 	print("check gameover", State.mons.all(
 			func(mon: Monster):
@@ -337,18 +350,55 @@ func _clear_fainted_mons():
 	for item: Monster in v:
 		State.mons.erase(item)
 
-## Zug eines Gegners: zufälliger Skill auf ein zufälliges lebendes Ziel
-## (Angriffe auf eigene Monster, Schilde und Buffs auf sich selbst oder einen Verbündeten)
-func _ki_turn(emon: Monster) -> void:
-	if _opponents_of(emon).is_empty() or not emon.is_alive():
+## Plant den nächsten Zug eines Gegners (Monster._intent): zufällige Skills, bis seine Aktionen aufgebraucht sind,
+## jeweils auf ein zufälliges lebendes Ziel (Angriffe auf eigene Monster, Schilde und Buffs auf sich selbst oder einen Verbündeten).
+## Gegner halten sich an dieselben Regeln wie der Spieler (Element, Kosten, Abklingzeit, Passive nicht ausspielbar).
+## Nur Angriffe ohne Abklingzeit dürfen mehrfach im selben Zug vorkommen.
+## Geplant wird vor dem Zug: Abklingzeiten zählen zu dessen Beginn noch einmal herunter, daher reicht <= 1.
+## Kerkermeister-Verbesserungen und Relics gelten nur für eigene Monster, Gegner haben immer _initial_moves.
+func _plan_intent(emon: Monster) -> void:
+	emon._intent = []
+	if not emon.is_alive() or _opponents_of(emon).is_empty():
 		return
-	# Gegner halten sich an dieselben Regeln wie der Spieler (Element, Abklingzeit, Passive nicht ausspielbar)
-	var usable = emon._skills.filter(func(skill): return Skills.is_playable(emon, skill))
-	if usable.is_empty():
+	var moves: int = emon._initial_moves
+	var once_used = []
+	while true:
+		var options = emon._skills.filter(func(skill): return _can_plan(emon, skill, moves) and not once_used.has(skill))
+		if options.is_empty():
+			return
+		var picked: Dictionary = options.pick_random()
+		moves -= maxi(picked.cost, 1)
+		if picked.get("cooldown", 0) > 0 or not Skills.is_damage_skill(picked):
+			once_used.append(picked)
+		emon._intent.append({"skill": picked, "target": _pick_target(emon, picked)})
+
+func _can_plan(emon: Monster, skill: Dictionary, moves_left: int) -> bool:
+	return Skills.can_use(emon, skill) and not Skills.is_passive(skill) \
+		and Skills.cooldown_left(skill) <= 1 and maxi(skill.cost, 1) <= moves_left
+
+func _pick_target(emon: Monster, skill: Dictionary) -> Monster:
+	var side = _allies_of(emon) if Skills.targets_friends(skill) else _opponents_of(emon)
+	return side.pick_random() if not side.is_empty() else null
+
+## Ziele, die inzwischen K.O. oder gefangen sind, werden durch ein anderes lebendes Ziel ersetzt.
+func _retarget_intents() -> void:
+	for emon in State.enemy_mons:
+		for action in emon._intent:
+			if not _is_valid_target(emon, action.skill, action.target):
+				action.target = _pick_target(emon, action.skill)
+	Events.intents_changed.emit()
+
+## Eine geplante Aktion eines Gegners ausführen (fällt weg, wenn es kein gültiges Ziel mehr gibt).
+func _ki_action(emon: Monster, action: Dictionary) -> void:
+	var skill: Dictionary = action.skill
+	if not Skills.is_playable(emon, skill):
 		return
-	var skill = usable.pick_random()
-	var to_hit = (_allies_of(emon) if Skills.targets_friends(skill) else _opponents_of(emon)).pick_random()
-	_use_skill(emon, skill, to_hit)
+	var target: Monster = action.target
+	if not _is_valid_target(emon, skill, target):
+		target = _pick_target(emon, skill)
+		if target == null:
+			return
+	_use_skill(emon, skill, target)
 	skill.scouted = true
 
 func _on_end_turn_pressed() -> void:

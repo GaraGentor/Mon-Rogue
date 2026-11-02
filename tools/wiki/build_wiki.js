@@ -176,7 +176,11 @@ function readBuilder(src, name) {
 	}
 	const params = m[1].split(",").map((p) => p.split(":")[0].trim()).filter(Boolean);
 	const body = gdToJs(readBracketed(src, m.index + m[0].length));
-	return Function(...params, `"use strict"; return (${body});`);
+	// Baukästen dürfen andere Helfer aufrufen (z. B. _skill_cost), die stehen erst beim Aufruf fest
+	return (...args) => {
+		const names = Object.keys(ctx.helpers);
+		return Function(...names, ...params, `"use strict"; return (${body});`)(...names.map((n) => ctx.helpers[n]), ...args);
+	};
 }
 
 // ─────────────────────────
@@ -237,8 +241,13 @@ function collect() {
 
 	// Skills
 	const skillsSrc = read("script/globals/skills.gd");
+	// Skills._skill_cost: 1 Aktion + 1 pro erreichter Schwelle aus COST_THRESHOLDS
+	const costThresholds = readVar(skillsSrc, "COST_THRESHOLDS", "Skills") ?? [];
+	ctx.helpers._skill_cost = (value) => 1 + costThresholds.filter((threshold) => value >= threshold).length;
 	ctx.helpers._basic_skill = readBuilder(skillsSrc, "_basic_skill");
 	ctx.helpers._egg_skill = readBuilder(skillsSrc, "_egg_skill");
+	ctx.helpers._effect_skill = readBuilder(skillsSrc, "_effect_skill");
+	ctx.helpers._with = (skill, extra) => Object.assign(skill, extra);
 	// Welche Listen es gibt, steht in get_skill(); so tauchen neue Listen automatisch auf
 	const listNames = (/for list in \[([^\]]*)\]/.exec(skillsSrc)?.[1] ?? "attack_skills, defensive_skills, buff_skills, egg_skills")
 		.split(",").map((s) => s.trim()).filter(Boolean);
