@@ -35,6 +35,8 @@ var rolled_mon_stats: Dictionary = {}
 
 # Monster-Arten, die in diesem Run schon besiegt wurden (deren Stats sind im Kampf sichtbar)
 var defeated_mon_names: Array[String] = []
+# Monster-Arten, die in diesem Run schon gefangen wurden (deren genaue HP sind im Kampf sichtbar)
+var caught_mon_names: Array[String] = []
 
 var is_boss_fight: bool = false
 var is_final_boss: bool = false
@@ -112,6 +114,7 @@ func reset() -> void:
 	pending_relic_reward = false
 	rolled_mon_stats = {}
 	defeated_mon_names = []
+	caught_mon_names = []
 	run_won = false
 	run_kills = 0
 	run_catches = 0
@@ -152,6 +155,14 @@ func mark_mon_defeated(mon_name: String) -> void:
 
 func is_mon_defeated(mon_name: String) -> bool:
 	return defeated_mon_names.has(mon_name)
+
+func mark_mon_caught(mon_name: String) -> void:
+	if not caught_mon_names.has(mon_name):
+		caught_mon_names.append(mon_name)
+
+# Art im Team oder in diesem Run schon gefangen: genaue HP von Gegnern dieser Art sind sichtbar
+func is_mon_known(mon_name: String) -> bool:
+	return caught_mon_names.has(mon_name) or mons.any(func(m: Monster): return m._name == mon_name)
 
 # Merkt sich den Treffer, der ein eigenes Monster K.O. schlägt (für den Endbildschirm).
 # Aufruf vor dem Abziehen der HP, hp_left ist also der Rest vor dem tödlichen Treffer.

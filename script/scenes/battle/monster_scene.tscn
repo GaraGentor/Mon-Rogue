@@ -1,10 +1,42 @@
-[gd_scene load_steps=4 format=3 uid="uid://dp31mv1lmyood"]
+[gd_scene load_steps=8 format=3 uid="uid://dp31mv1lmyood"]
 
 [ext_resource type="Texture2D" uid="uid://cc0iba7o70h8m" path="res://assets/mons/4/4_front.png" id="1_oxh2b"]
 [ext_resource type="Script" path="res://script/scenes/battle/monster_scene.gd" id="1_qfx22"]
-[ext_resource type="PackedScene" uid="uid://coyny15w4ca7j" path="res://script/scenes/battle/progress_bars.tscn" id="2_rg2b2"]
+[ext_resource type="Script" path="res://script/scenes/battle/hp_ring.gd" id="2_hpring"]
 
-[node name="MonsterScene" type="Control" node_paths=PackedStringArray("texture_rect", "hp_label", "progress_bar")]
+[sub_resource type="LabelSettings" id="LabelSettings_name"]
+font_size = 16
+outline_size = 6
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_info"]
+font_size = 14
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_stat_title"]
+font_size = 13
+font_color = Color(0.75, 0.75, 0.75, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stat"]
+content_margin_left = 6.0
+content_margin_top = 1.0
+content_margin_right = 6.0
+content_margin_bottom = 1.0
+bg_color = Color(0, 0, 0, 0.6)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.18)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="MonsterScene" type="Control" node_paths=PackedStringArray("texture_rect", "name_label", "hp_ring", "ring_label", "level_label", "extra_title", "extra_label", "type_label")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,45 +44,136 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qfx22")
-texture_rect = NodePath("VBoxContainer/TextureRect")
-hp_label = NodePath("GridContainer/Label2")
-progress_bar = NodePath("VBoxContainer/ProgressBars")
+texture_rect = NodePath("AspectRatioContainer/HBoxContainer/TextureRect")
+name_label = NodePath("AspectRatioContainer/HBoxContainer/Info/Name")
+hp_ring = NodePath("AspectRatioContainer/HBoxContainer/Info/HpRing")
+ring_label = NodePath("AspectRatioContainer/HBoxContainer/Info/HpRing/Label")
+level_label = NodePath("AspectRatioContainer/HBoxContainer/Info/Stats/LevelPanel/HBox/LevelValue")
+extra_title = NodePath("AspectRatioContainer/HBoxContainer/Info/Stats/ExtraPanel/HBox/ExtraTitle")
+extra_label = NodePath("AspectRatioContainer/HBoxContainer/Info/Stats/ExtraPanel/HBox/ExtraValue")
+type_label = NodePath("AspectRatioContainer/HBoxContainer/Info/Stats/TypePanel/HBox/TypeValue")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 8
+mouse_filter = 2
+ratio = 1.5
 
-[node name="ProgressBars" parent="VBoxContainer" instance=ExtResource("2_rg2b2")]
+[node name="HBoxContainer" type="HBoxContainer" parent="AspectRatioContainer"]
 layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+[node name="Info" type="VBoxContainer" parent="AspectRatioContainer/HBoxContainer"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="Name" type="Label" parent="AspectRatioContainer/HBoxContainer/Info"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "[NAME]"
+label_settings = SubResource("LabelSettings_name")
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="HpRing" type="Control" parent="AspectRatioContainer/HBoxContainer/Info"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_horizontal = 4
+mouse_filter = 2
+script = ExtResource("2_hpring")
+
+[node name="Label" type="Label" parent="AspectRatioContainer/HBoxContainer/Info/HpRing"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = ""
+label_settings = SubResource("LabelSettings_info")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Stats" type="VBoxContainer" parent="AspectRatioContainer/HBoxContainer/Info"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="LevelPanel" type="PanelContainer" parent="AspectRatioContainer/HBoxContainer/Info/Stats"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat")
+
+[node name="HBox" type="HBoxContainer" parent="AspectRatioContainer/HBoxContainer/Info/Stats/LevelPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LevelTitle" type="Label" parent="AspectRatioContainer/HBoxContainer/Info/Stats/LevelPanel/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "BATTLE_MON_LEVEL"
+label_settings = SubResource("LabelSettings_stat_title")
+
+[node name="LevelValue" type="Label" parent="AspectRatioContainer/HBoxContainer/Info/Stats/LevelPanel/HBox"]
+layout_mode = 2
+text = "1"
+label_settings = SubResource("LabelSettings_info")
+horizontal_alignment = 2
+
+[node name="ExtraPanel" type="PanelContainer" parent="AspectRatioContainer/HBoxContainer/Info/Stats"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat")
+
+[node name="HBox" type="HBoxContainer" parent="AspectRatioContainer/HBoxContainer/Info/Stats/ExtraPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ExtraTitle" type="Label" parent="AspectRatioContainer/HBoxContainer/Info/Stats/ExtraPanel/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "BATTLE_MON_CATCH"
+label_settings = SubResource("LabelSettings_stat_title")
+
+[node name="ExtraValue" type="Label" parent="AspectRatioContainer/HBoxContainer/Info/Stats/ExtraPanel/HBox"]
+layout_mode = 2
+text = "100%"
+label_settings = SubResource("LabelSettings_info")
+horizontal_alignment = 2
+
+[node name="TypePanel" type="PanelContainer" parent="AspectRatioContainer/HBoxContainer/Info/Stats"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat")
+
+[node name="HBox" type="HBoxContainer" parent="AspectRatioContainer/HBoxContainer/Info/Stats/TypePanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TypeTitle" type="Label" parent="AspectRatioContainer/HBoxContainer/Info/Stats/TypePanel/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "BATTLE_MON_TYPE"
+label_settings = SubResource("LabelSettings_stat_title")
+
+[node name="TypeValue" type="Label" parent="AspectRatioContainer/HBoxContainer/Info/Stats/TypePanel/HBox"]
+layout_mode = 2
+text = "FIRE"
+label_settings = SubResource("LabelSettings_info")
+horizontal_alignment = 2
+
+[node name="TextureRect" type="TextureRect" parent="AspectRatioContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 texture = ExtResource("1_oxh2b")
-expand_mode = 3
-stretch_mode = 4
-
-[node name="GridContainer" type="GridContainer" parent="."]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.085
-anchor_right = 0.141
-anchor_bottom = 0.358
-offset_left = 2.0
-offset_top = -0.200001
-offset_right = 0.519989
-offset_bottom = 0.23999
-columns = 2
-
-[node name="Label2" type="Label" parent="GridContainer"]
-visible = false
-layout_mode = 2
-text = "?"
+expand_mode = 1
+stretch_mode = 5
 
 [connection signal="gui_input" from="." to="." method="_on_gui_input"]

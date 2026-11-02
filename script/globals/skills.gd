@@ -21,7 +21,8 @@ func calc_damage(from: Monster, to: Monster, skill: Dictionary) -> float:
 	var atk = from.attack() if physical else from.s_attack()
 	var def = to.defense() if physical else to.s_defense()
 	var stat_factor = 2.0 * atk / max(atk + def, 0.001)
-	return atk * (skill.value / 100) * stat_factor * element_multiplier(skill.nature, to._type)
+	# aufrunden, damit angezeigter und abgezogener Schaden gleich sind (jeder Treffer macht mind. 1)
+	return ceilf(atk * (skill.value / 100) * stat_factor * element_multiplier(skill.nature, to._type))
 
 # ─────────────────────────
 # Element-Kreis: Wasser > Feuer > Luft > Erde > Wasser

@@ -168,6 +168,10 @@ func _on_confirm_pressed() -> void:
 		var ok = await dialog.confirm(tr("JUDGEMENT_RELEASE_STARTER_TITLE"), _starter_warning(), tr("JUDGEMENT_RELEASE_CONFIRM"))
 		if not ok:
 			return
+	# Neu ins Team aufgenommene Fänge starten mit vollen HP
+	for mon in State.mons:
+		if _new_mons.has(mon):
+			mon._lost_hp = 0
 	State.catched_mons.clear()
 	get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")
 

@@ -40,6 +40,10 @@ BATTLE_CATCH_CALL,Come... Join me...,Komm... Schließ dich mir an...
 BATTLE_CATCH_NOT_ON_SIDE,is not on your side!,ist nicht auf deiner Seite!
 BATTLE_CATCH_SUCCESS,Will now fight for you!,Kämpft jetzt für dich!
 BATTLE_CATCH_FAILED,Hypnosis failed!,Hypnose fehlgeschlagen!
+BATTLE_MON_LEVEL,Lv,Lv
+BATTLE_MON_CATCH,Catch,Fang
+BATTLE_MON_MOVES,Moves,Züge
+BATTLE_MON_TYPE,Type,Typ
 BATTLE_SWITCH,Switch,Wechseln
 BATTLE_NEXT,next,weiter
 MONSTER_CLOSE_INFO,Close Info,Info schließen

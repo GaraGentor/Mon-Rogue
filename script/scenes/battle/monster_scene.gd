@@ -7,9 +7,15 @@ extends Control
 
 var mon: Monster
 
-@export var hp_label: Label
-
-@export var progress_bar: BoxContainer
+@export var name_label: Label
+@export var hp_ring: Control
+## Mitte des Rings: eigene Monster zeigen ihre übrigen Züge, Gegner ihre HP (leer, solange unbekannt)
+@export var ring_label: Label
+@export var level_label: Label
+## Gegner: Fangchance, eigene Monster: HP
+@export var extra_title: Label
+@export var extra_label: Label
+@export var type_label: Label
 
 @export var is_healing: bool
 
@@ -26,14 +32,22 @@ func _ready() -> void:
 		visible = true
 		# eigene Monster stehen mit dem Rücken zur Kamera, Gegner schauen her
 		texture_rect.texture = Monmap.texture(mon._name, Monmap.SMALL, home_mons)
-		progress_bar.progress_bar.max_value = mon.hp()
-		progress_bar.progress_bar.value = mon.hp()
-		progress_bar.level_label.text = str(mon._level)
-		progress_bar.element_panel.self_modulate = Helper.color_by_mon(mon)
+		name_label.text = Helper.mon_battle_name(mon)
+		name_label.tooltip_text = name_label.text
+		hp_ring.max_value = mon.hp()
+		hp_ring.value = mon.hp()
+		hp_ring.fill_color = Helper.color_by_mon(mon)
+		level_label.text = str(mon._level)
+		type_label.text = tr(Helper.type_name_by_mon(mon))
+		type_label.self_modulate = Helper.color_by_mon(mon)
+		# eigene Monster kann man nicht fangen, ihre HP stehen deshalb hier statt im Ring
+		extra_title.text = tr("STAT_HP").trim_suffix(":") if home_mons else tr("BATTLE_MON_CATCH")
 		if home_mons:
-			progress_bar.skill_panel.visible = true
-		# eigene Monster kann man nicht fangen
-		progress_bar.catch_panel.visible = not home_mons
+			ring_label.tooltip_text = tr("BATTLE_MON_MOVES")
+			ring_label.mouse_filter = Control.MOUSE_FILTER_PASS
+			var settings: LabelSettings = ring_label.label_settings.duplicate()
+			settings.font_size = 24
+			ring_label.label_settings = settings
 		printStuff()
 
 func _deal_damage(_mon: Monster) -> void:
@@ -77,34 +91,21 @@ func _format_multiplier(multiplier: float) -> String:
 
 func printStuff() -> void:
 	if mon:
-		hp_label.text = "
-		MON LEVEL: {1}
-		HP: {0}
-		MON_HP_LOST: {3}
-		MON ATK: {4}
-		MON DEF: {5}
-		MON S-ATK: {6}
-		MON S-DEF: {7}
-		MOVES LEFT: {8}".format([
-		mon.hp(),
-		mon._level,
-		#pb1.max_value,
-		mon._lost_hp,
-		mon.attack(),
-		mon.defense(),
-		mon.s_attack(),
-		mon.s_defense(),
-		mon._computed_moves,
-		])
-		if not home_mons:
-			progress_bar.catch_propability_label.text = "%d%%" % roundi(Helper.catch_chance(mon) * 100)
-		#if progress_bar.progress_bar:
+		if home_mons:
+			ring_label.text = str(mon._computed_moves)
+		else:
+			extra_label.text = "%d%%" % roundi(Helper.catch_chance(mon) * 100)
 		if get_tree():
-			await get_tree().create_tween().tween_method(progress_bar.progress_bar.set_value, progress_bar.progress_bar.value, mon.hp() - mon._lost_hp, 0.3).finished
-		#progress_bar.progress_bar.value = mon.hp() - mon._lost_hp
-		progress_bar.skill_points_label.text = str(mon._computed_moves)
+			await get_tree().create_tween().tween_method(_set_hp, hp_ring.value, mon.hp() - mon._lost_hp, 0.3).finished
 		Events.damage_animation_done.emit(mon)
-		#pb1.value = mon.hp() - mon._lost_hp
+
+func _set_hp(value: float) -> void:
+	hp_ring.value = value
+	if home_mons:
+		extra_label.text = str(roundi(value))
+		return
+	# genaue HP von Gegnern nur bei Arten, die man hat oder in diesem Run gefangen hat, sonst bleibt der Ring leer
+	ring_label.text = str(roundi(value)) if State.is_mon_known(mon._name) else ""
 
 func _remove_mon(_mon) -> void:
 	if _mon == mon:
