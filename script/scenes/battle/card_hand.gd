@@ -23,18 +23,19 @@ func show_mon(mon: Monster) -> void:
 		card.skill = skill
 		card.hand = self
 		card_container.add_child(card)
-		card.set_requirement(Skills.missing_elements_text(mon, skill))
 	_target_scroll = 0.0
 	scroll_horizontal = 0
 	refresh_playable()
 
-## Karten ausgrauen, deren Kosten das Monster gerade nicht zahlen kann oder deren Element ihm fehlt
+## Karten ausgrauen, deren Kosten das Monster gerade nicht zahlen kann, deren Element ihm fehlt,
+## deren Abklingzeit noch läuft oder die passiv sind
 func refresh_playable() -> void:
 	if _mon == null:
 		return
 	for card in card_container.get_children():
 		if not card.is_queued_for_deletion():
-			card.playable = _mon._computed_moves >= card.skill.cost and Skills.can_use(_mon, card.skill)
+			card.show_state(_mon)
+			card.playable = _mon._computed_moves >= card.skill.cost and Skills.is_playable(_mon, card.skill)
 
 func swipe_by(amount: float) -> void:
 	_target_scroll = clampf(_target_scroll + amount, 0.0, _max_scroll())

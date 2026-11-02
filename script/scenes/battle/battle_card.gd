@@ -44,10 +44,16 @@ func _init_card() -> void:
 	value_label.text = str(skill.get("value", skill.get("damage", "")))
 	type_icon.texture = physical_texture if skill.damage_type == Enums.SKILL_DAMAGE_TYPE.PHYSICAL else magic_texture
 	description_label.text = tr(skill.description).format(skill)
+	description_label.self_modulate = Color.WHITE
 
-## Fehlen dem Monster Elemente für diesen Skill, steht das statt der Beschreibung auf der Karte
-func set_requirement(text: String) -> void:
+## Fehlen dem Monster Elemente für diesen Skill oder läuft die Abklingzeit noch,
+## steht das statt der Beschreibung auf der Karte
+func show_state(mon: Monster) -> void:
+	var text = Skills.missing_elements_text(mon, skill)
+	if text.is_empty() and not Skills.is_ready(skill):
+		text = tr("BATTLE_CARD_COOLDOWN").format({"turns": Skills.cooldown_left(skill)})
 	if text.is_empty():
+		_init_card()
 		return
 	description_label.text = text
 	description_label.self_modulate = Color(1, 0.45, 0.45)

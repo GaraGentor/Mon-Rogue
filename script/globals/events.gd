@@ -23,8 +23,10 @@ signal mon_is_catched(mon)
 
 # battle
 signal deal_damage_to_monster(mon)
-# Treffer mit Schaden und Element-Faktor (für die schwebende Anzeige "Sehr effektiv!")
-signal monster_hit_with_element(mon, damage, multiplier)
+# Treffer mit Schaden und Element-Faktor (für die schwebende Anzeige "Sehr effektiv!"), blocked = vom Schild abgefangen
+signal monster_hit_with_element(mon, damage, multiplier, blocked)
+# Schild, Buff oder Abklingzeit eines Monsters hat sich geändert
+signal monster_status_changed(mon)
 
 # monster widget
 signal skill_label_pressed(skill)

@@ -158,10 +158,19 @@ SKILL_BASIC_BLOCK_FIRE,Ember Guard,Glutschild
 SKILL_BASIC_BLOCK_WATER,Water Shield,Wasserschild
 SKILL_BASIC_BLOCK_AIR,Wind Shield,Windschild
 SKILL_BASIC_BLOCK_DESC,Blocks {value} damage,Blockt {value} Schaden
-SKILL_STRENGTH_BLOCK,strength block,Kraftblock
-SKILL_STRENGTH_BLOCK_DESC,?,?
 SKILL_DAMAGE_PHYSICAL_DESC,Deals {value}% physical damage,Verursacht {value}% physischen Schaden
 SKILL_DAMAGE_ABILITY_DESC,Deals {value}% magical damage,Verursacht {value}% magischen Schaden
+SKILL_STONE_GUARD,Stone Guard,Felsenpanzer
+SKILL_MIST_VEIL,Mist Veil,Nebelschleier
+SKILL_SHIELD_PHYSICAL_DESC,Shields an ally with {value}% of its DEF against physical damage,Schützt ein eigenes Monster mit {value}% seiner VER vor physischem Schaden
+SKILL_SHIELD_ABILITY_DESC,Shields an ally with {value}% of its SPD against magical damage,Schützt ein eigenes Monster mit {value}% seiner SVE vor magischem Schaden
+SKILL_TEMPERED_HIDE,Tempered Hide,Gehärtete Haut
+SKILL_BUFF_DEF_DESC,+{value}% DEF for an ally for {buff_turns} turns,+{value}% VER für ein eigenes Monster für {buff_turns} Züge
+SKILL_LIFE_SPRING,Life Spring,Lebensquell
+SKILL_PASSIVE_HP_DESC,Passive: +{value} HP for every monster in the team,Passiv: +{value} KP für jedes Monster im Team
+SKILL_SQUALL,Squall,Sturmböe
+SKILL_FIRESTORM,Firestorm,Feuersturm
+SKILL_AREA_ABILITY_DESC,Deals {value}% magical damage to all enemies,Verursacht {value}% magischen Schaden an allen Gegnern
 SKILL_GUST,gust,Windstoß
 SKILL_SPLASH,splash,Platscher
 SKILL_EMBER,ember,Glut
@@ -316,6 +325,11 @@ SHOP_HINT,Drag an item over here to buy it.,"Zieh eine Ware hier herüber, um si
 REWARD_NO_TARGET,None of your monsters can use this.,Keins deiner Monster kann das gebrauchen.
 BATTLE_SUPER_EFFECTIVE,Super effective!,Sehr effektiv!
 BATTLE_NOT_EFFECTIVE,Not very effective...,Nicht sehr effektiv...
+BATTLE_CARD_COOLDOWN,Ready in {turns} turns,Bereit in {turns} Zügen
+BATTLE_BLOCKED,{value} blocked,{value} geblockt
+BATTLE_STATUS_SHIELD,Shield {value},Schild {value}
+BATTLE_STATUS_S_SHIELD,Sp. Shield {value},Sp.-Schild {value}
+BATTLE_STATUS_BUFF,Buff,Buff
 TRAINER_TITLE,Trainer,Trainer
 TRAINER_HINT,Drag a skill onto a monster to teach it.,"Zieh einen Skill auf ein Monster, um ihn ihm beizubringen."
 TRAINER_CHOOSE_MON,Who should learn it?,Wer soll ihn lernen?

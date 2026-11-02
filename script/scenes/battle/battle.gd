@@ -36,6 +36,9 @@ func _ready() -> void:
 	Events.monster_faints.connect(_check_game_over)
 	Events.finish_catching.connect(_finish_catching)
 
+	# Schilde, Buffs und Abklingzeiten gelten nur für einen Kampf
+	for mon in State.mons + State.enemy_mons:
+		mon.reset_battle_state()
 	_refresh_skill_points()
 	Events.mouse_event.emit({"action": Enums.MOUSE_ACTION.SELECT_MONSTER, "mon": State.enemy_mons[0]})
 
@@ -56,6 +59,7 @@ func _is_own_turn() -> bool:
 
 func _on_turn_for(mon: Monster) -> void:
 	active_mon = mon
+	mon.start_turn()
 	var own_index = State.mons.find(mon)
 	if own_index > -1:
 		# Skillpunkte zu Beginn des eigenen Zuges auffüllen
@@ -114,6 +118,9 @@ func _exit_tree() -> void:
 	Events.mouse_event.disconnect(_catch_mouse_event)
 	Events.monster_faints.disconnect(_check_game_over)
 	Events.finish_catching.disconnect(_finish_catching)
+	# Buffs sollen nach dem Kampf nicht in den Werten auf der Karte stehen bleiben
+	for mon in State.mons:
+		mon.reset_battle_state()
 
 func _catch_mouse_event(event) -> void:
 	if event.action == Enums.MOUSE_ACTION.SELECT_MONSTER and event.mon != null:
@@ -122,20 +129,53 @@ func _catch_mouse_event(event) -> void:
 		# nur das Monster, das am Zug ist, darf Skills spielen
 		if not _is_own_turn():
 			return
-		# deal damage
-		catch_button.disabled = true
-
 		# per Drag & Drop gespielte Karten bringen ihr Ziel mit
-		var target: Monster = event.get("mon", currently_selected_enemy_mon)
+		var target: Monster = event.get("mon", _default_target(event.skill))
+		if not Skills.is_playable(active_mon, event.skill) or not _is_valid_target(active_mon, event.skill, target):
+			return
 		var isOk = subract_skill_points(event.skill, active_mon)
 		print("deal damage" + str(isOk))
 		if isOk:
-			if event.skill.target == Enums.CARD_TARGETS.SINGLE_ENEMY:
-				event.skill.handle.call({"from": active_mon, "skill": event.skill, "mon": target})
-			Events.monster_hit_monster.emit(_scene_for(active_mon), _scene_for(target))
+			catch_button.disabled = true
+			_use_skill(active_mon, event.skill, target)
 			Events.call_skill_card.emit(event.skill)
 			mouse_action = Enums.MOUSE_ACTION.NONE
 	mouse_action = event.action
+
+## lebende Monster auf der Seite von mon (inklusive mon selbst)
+func _allies_of(mon: Monster) -> Array:
+	return (State.mons if State.mons.has(mon) else State.enemy_mons).filter(func(m: Monster): return m.is_alive())
+
+## lebende Monster auf der Gegenseite von mon
+func _opponents_of(mon: Monster) -> Array:
+	return (State.enemy_mons if State.mons.has(mon) else State.mons).filter(func(m: Monster): return m.is_alive())
+
+## Ziel für Karten, die ohne Drag & Drop gespielt werden: Schilde und Buffs auf das markierte eigene Monster
+## (sonst auf sich selbst), Angriffe auf den zuletzt markierten Gegner.
+func _default_target(skill: Dictionary) -> Monster:
+	if Skills.targets_friends(skill):
+		return selected_mon if _allies_of(active_mon).has(selected_mon) else active_mon
+	return currently_selected_enemy_mon
+
+## Schilde und Buffs nur auf eigene Monster, Angriffe nur auf Gegner
+func _is_valid_target(from: Monster, skill: Dictionary, target: Monster) -> bool:
+	if target == null:
+		return false
+	var side = _allies_of(from) if Skills.targets_friends(skill) else _opponents_of(from)
+	return side.has(target)
+
+## Setzt einen Skill ein: Flächen-Skills treffen die ganze Seite des Ziels, danach startet die Abklingzeit.
+func _use_skill(from: Monster, skill: Dictionary, target: Monster) -> void:
+	var targets = [target]
+	if Skills.targets_team(skill):
+		targets = _allies_of(target)
+	for mon in targets:
+		# Angriffsanimation nur gegen Gegner
+		if not Skills.targets_friends(skill):
+			Events.monster_hit_monster.emit(_scene_for(from), _scene_for(mon))
+		skill.handle.call({"from": from, "skill": skill, "mon": mon})
+	Skills.start_cooldown(skill)
+	Events.monster_status_changed.emit(from)
 
 func subract_skill_points(selected_skill, mon) -> bool:
 	if mon._computed_moves >= selected_skill.cost:
@@ -297,21 +337,19 @@ func _clear_fainted_mons():
 	for item: Monster in v:
 		State.mons.erase(item)
 
-## Zug eines Gegners: zufälliger Skill auf ein zufälliges lebendes eigenes Monster
+## Zug eines Gegners: zufälliger Skill auf ein zufälliges lebendes Ziel
+## (Angriffe auf eigene Monster, Schilde und Buffs auf sich selbst oder einen Verbündeten)
 func _ki_turn(emon: Monster) -> void:
-	var alive = State.mons.filter(func(mon: Monster): return mon.is_alive())
-	if alive.is_empty() or not emon.is_alive():
+	if _opponents_of(emon).is_empty() or not emon.is_alive():
 		return
-	# Gegner halten sich an dieselbe Element-Regel wie der Spieler
-	var usable = emon._skills.filter(func(skill): return Skills.can_use(emon, skill))
+	# Gegner halten sich an dieselben Regeln wie der Spieler (Element, Abklingzeit, Passive nicht ausspielbar)
+	var usable = emon._skills.filter(func(skill): return Skills.is_playable(emon, skill))
 	if usable.is_empty():
 		return
 	var skill = usable.pick_random()
-	var to_hit = alive.pick_random()
-	if skill.target == Enums.CARD_TARGETS.SINGLE_ENEMY:
-		Events.monster_hit_monster.emit(_scene_for(emon), _scene_for(to_hit))
-		skill.handle.call({"from": emon, "skill": skill, "mon": to_hit})
-		skill.scouted = true
+	var to_hit = (_allies_of(emon) if Skills.targets_friends(skill) else _opponents_of(emon)).pick_random()
+	_use_skill(emon, skill, to_hit)
+	skill.scouted = true
 
 func _on_end_turn_pressed() -> void:
 	if not _is_own_turn():

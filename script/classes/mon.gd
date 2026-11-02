@@ -38,6 +38,13 @@ var _computed_moves: int = 1:
 # Edelstein-Boni für diesen Run: Stat-Key aus STATS in gems.gd -> Anteil (0.1 = +10 %)
 var _gems: Dictionary = {}
 
+# Kampf-Zustand, wird zu Beginn jedes Kampfes zurückgesetzt (reset_battle_state)
+# Schilde fangen Schaden ab, bis sie aufgebraucht sind: physisch gegen physischen, magisch gegen magischen Schaden
+var _shield: float = 0
+var _s_shield: float = 0
+# Buffs: Stat-Key (wie bei _gems) -> {"factor": 0.3 = +30 %, "turns": übrige eigene Züge}
+var _buffs: Dictionary = {}
+
 func _init(level: int, meta_data: Dictionary) -> void:
 	## get saved data and apply.
 	Events.mon_upgraded.connect(mon_upgraded)
@@ -71,6 +78,55 @@ func upgrade_all_skills_by_level(level):
 func upgrade_skill(skill, level):
 	pass
 
+func reset_battle_state() -> void:
+	_shield = 0
+	_s_shield = 0
+	_buffs = {}
+	for skill in _skills:
+		skill.erase("_cooldown_left")
+	Events.monster_status_changed.emit(self)
+
+# Beginn eines eigenen Zuges (eigene Monster und Gegner): Abklingzeiten und Buffs zählen herunter.
+func start_turn() -> void:
+	for skill in _skills:
+		Skills.tick_cooldown(skill)
+	for stat in _buffs.keys():
+		_buffs[stat].turns -= 1
+		if _buffs[stat].turns <= 0:
+			_buffs.erase(stat)
+	Events.monster_status_changed.emit(self)
+
+func add_shield(amount: float, physical: bool) -> void:
+	if physical:
+		_shield += amount
+	else:
+		_s_shield += amount
+	Events.monster_status_changed.emit(self)
+
+# Zieht den Schaden vom passenden Schild ab und liefert, was durchkommt.
+func absorb_damage(damage: float, physical: bool) -> float:
+	var shield = _shield if physical else _s_shield
+	var blocked = minf(shield, damage)
+	if blocked <= 0:
+		return damage
+	if physical:
+		_shield -= blocked
+	else:
+		_s_shield -= blocked
+	Events.monster_status_changed.emit(self)
+	return damage - blocked
+
+# Erneutes Buffen desselben Werts stapelt nicht, sondern frischt Stärke und Dauer auf.
+func add_buff(stat: String, factor: float, turns: int) -> void:
+	_buffs[stat] = {"factor": maxf(factor, _buffs.get(stat, {}).get("factor", 0.0)), "turns": turns}
+	Events.monster_status_changed.emit(self)
+
+func buff_factor(stat: String) -> float:
+	return 1.0 + _buffs.get(stat, {}).get("factor", 0.0)
+
+func is_buffed() -> bool:
+	return not _buffs.is_empty()
+
 func reset_to_new_round():
 	Events.refresh_ui_for_monster.emit()
 	print("_upgrades", _upgrades, "_initial_moves", _initial_moves)
@@ -88,22 +144,23 @@ func get_unlockable_egg_skill() -> Dictionary:
 	return {}
 
 func hp():
-	return (_growth.hp * _level) * Helper.points_per_level(_best_points) * gem_factor("hp")
+	# passive Skills im Team (z. B. +5 KP) kommen obendrauf
+	return (_growth.hp * _level) * Helper.points_per_level(_best_points) * gem_factor("hp") + Skills.passive_bonus(self, "hp")
 
 func attack():
-	return (_growth.atk * _level) * Helper.points_per_level(_best_points) * gem_factor("atk")
+	return (_growth.atk * _level) * Helper.points_per_level(_best_points) * gem_factor("atk") * buff_factor("atk")
 
 func defense():
-	return (_growth.def * _level) * Helper.points_per_level(_best_points) * gem_factor("def")
+	return (_growth.def * _level) * Helper.points_per_level(_best_points) * gem_factor("def") * buff_factor("def")
 	
 func s_attack():
-	return (_growth.s_atk * _level) * Helper.points_per_level(_best_points) * gem_factor("s_atk")
+	return (_growth.s_atk * _level) * Helper.points_per_level(_best_points) * gem_factor("s_atk") * buff_factor("s_atk")
 	
 func s_defense():
-	return (_growth.s_def * _level) * Helper.points_per_level(_best_points) * gem_factor("s_def")
+	return (_growth.s_def * _level) * Helper.points_per_level(_best_points) * gem_factor("s_def") * buff_factor("s_def")
 
 func speed():
-	return (_growth.speed * _level) * Helper.points_per_level(_best_points) * gem_factor("speed")
+	return (_growth.speed * _level) * Helper.points_per_level(_best_points) * gem_factor("speed") * buff_factor("speed")
 
 func best():
 	return _best_points

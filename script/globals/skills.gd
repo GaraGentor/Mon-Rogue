@@ -3,10 +3,12 @@ extends Node
 func deal_damage(props):
 	# für Kopfgelder: wer zuletzt getroffen hat, hat das Monster besiegt
 	props.mon._last_hit_by = props.from
-	var damage = calc_damage(props.from, props.mon, props.skill)
+	var full_damage = calc_damage(props.from, props.mon, props.skill)
+	# Schilde fangen den Schaden zuerst ab
+	var damage = props.mon.absorb_damage(full_damage, is_physical(props.skill))
 	var multiplier = element_multiplier(props.skill.nature, props.mon._type)
 	print("lose:" + str(props.skill.value) + ":" + str(damage) + " (Element x" + str(multiplier) + ")")
-	Events.monster_hit_with_element.emit(props.mon, damage, multiplier)
+	Events.monster_hit_with_element.emit(props.mon, damage, multiplier, full_damage - damage)
 	if State.mons.has(props.mon) and props.mon.is_alive() and props.mon._lost_hp + damage > props.mon.hp():
 		State.record_own_faint(props.mon, props.from, props.skill, damage, multiplier)
 	props.mon._lost_hp += damage
@@ -16,8 +18,11 @@ func deal_damage(props):
 # Physisch: Angriff gegen Verteidigung, Magisch: Sp. Angriff gegen Sp. Verteidigung.
 # Bei gleichen Werten bleibt der Schaden wie vorher (Faktor 1), mehr Angriff -> bis zu x2, mehr Verteidigung -> gegen 0.
 
+func is_physical(skill: Dictionary) -> bool:
+	return skill.get("damage_type", Enums.SKILL_DAMAGE_TYPE.PHYSICAL) == Enums.SKILL_DAMAGE_TYPE.PHYSICAL
+
 func calc_damage(from: Monster, to: Monster, skill: Dictionary) -> float:
-	var physical = skill.get("damage_type", Enums.SKILL_DAMAGE_TYPE.PHYSICAL) == Enums.SKILL_DAMAGE_TYPE.PHYSICAL
+	var physical = is_physical(skill)
 	var atk = from.attack() if physical else from.s_attack()
 	var def = to.defense() if physical else to.s_defense()
 	var stat_factor = 2.0 * atk / max(atk + def, 0.001)
@@ -53,9 +58,22 @@ func element_score(skill_nature: int, target_type: int) -> int:
 				score -= 1
 	return score
 
-# Macht der Skill Schaden? (Block-Skills haben zwar einen Wert und ein Gegner-Ziel, aber keinen Schaden.)
+# Macht der Skill Schaden? (Schild-, Buff- und passive Skills haben zwar einen Wert, aber keinen Schaden.)
 func is_damage_skill(skill: Dictionary) -> bool:
-	return skill.has("value") and not defensive_skills.any(func(block): return block.name == skill.name)
+	return skill.has("value") and skill.get("effect", "damage") == "damage" \
+		and not defensive_skills.any(func(block): return block.name == skill.name)
+
+# Schilde und Buffs zielen auf das eigene Team.
+func targets_friends(skill: Dictionary) -> bool:
+	return skill.target in [Enums.CARD_TARGETS.SINGLE_FRIEND, Enums.CARD_TARGETS.TEAM_FRIEND]
+
+# Flächen-Skills treffen alle Monster der Zielseite.
+func targets_team(skill: Dictionary) -> bool:
+	return skill.target in [Enums.CARD_TARGETS.TEAM_ENEMY, Enums.CARD_TARGETS.TEAM_FRIEND]
+
+# Passive Skills wirken einfach, solange das Monster sie kennt, und können nicht ausgespielt werden.
+func is_passive(skill: Dictionary) -> bool:
+	return skill.get("effect", "") == "passive"
 
 # +1 -> x1.5, +2 -> x2.0, ... / -1 -> x0.5, -2 -> x0.25, ...
 func element_multiplier(skill_nature: int, target_type: int) -> float:
@@ -64,9 +82,57 @@ func element_multiplier(skill_nature: int, target_type: int) -> float:
 		return 1.0 + ELEMENT_BONUS * score
 	return pow(1.0 - ELEMENT_BONUS, -score)
 
+# ─────────────────────────
+# Schilde halten den ganzen Kampf, bis sie aufgebraucht sind (siehe Monster.absorb_damage).
+# Physische Schilde fangen nur physischen Schaden ab, magische nur magischen.
+
+# Basis-Blocks: fester Schild gegen physischen Schaden.
+func add_flat_shield(props):
+	props.mon.add_shield(props.skill.value, true)
+
+# Physischer Block: value % der Verteidigung, magischer Block: value % der Sp. Verteidigung.
 func add_shield(props):
-	pass
-	# props.mon._shield += props.skill.value
+	var physical = is_physical(props.skill)
+	var def = props.mon.defense() if physical else props.mon.s_defense()
+	props.mon.add_shield(ceilf(def * props.skill.value / 100), physical)
+
+# Buff: value % mehr auf buff_stat für buff_turns eigene Züge des Ziels.
+func add_buff(props):
+	props.mon.add_buff(props.skill.buff_stat, props.skill.value / 100, props.skill.buff_turns)
+
+# Bonus aller passiven Skills im Team auf einen Wert (z. B. +5 KP für jedes Monster im Team).
+# Es gilt die Element-Regel: nur Monster, die den Skill einsetzen könnten, geben den Bonus.
+func passive_bonus(mon: Monster, stat: String) -> float:
+	var team = State.mons if State.mons.has(mon) else State.enemy_mons if State.enemy_mons.has(mon) else [mon]
+	var bonus = 0.0
+	for member in team:
+		for skill in member._skills:
+			if is_passive(skill) and skill.passive_stat == stat and can_use(member, skill):
+				bonus += skill.value
+	return bonus
+
+# ─────────────────────────
+# Abklingzeit: Nach dem Einsatz ist ein Skill für cooldown eigene Züge gesperrt.
+# Heruntergezählt wird zu Beginn jedes Zuges des Monsters (Monster.start_turn), daher +1 für den laufenden Zug.
+# _cooldown_left ist damit genau die Anzahl Züge, bis der Skill wieder bereit ist.
+
+func start_cooldown(skill: Dictionary) -> void:
+	if skill.get("cooldown", 0) > 0:
+		skill._cooldown_left = skill.cooldown + 1
+
+func cooldown_left(skill: Dictionary) -> int:
+	return skill.get("_cooldown_left", 0)
+
+func is_ready(skill: Dictionary) -> bool:
+	return cooldown_left(skill) <= 0
+
+func tick_cooldown(skill: Dictionary) -> void:
+	if cooldown_left(skill) > 0:
+		skill._cooldown_left -= 1
+
+# Kann das Monster den Skill gerade ausspielen? (Element passt, nicht passiv, Abklingzeit vorbei)
+func is_playable(mon: Monster, skill: Dictionary) -> bool:
+	return can_use(mon, skill) and not is_passive(skill) and is_ready(skill)
 
 # Stufe eines Skills (1 = schwach, 4 = sehr stark) -> Gewicht beim zufälligen Generieren.
 # Je stärker der Skill, desto seltener taucht er auf.
@@ -74,13 +140,17 @@ const TIER_WEIGHTS = {1: 50, 2: 25, 3: 10, 4: 3}
 
 # Liefert eine frische Kopie des Skills mit diesem Namen (aus allen Skill-Listen) oder {}.
 func get_skill(skill_name: String) -> Dictionary:
-	for list in [attack_skills, defensive_skills, buff_skills, egg_skills, milestone_skills, bounty_skills]:
+	for list in [attack_skills, defensive_skills, buff_skills, passive_skills, area_skills, egg_skills, milestone_skills, bounty_skills]:
 		for skill in list:
 			if skill.name == skill_name:
 				var copy = skill.duplicate()
 				copy.id = Helper.generate_fake_uuid()
 				return copy
 	return {}
+
+# Effekt-Skills, die wie Ei-Attacken im Biom-Pool auftauchen (die Basis-Blocks gehören fest zu den Arten).
+func effect_skills() -> Array:
+	return defensive_skills.filter(func(skill): return skill.has("effect")) + buff_skills + passive_skills + area_skills
 
 func get_tier(skill_name: String) -> int:
 	return get_skill(skill_name).get("tier", 1)
@@ -119,9 +189,9 @@ func pick_weighted_unique(skill_names: Array, count: int, depth: int = 0) -> Arr
 		pool.erase(skill_name)
 	return picked
 
-# Ei-Attacken, deren Element zum Biom passt (biome_mask 0 = alle).
+# Ei-Attacken und Effekt-Skills (Schild, Buff, Passiv, Flächenschaden), deren Element zum Biom passt (biome_mask 0 = alle).
 func get_biome_skills(biome_mask: int) -> Array:
-	return egg_skills.filter(func(skill): return biome_mask == 0 or skill.nature & biome_mask != 0).map(
+	return (egg_skills + effect_skills()).filter(func(skill): return biome_mask == 0 or skill.nature & biome_mask != 0).map(
 		func(skill): return skill.name)
 
 # ─────────────────────────
@@ -296,14 +366,21 @@ var attack_skills = [
 	_basic_skill("SKILL_BASIC_ATTACK_AIR", Enums.MON_TYPES.AIR, 22.0, "SKILL_BASIC_ATTACK_DESC", func(props): deal_damage(props)),
 ]
 
+# Basis-Blocks: fester Schild auf ein eigenes Monster.
+# Die beiden Schild-Skills: value % der (Sp.) Verteidigung als Schild, mit Abklingzeit.
 var defensive_skills = [
-	_basic_skill("SKILL_BASIC_BLOCK_EARTH", Enums.MON_TYPES.EARTH, 4.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_shield(props)),
-	_basic_skill("SKILL_BASIC_BLOCK_FIRE", Enums.MON_TYPES.FIRE, 1.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_shield(props)),
-	_basic_skill("SKILL_BASIC_BLOCK_WATER", Enums.MON_TYPES.WATER, 3.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_shield(props)),
-	_basic_skill("SKILL_BASIC_BLOCK_AIR", Enums.MON_TYPES.AIR, 2.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_shield(props)),
+	_basic_skill("SKILL_BASIC_BLOCK_EARTH", Enums.MON_TYPES.EARTH, 4.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_flat_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
+	_basic_skill("SKILL_BASIC_BLOCK_FIRE", Enums.MON_TYPES.FIRE, 1.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_flat_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
+	_basic_skill("SKILL_BASIC_BLOCK_WATER", Enums.MON_TYPES.WATER, 3.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_flat_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
+	_basic_skill("SKILL_BASIC_BLOCK_AIR", Enums.MON_TYPES.AIR, 2.0, "SKILL_BASIC_BLOCK_DESC", func(props): add_flat_shield(props), Enums.CARD_TARGETS.SINGLE_FRIEND),
+	_effect_skill("SKILL_STONE_GUARD", Enums.MON_TYPES.EARTH, 50.0, 1, Enums.SKILL_DAMAGE_TYPE.PHYSICAL, "shield",
+		"SKILL_SHIELD_PHYSICAL_DESC", Enums.CARD_TARGETS.SINGLE_FRIEND, 2, func(props): add_shield(props)),
+	_effect_skill("SKILL_MIST_VEIL", Enums.MON_TYPES.WATER, 50.0, 1, Enums.SKILL_DAMAGE_TYPE.ABILITY, "shield",
+		"SKILL_SHIELD_ABILITY_DESC", Enums.CARD_TARGETS.SINGLE_FRIEND, 2, func(props): add_shield(props)),
 ]
 
-func _basic_skill(skill_name: String, nature: int, value: float, description: String, handle: Callable) -> Dictionary:
+func _basic_skill(skill_name: String, nature: int, value: float, description: String, handle: Callable,
+		target: int = Enums.CARD_TARGETS.SINGLE_ENEMY) -> Dictionary:
 	return {
 		"cost": 1,
 		"name": skill_name,
@@ -312,27 +389,56 @@ func _basic_skill(skill_name: String, nature: int, value: float, description: St
 		"cooldown": 0,
 		"damage_type": Enums.SKILL_DAMAGE_TYPE.PHYSICAL,
 		"description": description,
-		"target": Enums.CARD_TARGETS.SINGLE_ENEMY,
+		"target": target,
 		"scouted": false,
 		"tier": 1,
 		"shop_cost": {"min": 5, "max": 15},
 		"handle": handle
 	}
 
+# Buffs auf ein eigenes Monster, im Kampf als "Buff" am Monster angezeigt.
 var buff_skills = [
-	{
-		"cost": 1,
-		"name": "SKILL_STRENGTH_BLOCK",
-		"nature": Enums.MON_TYPES.AIR,
-		"damage": 2,
-		"cooldown": 0,
-		"damage_type": Enums.SKILL_DAMAGE_TYPE.ABILITY,
-		"description": "SKILL_STRENGTH_BLOCK_DESC",
-		"scouted": false,
-		"shop_cost": {"min": 5, "max": 15},
-		"target": Enums.CARD_TARGETS.SINGLE_ENEMY,
-	}
+	_with(_effect_skill("SKILL_TEMPERED_HIDE", Enums.MON_TYPES.FIRE, 30.0, 1, Enums.SKILL_DAMAGE_TYPE.PHYSICAL, "buff",
+		"SKILL_BUFF_DEF_DESC", Enums.CARD_TARGETS.SINGLE_FRIEND, 2, func(props): add_buff(props)),
+		{"buff_stat": "def", "buff_turns": 3}),
 ]
+
+# Passive Skills: nicht ausspielbar, wirken einfach, solange das Monster sie kennt (können beim Lernen ersetzt werden).
+var passive_skills = [
+	_with(_effect_skill("SKILL_LIFE_SPRING", Enums.MON_TYPES.WATER, 5.0, 2, Enums.SKILL_DAMAGE_TYPE.ABILITY, "passive",
+		"SKILL_PASSIVE_HP_DESC", Enums.CARD_TARGETS.TEAM_FRIEND, 0, func(_props): pass),
+		{"cost": 0, "passive_stat": "hp"}),
+]
+
+# Flächenschaden: trifft alle Gegner, dafür schwächer als Skills auf ein Ziel.
+var area_skills = [
+	_effect_skill("SKILL_SQUALL", Enums.MON_TYPES.AIR, 15.0, 1, Enums.SKILL_DAMAGE_TYPE.ABILITY, "damage",
+		"SKILL_AREA_ABILITY_DESC", Enums.CARD_TARGETS.TEAM_ENEMY, 1, func(props): deal_damage(props)),
+	_effect_skill("SKILL_FIRESTORM", Enums.MON_TYPES.FIRE, 40.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY, "damage",
+		"SKILL_AREA_ABILITY_DESC", Enums.CARD_TARGETS.TEAM_ENEMY, 3, func(props): deal_damage(props)),
+]
+
+func _effect_skill(skill_name: String, nature: int, value: float, tier: int, damage_type: int, effect: String,
+		description: String, target: int, cooldown: int, handle: Callable) -> Dictionary:
+	return {
+		"cost": 1,
+		"name": skill_name,
+		"nature": nature,
+		"value": value,
+		"cooldown": cooldown,
+		"damage_type": damage_type,
+		"effect": effect,
+		"description": description,
+		"target": target,
+		"scouted": false,
+		"tier": tier,
+		"shop_cost": {"min": 5 * tier, "max": 15 * tier},
+		"handle": handle
+	}
+
+func _with(skill: Dictionary, extra: Dictionary) -> Dictionary:
+	skill.merge(extra, true)
+	return skill
 
 # Test-Skills für Ei-Attacken (alle Schaden auf ein Ziel), Stufe 1-4 bestimmt die Seltenheit.
 var egg_skills = [

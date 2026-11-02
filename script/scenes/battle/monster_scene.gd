@@ -24,6 +24,7 @@ func _ready() -> void:
 	Events.refresh_ui_for_monster.connect(printStuff)
 	Events.deal_damage_to_monster.connect(_deal_damage)
 	Events.monster_hit_with_element.connect(_show_hit_text)
+	Events.monster_status_changed.connect(_on_status_changed)
 	Events.monster_faints.connect(_remove_mon)
 	Events.mon_is_catched.connect(_remove_mon)
 	var mons = State.mons if home_mons else State.enemy_mons
@@ -57,11 +58,16 @@ func _deal_damage(_mon: Monster) -> void:
 const SUPER_EFFECTIVE_COLOR := Color(1.0, 0.55, 0.2)
 const NOT_EFFECTIVE_COLOR := Color(0.6, 0.65, 0.7)
 
-# Schwebender Schadenstext über dem Monster, bei Element-Vorteil/-Nachteil mit Hinweis und Faktor.
-func _show_hit_text(_mon: Monster, damage: float, multiplier: float) -> void:
+const STATUS_COLOR := Color(0.55, 0.8, 1.0)
+
+# Schwebender Schadenstext über dem Monster, bei Element-Vorteil/-Nachteil mit Hinweis und Faktor,
+# vom Schild abgefangener Schaden steht darunter.
+func _show_hit_text(_mon: Monster, damage: float, multiplier: float, blocked: float = 0.0) -> void:
 	if mon != _mon:
 		return
 	var text = str(roundi(damage))
+	if blocked > 0:
+		text += "\n" + tr("BATTLE_BLOCKED").format({"value": roundi(blocked)})
 	var color = Color.WHITE
 	if multiplier > 1.0:
 		text = tr("BATTLE_SUPER_EFFECTIVE") + " x%s\n" % _format_multiplier(multiplier) + text
@@ -88,6 +94,40 @@ func _show_hit_text(_mon: Monster, damage: float, multiplier: float) -> void:
 
 func _format_multiplier(multiplier: float) -> String:
 	return String.num(multiplier, 2)
+
+# Status unter dem Monster-Bild: Schilde mit ihrem Wert, Buffs nur als "Buff".
+var _status_label: Label
+
+func _on_status_changed(_mon: Monster) -> void:
+	if mon != _mon:
+		return
+	var parts = []
+	if mon._shield > 0:
+		parts.append(tr("BATTLE_STATUS_SHIELD").format({"value": roundi(mon._shield)}))
+	if mon._s_shield > 0:
+		parts.append(tr("BATTLE_STATUS_S_SHIELD").format({"value": roundi(mon._s_shield)}))
+	if mon.is_buffed():
+		parts.append(tr("BATTLE_STATUS_BUFF"))
+	if _status_label == null:
+		_status_label = Label.new()
+		_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_status_label.add_theme_font_size_override("font_size", 20)
+		_status_label.add_theme_color_override("font_color", STATUS_COLOR)
+		_status_label.add_theme_color_override("font_outline_color", Color.BLACK)
+		_status_label.add_theme_constant_override("outline_size", 6)
+		_status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_status_label.z_index = 5
+		add_child(_status_label)
+	_status_label.text = "  ".join(PackedStringArray(parts))
+	_status_label.visible = not parts.is_empty()
+	_place_status_label()
+
+func _place_status_label() -> void:
+	if _status_label == null or not _status_label.visible:
+		return
+	_status_label.size = _status_label.get_minimum_size()
+	_status_label.position = _texture_offset() + Vector2((texture_rect.size.x - _status_label.size.x) / 2,
+		texture_rect.size.y - _status_label.size.y)
 
 func printStuff() -> void:
 	if mon:
@@ -137,6 +177,8 @@ func _process(_delta: float) -> void:
 		and _can_drop_data(Vector2.ZERO, drag_data)
 	modulate = Color(1.3, 1.3, 1.0) if hovered else Color.WHITE
 	_update_drag_preview(drag_data)
+	# das Layout kann sich verschieben (z. B. wenn ein Monster ausscheidet)
+	_place_status_label()
 
 # Während eine Angriffskarte gezogen wird, zeigt jedes mögliche Ziel seinen Element-Faktor an.
 var _preview_label: Label
