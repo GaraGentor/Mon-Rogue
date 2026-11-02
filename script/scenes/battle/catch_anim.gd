@@ -20,6 +20,8 @@ func catch_mon(mon: Monster) -> void:
 	if catched:
 		Events.mon_is_catched.emit(mon)
 		mon.unlock_skills()
+		# Zusatzaktionen gibt es für eigene Monster nur über den Kerkermeister
+		mon._initial_moves = Monster.BASE_MOVES
 		State.catched_mons.append(mon)
 		State.mark_mon_caught(mon._name)
 		State.run_catches += 1

@@ -206,28 +206,37 @@ func _refresh_skill_points() -> void:
 ## - level: [Stufe beim ersten Kampf, Stufe beim letzten Kampf]
 ## - offset: zufällige Abweichung pro Monster [min, max]
 ## - counts: Gewichte für 1/2/3 Gegner [am Anfang, am Ende]
+## - moves: Gewichte für 1/2/3 Aktionen pro Zug, je Gegner gewürfelt [am Anfang, am Ende].
+##   Eigene Monster kommen nur über den Kerkermeister auf mehr Aktionen, teure Skills (Kosten 2-3)
+##   und die späten Biome verlangen daher gefangene, stärkere Monster und Verbesserungen.
 ## Ein Team, das jeden Kampf ausfechtet (2 K.O.s = +1 Stufe), liegt etwa gleichauf;
 ## wer lieber alles fängt, levelt nicht und fällt zurück.
 const ENCOUNTERS := [
 	# Biom 1: Einstieg, fast nur Einzelkämpfe auf gleicher oder niedrigerer Stufe
-	{"fights": 4, "level": [2, 4], "offset": [-1, 0], "counts": [[100, 0, 0], [70, 30, 0]]},
+	{"fights": 4, "level": [2, 4], "offset": [-1, 0], "counts": [[100, 0, 0], [70, 30, 0]],
+		"moves": [[100, 0, 0], [90, 10, 0]]},
 	# Biom 2: Doppelkämpfe werden normal
-	{"fights": 4, "level": [5, 9], "offset": [-1, 1], "counts": [[70, 30, 0], [40, 50, 10]]},
+	{"fights": 4, "level": [5, 9], "offset": [-1, 1], "counts": [[70, 30, 0], [40, 50, 10]],
+		"moves": [[85, 15, 0], [65, 30, 5]]},
 	# Biom 3: erste 3er-Gruppen
-	{"fights": 5, "level": [10, 15], "offset": [-1, 1], "counts": [[40, 50, 10], [15, 55, 30]]},
+	{"fights": 5, "level": [10, 15], "offset": [-1, 1], "counts": [[40, 50, 10], [15, 55, 30]],
+		"moves": [[60, 35, 5], [40, 45, 15]]},
 	# Biom 4: gleiche oder höhere Stufe
-	{"fights": 6, "level": [16, 23], "offset": [0, 1], "counts": [[15, 55, 30], [5, 40, 55]]},
+	{"fights": 6, "level": [16, 23], "offset": [0, 1], "counts": [[15, 55, 30], [5, 40, 55]],
+		"moves": [[40, 45, 15], [20, 50, 30]]},
 	# Biom 5: 3 gegen 2 ist die Regel
-	{"fights": 7, "level": [24, 33], "offset": [0, 2], "counts": [[5, 35, 60], [0, 20, 80]]},
+	{"fights": 7, "level": [24, 33], "offset": [0, 2], "counts": [[5, 35, 60], [0, 20, 80]],
+		"moves": [[20, 50, 30], [5, 45, 50]]},
 ]
 
-## Bosse pro Biom: Anzahl und Stufen über der Endstufe des Bioms
+## Bosse pro Biom: Anzahl, Stufen über der Endstufe des Bioms und Mindest-Aktionen pro Zug
+## (gewürfelt wird wie am Ende des Bioms, der Endboss hat immer 3)
 const BOSS_ENCOUNTERS := [
-	{"count": 1, "level_bonus": 2},
-	{"count": 2, "level_bonus": 1},
-	{"count": 2, "level_bonus": 2},
-	{"count": 3, "level_bonus": 1},
-	{"count": 3, "level_bonus": 2},
+	{"count": 1, "level_bonus": 2, "min_moves": 1},
+	{"count": 2, "level_bonus": 1, "min_moves": 2},
+	{"count": 2, "level_bonus": 2, "min_moves": 2},
+	{"count": 3, "level_bonus": 1, "min_moves": 2},
+	{"count": 3, "level_bonus": 2, "min_moves": 3},
 ]
 
 func _generate_battle():
@@ -235,6 +244,7 @@ func _generate_battle():
 	var encounter: Dictionary = ENCOUNTERS[depth]
 	var count: int
 	var level: int
+	var min_moves: int = 1
 	# wird unten zurückgesetzt, merken für das Kopfgeld
 	var is_map_boss: bool = State.is_map_boss
 	is_boss_battle = State.is_boss_fight or is_map_boss
@@ -243,14 +253,17 @@ func _generate_battle():
 		var boss: Dictionary = BOSS_ENCOUNTERS[depth]
 		count = boss.count
 		level = encounter.level[1] + boss.level_bonus
+		min_moves = boss.min_moves
+		t = 1.0
 	elif State.is_map_boss:
 		# Boss-Feld auf der Karte: Boss-Anzahl, aber auf der aktuellen Stufe des Bioms
 		var boss: Dictionary = BOSS_ENCOUNTERS[depth]
 		count = boss.count
 		level = roundi(lerpf(encounter.level[0], encounter.level[1], t)) + boss.level_bonus
+		min_moves = boss.min_moves
 		State.is_map_boss = false
 	else:
-		count = _roll_enemy_count(encounter.counts, t)
+		count = _roll_weighted(encounter.counts, t)
 		level = roundi(lerpf(encounter.level[0], encounter.level[1], t))
 		State.biome_fight_index += 1
 	var ms = Helper.generate_mons({"count": count})
@@ -264,6 +277,7 @@ func _generate_battle():
 		mon._level = max(1, level + randi_range(encounter.offset[0], encounter.offset[1]))
 		if mon._bounty != "":
 			mon._level += Skills.get_bounty(mon._bounty).level_bonus
+		mon._initial_moves = maxi(_roll_weighted(encounter.moves, t), min_moves)
 		State.record_sighting(mon, depth)
 	print("encounter depth ", depth, " fight ", State.biome_fight_index, ": ", count, "x level ", level)
 	State.enemy_mons = ms
@@ -275,8 +289,8 @@ func _roll_bounty(depth: int) -> Dictionary:
 		return {}
 	return open.pick_random()
 
-## Zieht die Gegneranzahl (1-3) mit zwischen Biom-Anfang und -Ende interpolierten Gewichten.
-func _roll_enemy_count(counts: Array, t: float) -> int:
+## Zieht 1-3 (Gegneranzahl oder Aktionen) mit zwischen Biom-Anfang und -Ende interpolierten Gewichten.
+func _roll_weighted(counts: Array, t: float) -> int:
 	var weights = []
 	for i in 3:
 		weights.append(lerpf(counts[0][i], counts[1][i], t))
@@ -355,7 +369,7 @@ func _clear_fainted_mons():
 ## Gegner halten sich an dieselben Regeln wie der Spieler (Element, Kosten, Abklingzeit, Passive nicht ausspielbar).
 ## Nur Angriffe ohne Abklingzeit dürfen mehrfach im selben Zug vorkommen.
 ## Geplant wird vor dem Zug: Abklingzeiten zählen zu dessen Beginn noch einmal herunter, daher reicht <= 1.
-## Kerkermeister-Verbesserungen und Relics gelten nur für eigene Monster, Gegner haben immer _initial_moves.
+## Kerkermeister-Verbesserungen und Relics gelten nur für eigene Monster, Gegner haben _initial_moves (gewürfelt in _generate_battle).
 func _plan_intent(emon: Monster) -> void:
 	emon._intent = []
 	if not emon.is_alive() or _opponents_of(emon).is_empty():

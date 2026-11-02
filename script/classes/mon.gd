@@ -30,8 +30,10 @@ var _lost_hp: float = 0:
 
 var _skills: Array
 # Aktionen pro Zug ohne Kerkermeister-Verbesserung (jede gesprengte Kette gibt +1, siehe jailer.gd)
-var _initial_moves: int = 1
-var _computed_moves: int = 1:
+const BASE_MOVES := 1
+# Gegner würfeln mehr (battle.gd ENCOUNTERS.moves), das verfällt beim Fangen
+var _initial_moves: int = BASE_MOVES
+var _computed_moves: int = BASE_MOVES:
 	set(value):
 		_computed_moves = value
 		Events.refresh_ui_for_monster.emit()

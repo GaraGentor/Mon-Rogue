@@ -12,7 +12,7 @@ const REROLL_COST := 25
 ## Fundorte für die Ansage des Kerkermeisters (JAILER_PLACE_0 ...)
 const PLACE_COUNT := 5
 ## Aktionen pro Zug ohne Verbesserung (Monster._initial_moves)
-const BASE_MOVES := 1
+const BASE_MOVES := Monster.BASE_MOVES
 const SHARD_CARD_SIZE := Vector2(220, 0)
 const JAILER_SIZE := Vector2(130, 160)
 const TOP_ROW_HEIGHT := 160
