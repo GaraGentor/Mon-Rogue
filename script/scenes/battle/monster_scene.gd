@@ -123,7 +123,7 @@ func _icon_row(items: Array, color: Color, font_size: int) -> HBoxContainer:
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if item is Monster:
-			icon.texture = Monmap.texture(item._name, Monmap.SMALL)
+			icon.texture = Monmap.texture(item._name, Monmap.TINY)
 			icon.custom_minimum_size = Vector2.ONE * font_size * 1.8
 		else:
 			icon.texture = item
@@ -267,7 +267,7 @@ func _update_drag_preview(drag_data) -> void:
 
 # Absichten über dem Monster-Bild, als Symbole:
 # Gegner zeigen ihren geplanten Zug (Schwert = Angriff, Stern = Sp.-Angriff, Schild, Buff-Pfeil, dahinter das Bild des Ziels),
-# eigene Monster den Schaden, der im nächsten Zug der Gegner auf sie zukommt, mit und ohne Schild ("-12 -> -4").
+# eigene Monster den Schaden, der im nächsten Zug der Gegner auf sie zukommt, mit und ohne Schild (Schwert -12, Schild -4).
 const INTENT_COLOR := Color(1.0, 0.45, 0.4)
 const INTENT_BLOCKED_COLOR := Color(0.55, 0.8, 1.0)
 const BUFF_COLOR := Color(0.55, 1.0, 0.55)
@@ -296,7 +296,7 @@ func _own_intent_rows() -> Array:
 	var after = roundi(incoming.after)
 	# Blau, wenn der Schild etwas abfängt: so sieht man direkt, dass sich Blocken gelohnt hat
 	if after < full:
-		return [_icon_row([ICON_ATTACK, "-%d" % full, "->", ICON_SHIELD, "-%d" % after], INTENT_BLOCKED_COLOR, INTENT_FONT_SIZE)]
+		return [_icon_row([ICON_ATTACK, "-%d" % full, ICON_SHIELD, "-%d" % after], INTENT_BLOCKED_COLOR, INTENT_FONT_SIZE)]
 	return [_icon_row([ICON_ATTACK, "-%d" % full], INTENT_COLOR, INTENT_FONT_SIZE)]
 
 func _enemy_intent_rows() -> Array:
@@ -313,16 +313,16 @@ func _enemy_intent_rows() -> Array:
 			var side = State.mons if State.mons.has(target) else State.enemy_mons
 			targets = side.filter(func(m: Monster): return m.is_alive())
 		if Skills.is_damage_skill(skill):
-			var items = [ICON_ATTACK if physical else ICON_S_ATTACK, "-%d" % roundi(Skills.calc_damage(mon, target, skill)), "->"]
+			var items = [ICON_ATTACK if physical else ICON_S_ATTACK, "-%d" % roundi(Skills.calc_damage(mon, target, skill))]
 			rows.append(_icon_row(items + targets, INTENT_COLOR if physical else SPECIAL_COLOR, INTENT_FONT_SIZE))
 		elif skill.get("effect", "") == "buff":
 			var stat = tr(BUFF_STAT_KEYS.get(skill.buff_stat, "")).trim_suffix(":")
-			rows.append(_icon_row([ICON_BUFF, "+%d%% %s" % [roundi(skill.value), stat], "->"] + targets, BUFF_COLOR, INTENT_FONT_SIZE))
+			rows.append(_icon_row([ICON_BUFF, "+%d%% %s" % [roundi(skill.value), stat]] + targets, BUFF_COLOR, INTENT_FONT_SIZE))
 		else:
 			# gleiche Rechnung wie Skills.add_shield, für das erste Ziel
 			var def = target.defense() if physical else target.s_defense()
 			var amount = ceilf(def * skill.value / 100)
-			rows.append(_icon_row([ICON_SHIELD if physical else ICON_S_SHIELD, "+%d" % amount, "->"] + targets,
+			rows.append(_icon_row([ICON_SHIELD if physical else ICON_S_SHIELD, "+%d" % amount] + targets,
 				INTENT_BLOCKED_COLOR if physical else SPECIAL_COLOR, INTENT_FONT_SIZE))
 	return rows
 

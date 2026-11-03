@@ -49,11 +49,13 @@ var map_settings = {
 
 enum EVENT_TYPE {
 	CAMP = 0,
+	WHEEL,
 }
 
 # Was ein EVENT-Feld auslöst, Wahrscheinlichkeit in Prozent (alle zusammen sollten 100 ergeben)
 var event_chances = {
-	EVENT_TYPE.CAMP: 100,
+	EVENT_TYPE.CAMP: 50,
+	EVENT_TYPE.WHEEL: 50,
 }
 
 # Würfelt anhand von event_chances, welches Ereignis ein EVENT-Feld auslöst.

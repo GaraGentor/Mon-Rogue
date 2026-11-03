@@ -27,6 +27,7 @@ extends Control
 
 const RELIC_REWARD_SCENE := preload("res://script/scenes/relic_reward/relic_reward.tscn")
 const GEM_SCENE := preload("res://script/scenes/gems/gems.tscn")
+const WHEEL_EVENT := preload("res://script/scenes/wheel_event/wheel_event.gd")
 
 @export var view_container: Panel
 
@@ -216,6 +217,8 @@ func call_random_event() -> void:
 	match event:
 		Map.EVENT_TYPE.CAMP:
 			open_heal_camp()
+		Map.EVENT_TYPE.WHEEL:
+			view_container.add_child(WHEEL_EVENT.new())
 
 func open_heal_camp() -> void:
 	var hcs = heal_camp_scene.instantiate()

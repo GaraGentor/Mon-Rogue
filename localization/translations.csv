@@ -456,3 +456,8 @@ RUN_END_EGG_DEFAULT,Egg moves:,Ei-Attacken:
 RUN_END_EGG_UNLOCKABLE,Sacrifice:,Opfern:
 RUN_END_EGG_MILESTONE,Milestones:,Meilensteine:
 RUN_END_EGG_BOUNTY,Bounties:,Kopfgelder:
+EVENT_WHEEL_TITLE,Wheel of Fortune,Glücksrad
+EVENT_WHEEL_DESC,"Spin the wheel: win or lose $ {amount}, half of your gold.","Dreh am Rad: gewinne oder verliere $ {amount}, die Hälfte deines Goldes."
+EVENT_WHEEL_SPIN,Spin!,Drehen!
+EVENT_WHEEL_WIN,You win $ {amount}!,Du gewinnst $ {amount}!
+EVENT_WHEEL_LOSE,You lose $ {amount}...,Du verlierst $ {amount}...
