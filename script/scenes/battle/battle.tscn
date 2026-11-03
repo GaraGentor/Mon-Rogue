@@ -1,15 +1,15 @@
-[gd_scene load_steps=16 format=4 uid="uid://cljr4qcwlnyny"]
+[gd_scene format=4 uid="uid://cljr4qcwlnyny"]
 
-[ext_resource type="Script" path="res://script/scenes/battle/battle.gd" id="1_08vc2"]
-[ext_resource type="Script" path="res://script/scenes/battle/animation_controller.gd" id="3_cggex"]
+[ext_resource type="Script" uid="uid://bobjnfvtlhndb" path="res://script/scenes/battle/battle.gd" id="1_08vc2"]
+[ext_resource type="Script" uid="uid://1wes0enluvmo" path="res://script/scenes/battle/animation_controller.gd" id="3_cggex"]
 [ext_resource type="Texture2D" uid="uid://bayjcxae1moqp" path="res://assets/sczene_backgrounds/ChatGPT Image 25. Juni 2025, 16_50_09.png" id="3_das7h"]
 [ext_resource type="Texture2D" uid="uid://bq0pf5g35vxjd" path="res://assets/mons/1/1_frontx256.png" id="4_hpryk"]
 [ext_resource type="PackedScene" uid="uid://dp31mv1lmyood" path="res://script/scenes/battle/monster_scene.tscn" id="5_wskai"]
 [ext_resource type="PackedScene" path="res://script/scenes/battle/battle_info_panel.tscn" id="6_5lcde"]
 [ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="7_uo6ii"]
 [ext_resource type="Texture2D" uid="uid://ck33hdad7oy4q" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 3. Nov. 2025, 18_18_01.png" id="11_uycmc"]
-[ext_resource type="Shader" path="res://script/scenes/battle/catch_anim.gdshader" id="13_3plyr"]
-[ext_resource type="Script" path="res://script/scenes/battle/catch_anim.gd" id="13_lgcwj"]
+[ext_resource type="Shader" uid="uid://b072tfwp8m2f" path="res://script/scenes/battle/catch_anim.gdshader" id="13_3plyr"]
+[ext_resource type="Script" uid="uid://dgw3mowp6ys8c" path="res://script/scenes/battle/catch_anim.gd" id="13_lgcwj"]
 [ext_resource type="Texture2D" uid="uid://b2qv7gtjjlj7u" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 3. Nov. 2025, 18_19_58.png" id="13_lhy1u"]
 [ext_resource type="PackedScene" path="res://script/scenes/battle/card_hand.tscn" id="14_hand"]
 
@@ -26,7 +26,7 @@ shader_parameter/color_count = 4
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_tuqf4"]
 
-[node name="Battle" type="Control" node_paths=PackedStringArray("catch_anim", "catch_button", "battle_info", "card_hand")]
+[node name="Battle" type="Control" unique_id=1735669626 node_paths=PackedStringArray("catch_anim", "catch_button", "battle_info", "card_hand")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,16 +39,16 @@ catch_button = NodePath("UI/HBoxContainer/TextureRect/Catch")
 battle_info = NodePath("UI/BattleInfoPanel")
 card_hand = NodePath("GameWindow/CardHand")
 
-[node name="AnimationController" type="Node" parent="."]
+[node name="AnimationController" type="Node" parent="." unique_id=1941830434]
 script = ExtResource("3_cggex")
 
-[node name="GameWindow" type="Control" parent="."]
+[node name="GameWindow" type="Control" parent="." unique_id=1169158061]
 layout_mode = 1
 anchor_right = 0.639
 anchor_bottom = 1.0
 offset_right = 0.079895
 
-[node name="TextureRect" type="TextureRect" parent="GameWindow"]
+[node name="TextureRect" type="TextureRect" parent="GameWindow" unique_id=1257679029]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -59,7 +59,7 @@ grow_vertical = 2
 texture = ExtResource("3_das7h")
 expand_mode = 1
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="GameWindow"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="GameWindow" unique_id=1067161045]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.03
@@ -68,23 +68,23 @@ anchor_bottom = 0.4
 offset_right = 2.0
 alignment = 1
 
-[node name="MonsterScene0" parent="GameWindow/HBoxContainer3" instance=ExtResource("5_wskai")]
+[node name="MonsterScene0" parent="GameWindow/HBoxContainer3" unique_id=863722545 instance=ExtResource("5_wskai")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MonsterScene1" parent="GameWindow/HBoxContainer3" instance=ExtResource("5_wskai")]
+[node name="MonsterScene1" parent="GameWindow/HBoxContainer3" unique_id=1666613509 instance=ExtResource("5_wskai")]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 mon_slot = 1
 
-[node name="MonsterScene2" parent="GameWindow/HBoxContainer3" instance=ExtResource("5_wskai")]
+[node name="MonsterScene2" parent="GameWindow/HBoxContainer3" unique_id=1727657015 instance=ExtResource("5_wskai")]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 mon_slot = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="GameWindow"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="GameWindow" unique_id=285976807]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.002
@@ -94,19 +94,19 @@ anchor_bottom = 0.7
 offset_left = 0.364
 alignment = 1
 
-[node name="MonsterScene0" parent="GameWindow/HBoxContainer2" instance=ExtResource("5_wskai")]
+[node name="MonsterScene0" parent="GameWindow/HBoxContainer2" unique_id=1958585144 instance=ExtResource("5_wskai")]
 layout_mode = 2
 size_flags_horizontal = 3
 home_mons = true
 
-[node name="MonsterScene1" parent="GameWindow/HBoxContainer2" instance=ExtResource("5_wskai")]
+[node name="MonsterScene1" parent="GameWindow/HBoxContainer2" unique_id=835013480 instance=ExtResource("5_wskai")]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 mon_slot = 1
 home_mons = true
 
-[node name="HandBackground" type="ColorRect" parent="GameWindow"]
+[node name="HandBackground" type="ColorRect" parent="GameWindow" unique_id=1565682947]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.7
@@ -116,15 +116,13 @@ offset_right = 2.0
 mouse_filter = 2
 color = Color(0, 0, 0, 0.45)
 
-[node name="CardHand" parent="GameWindow" instance=ExtResource("14_hand")]
+[node name="CardHand" parent="GameWindow" unique_id=1000149303 instance=ExtResource("14_hand")]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.7
-anchor_right = 1.0
-anchor_bottom = 1.0
 offset_right = 2.0
 
-[node name="Phase" type="Control" parent="."]
+[node name="Phase" type="Control" parent="." unique_id=1459139747]
 visible = false
 layout_mode = 1
 anchor_right = 0.642
@@ -132,7 +130,7 @@ anchor_bottom = 0.056
 offset_right = 0.23999
 offset_bottom = -0.32
 
-[node name="ColorRect" type="ColorRect" parent="Phase"]
+[node name="ColorRect" type="ColorRect" parent="Phase" unique_id=141679833]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.998
@@ -140,7 +138,7 @@ anchor_bottom = 0.875
 offset_right = -0.356018
 color = Color(0, 0, 0, 1)
 
-[node name="PhaseLabel" type="Label" parent="Phase/ColorRect"]
+[node name="PhaseLabel" type="Label" parent="Phase/ColorRect" unique_id=1730462350]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -149,7 +147,7 @@ grow_horizontal = 2
 text = "BATTLE_PHASE"
 horizontal_alignment = 1
 
-[node name="UI" type="Control" parent="."]
+[node name="UI" type="Control" parent="." unique_id=1082588571]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -158,7 +156,7 @@ offset_left = 819.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorRect" type="ColorRect" parent="UI"]
+[node name="ColorRect" type="ColorRect" parent="UI" unique_id=308788346]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -167,13 +165,13 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
-[node name="BattleInfoPanel" parent="UI" instance=ExtResource("6_5lcde")]
+[node name="BattleInfoPanel" parent="UI" unique_id=1617508137 instance=ExtResource("6_5lcde")]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 0.84
 offset_bottom = 11.2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="UI"]
+[node name="HBoxContainer" type="HBoxContainer" parent="UI" unique_id=109800599]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.017
@@ -186,14 +184,14 @@ offset_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="UI/HBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="UI/HBoxContainer" unique_id=781254773]
 layout_mode = 2
 size_flags_horizontal = 3
 texture = ExtResource("11_uycmc")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Catch" type="Button" parent="UI/HBoxContainer/TextureRect"]
+[node name="Catch" type="Button" parent="UI/HBoxContainer/TextureRect" unique_id=905362931]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -207,14 +205,14 @@ text = "BATTLE_HYPNOSIS"
 icon = SubResource("ImageTexture_quuqv")
 flat = true
 
-[node name="TextureRect3" type="TextureRect" parent="UI/HBoxContainer"]
+[node name="TextureRect3" type="TextureRect" parent="UI/HBoxContainer" unique_id=1984233202]
 layout_mode = 2
 size_flags_horizontal = 3
 texture = ExtResource("13_lhy1u")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="EndTurn" type="Button" parent="UI/HBoxContainer/TextureRect3"]
+[node name="EndTurn" type="Button" parent="UI/HBoxContainer/TextureRect3" unique_id=1939269431]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -227,13 +225,13 @@ theme_override_font_sizes/font_size = 26
 text = "BATTLE_END_TURN"
 flat = true
 
-[node name="UI_Blocker" type="Panel" parent="."]
+[node name="UI_Blocker" type="Panel" parent="." unique_id=927229944]
 visible = false
 layout_mode = 0
 offset_right = 1286.0
 offset_bottom = 725.0
 
-[node name="Catch_anim" type="Control" parent="." node_paths=PackedStringArray("msg")]
+[node name="Catch_anim" type="Control" parent="." unique_id=1800587850 node_paths=PackedStringArray("msg")]
 visible = false
 z_index = 20
 layout_mode = 1
@@ -245,7 +243,7 @@ grow_vertical = 2
 script = ExtResource("13_lgcwj")
 msg = NodePath("TextureRect/Label2")
 
-[node name="TextureRect" type="TextureRect" parent="Catch_anim"]
+[node name="TextureRect" type="TextureRect" parent="Catch_anim" unique_id=50211099]
 material = SubResource("ShaderMaterial_ycqul")
 layout_mode = 1
 anchors_preset = 15
@@ -255,7 +253,7 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("CanvasTexture_tuqf4")
 
-[node name="MonTexture" type="TextureRect" parent="Catch_anim/TextureRect"]
+[node name="MonTexture" type="TextureRect" parent="Catch_anim/TextureRect" unique_id=438198927]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -270,7 +268,7 @@ texture = ExtResource("4_hpryk")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Catch_anim/TextureRect"]
+[node name="Label" type="Label" parent="Catch_anim/TextureRect" unique_id=1073071278]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -283,7 +281,7 @@ theme_override_font_sizes/font_size = 64
 text = "BATTLE_CATCH_CALL"
 horizontal_alignment = 1
 
-[node name="Label2" type="Label" parent="Catch_anim/TextureRect"]
+[node name="Label2" type="Label" parent="Catch_anim/TextureRect" unique_id=903598385]
 visible = false
 layout_mode = 1
 anchors_preset = 7

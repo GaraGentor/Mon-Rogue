@@ -9,7 +9,7 @@ func deal_damage(props):
 	var multiplier = element_multiplier(props.skill.nature, props.mon._type)
 	print("lose:" + str(props.skill.value) + ":" + str(damage) + " (Element x" + str(multiplier) + ")")
 	Events.monster_hit_with_element.emit(props.mon, damage, multiplier, full_damage - damage)
-	if State.mons.has(props.mon) and props.mon.is_alive() and props.mon._lost_hp + damage > props.mon.hp():
+	if State.mons.has(props.mon) and props.mon.is_alive() and roundi(props.mon.hp() - props.mon._lost_hp - damage) <= 0:
 		State.record_own_faint(props.mon, props.from, props.skill, damage, multiplier)
 	props.mon._lost_hp += damage
 

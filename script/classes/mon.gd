@@ -171,8 +171,9 @@ func speed():
 func best():
 	return _best_points
 
+## tot, sobald die HP-Anzeige (gerundet) 0 zeigt
 func is_alive() -> bool:
-	return _lost_hp <= hp()
+	return roundi(hp() - _lost_hp) > 0
 
 func gem_factor(stat: String) -> float:
 	return 1.0 + _gems.get(stat, 0.0)
