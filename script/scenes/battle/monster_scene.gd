@@ -38,6 +38,11 @@ func _ready() -> void:
 		visible = true
 		# eigene Monster stehen mit dem Rücken zur Kamera, Gegner schauen her
 		Monmap.show_on(texture_rect, mon._name, Monmap.SMALL, home_mons and not show_front)
+		if home_mons and not show_front:
+			# eigene Monster sitzen unten in ihrer Reihe und ragen etwas hinter die Kartenhand,
+			# so wirken sie näher und größer als die Gegner; Name und HP bleiben oben sichtbar
+			$AspectRatioContainer.alignment_vertical = AspectRatioContainer.ALIGNMENT_END
+			$AspectRatioContainer/HBoxContainer/Info.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		name_label.text = Helper.mon_battle_name(mon)
 		name_label.tooltip_text = name_label.text
 		# Name in der Typfarbe, wie im Infobereich
