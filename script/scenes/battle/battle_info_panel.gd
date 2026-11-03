@@ -41,10 +41,18 @@ func refresh() -> void:
 	element_chip._init_color(monster)
 	if monster_texture:
 		monster_texture.texture = Monmap.texture(monster._name, Monmap.MEDIUM)
+		_reveal_monster_pixels()
 	# eigene Stats sind bekannt, gegnerische erst nachdem die Art in diesem Run besiegt wurde
 	var stats_known := reveal_all or State.mons.has(monster) or State.is_mon_defeated(monster._name)
 	stats_grid.init_with_mon(monster, not stats_known)
 	_build_skill_list()
+
+## Pixel-Partikel des Monsterbilds tauchen nacheinander auf (nur mit living_pixels-Shader)
+func _reveal_monster_pixels() -> void:
+	var mat := monster_texture.material as ShaderMaterial
+	if mat == null or mat.get_shader_parameter("reveal") == null:
+		return
+	create_tween().tween_method(func(v: float): mat.set_shader_parameter("reveal", v), 0.0, 1.0, 0.5)
 
 func _build_skill_list() -> void:
 	for c in skill_grid.get_children():

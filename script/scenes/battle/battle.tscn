@@ -52,6 +52,7 @@ anchor_bottom = 1.0
 offset_right = 0.079895
 
 [node name="TextureRect" type="TextureRect" parent="GameWindow" unique_id=1257679029]
+modulate = Color(0.73561597, 0.7273815, 0.62138367, 1)
 material = SubResource("CanvasItemMaterial_k0ik4")
 layout_mode = 1
 anchors_preset = 15

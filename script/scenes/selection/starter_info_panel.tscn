@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://bxoeupl6ad2ke" path="res://assets/ui/icons/firework (1).svg" id="7_phys"]
 [ext_resource type="Texture2D" uid="uid://djt3q5aymms0i" path="res://assets/ui/icons/sparkle.svg" id="8_magic"]
 [ext_resource type="PackedScene" uid="uid://owmyxu3qq3so" path="res://script/ui/element_chip/element_chip.tscn" id="9_chip"]
+[ext_resource type="Material" path="res://script/ui/shader/living_pixels_material.tres" id="10_living"]
 
 
 [node name="StarterInfoPanel" type="Control" node_paths=PackedStringArray("monster_texture", "name_label", "element_chip", "stats_grid", "skill_grid", "skill_info_container")]
@@ -52,6 +53,7 @@ text = "[NAME]"
 horizontal_alignment = 1
 
 [node name="MonsterTexture" type="TextureRect" parent="MarginContainer/VBoxContainer"]
+material = ExtResource("10_living")
 custom_minimum_size = Vector2(0, 280)
 layout_mode = 2
 expand_mode = 1
