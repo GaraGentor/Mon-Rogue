@@ -71,7 +71,7 @@ func toggle_panels() -> void:
 
 func switch_image(mon: Monster) -> void:
 	name_label.text = Helper.mon_battle_name(mon)
-	monster_texture.texture = Monmap.texture(mon._name, Monmap.SMALL)
+	Monmap.show_on(monster_texture, mon._name, Monmap.SMALL)
 	pass
 
 func init_skills(mon: Monster) -> void:

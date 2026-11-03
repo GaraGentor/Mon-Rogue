@@ -393,7 +393,7 @@ func _fill_badges(row: HBoxContainer, mon: Monster, slot: int = -1) -> void:
 		row.add_child(_badge(tr("JUDGEMENT_BADGE_NEW"), GOLD, Color.BLACK))
 		var egg_skill = mon.get_unlockable_egg_skill()
 		if not egg_skill.is_empty():
-			var egg = _badge(tr(egg_skill.name), Color(0.15, 0.13, 0.1), GOLD, EGG_ICON)
+			var egg = _badge(tr(egg_skill.name), Color(0.15, 0.13, 0.1), GOLD, EGG_ICON, Monmap.egg_material(Monmap.rarity_of(mon._name)))
 			egg.tooltip_text = tr("EGG_SKILL_HINT")
 			row.add_child(egg)
 	elif not State.mons.has(mon):
@@ -494,7 +494,7 @@ func _make_frame(area: Control) -> Panel:
 func _drag_preview(mon: Monster) -> Control:
 	var holder := Control.new()
 	var picture := TextureRect.new()
-	picture.texture = Monmap.texture(mon._name, Monmap.ICON)
+	Monmap.show_on(picture, mon._name, Monmap.ICON)
 	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	picture.size = Vector2(120, 120)
@@ -503,7 +503,7 @@ func _drag_preview(mon: Monster) -> Control:
 	holder.add_child(picture)
 	return holder
 
-func _badge(text: String, background: Color, color: Color, icon: Texture2D = null) -> PanelContainer:
+func _badge(text: String, background: Color, color: Color, icon: Texture2D = null, icon_material: Material = null) -> PanelContainer:
 	var badge := PanelContainer.new()
 	var style := StyleBoxFlat.new()
 	style.bg_color = background
@@ -519,6 +519,7 @@ func _badge(text: String, background: Color, color: Color, icon: Texture2D = nul
 	if icon:
 		var picture := TextureRect.new()
 		picture.texture = icon
+		picture.material = icon_material
 		picture.custom_minimum_size = Vector2(18, 18)
 		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

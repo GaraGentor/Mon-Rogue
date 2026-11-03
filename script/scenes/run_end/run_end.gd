@@ -229,7 +229,7 @@ func _show_mon(mon_name: String) -> void:
 	var header = HBoxContainer.new()
 	header.add_theme_constant_override("separation", 10)
 	var portrait = TextureRect.new()
-	portrait.texture = Monmap.texture(mon_name, 64)
+	Monmap.show_on(portrait, mon_name, 64)
 	portrait.custom_minimum_size = Vector2(64, 64)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

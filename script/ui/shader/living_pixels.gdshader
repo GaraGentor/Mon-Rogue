@@ -5,8 +5,10 @@ shader_type canvas_item;
 // Danach animiertes Ordered Dithering (Bayer 4x4) für den flimmernden Retro-Look.
 // Alle Bewegungen nutzen ganzzahlige Frequenzen über loop_seconds -> nahtlose Schleife.
 
-// Partikel über die Bildbreite (Höhe folgt dem Seitenverhältnis)
-uniform float grid_size : hint_range(16.0, 256.0, 1.0) = 96.0;
+// Partikelgröße in Bildschirmpixeln, damit kleine Icons und große Bilder gleich grob wirken
+uniform float pixel_size : hint_range(1.0, 12.0, 0.5) = 3.0;
+// Mindestanzahl Partikel über die Bildbreite, sonst werden winzige Icons unkenntlich
+uniform float min_cells : hint_range(8.0, 128.0, 1.0) = 32.0;
 // Grundbewegung in Partikelgrößen, max. 0.5 damit die 3x3-Nachbarsuche reicht
 uniform float amplitude : hint_range(0.0, 0.5) = 0.22;
 // kurze ruckartige Sprünge einzelner Partikel
@@ -28,6 +30,12 @@ uniform float dither_fps : hint_range(0.0, 30.0) = 10.0;
 uniform float alpha_cutoff : hint_range(0.0, 1.0) = 0.35;
 // 0 = unsichtbar, 1 = alle Partikel da (zum Einblenden per Tween)
 uniform float reveal : hint_range(0.0, 1.0) = 1.0;
+// Umriss um die Silhouette (z. B. ausgewähltes Monster im Kampf), Alpha 0 = aus
+uniform vec4 outline_color : source_color = vec4(1.0, 1.0, 0.0, 0.0);
+// Umrissbreite in Bildschirmpixeln
+uniform float outline_thickness : hint_range(0.0, 16.0) = 4.0;
+// Einfärbung nach Helligkeit (z. B. Eier nach Seltenheit), Alpha = Stärke, 0 = aus
+uniform vec4 tint_color : source_color = vec4(1.0, 1.0, 1.0, 0.0);
 
 const float BAYER[16] = float[16](
 	0.0, 8.0, 2.0, 10.0,
@@ -50,7 +58,13 @@ vec4 hash4(vec2 p) {
 }
 
 void fragment() {
-	vec2 cells = grid_size * vec2(1.0, TEXTURE_PIXEL_SIZE.x / TEXTURE_PIXEL_SIZE.y);
+	// Bildschirmpixel pro UV-Einheit, auch bei Skalierung und Drehung
+	vec2 px_per_uv = 1.0 / max(vec2(
+		length(vec2(dFdx(UV.x), dFdy(UV.x))),
+		length(vec2(dFdx(UV.y), dFdy(UV.y)))
+	), vec2(1e-6));
+	float cells_x = max(round(px_per_uv.x / pixel_size), min_cells);
+	vec2 cells = vec2(cells_x, max(1.0, round(cells_x * px_per_uv.y / px_per_uv.x)));
 	vec2 g = UV * cells;
 	vec2 base = floor(g);
 
@@ -71,6 +85,10 @@ void fragment() {
 			vec4 col = textureLod(TEXTURE, (cell + 0.5) / cells, 0.0);
 			if (col.a < alpha_cutoff) {
 				continue;
+			}
+			if (tint_color.a > 0.0) {
+				float lum = dot(col.rgb, vec3(0.299, 0.587, 0.114));
+				col.rgb = mix(col.rgb, tint_color.rgb * lum * 1.3, tint_color.a);
 			}
 			vec4 h = hash4(cell);
 			vec4 h2 = hash4(cell + 71.37);
@@ -106,6 +124,19 @@ void fragment() {
 
 	if (best_prio < 0.0) {
 		COLOR = vec4(0.0);
+		// Umriss außerhalb der ursprünglichen Silhouette
+		if (outline_color.a > 0.0 && textureLod(TEXTURE, UV, 0.0).a < alpha_cutoff) {
+			vec2 r = outline_thickness / px_per_uv;
+			float hit = 0.0;
+			for (int i = 0; i < 12; i++) {
+				float a = float(i) * TAU / 12.0;
+				vec2 p = UV + vec2(cos(a), sin(a)) * r;
+				if (p.x >= 0.0 && p.y >= 0.0 && p.x <= 1.0 && p.y <= 1.0) {
+					hit = max(hit, step(alpha_cutoff, textureLod(TEXTURE, p, 0.0).a));
+				}
+			}
+			COLOR = vec4(outline_color.rgb, outline_color.a * hit) * vertex_color;
+		}
 	} else {
 		vec2 dp = floor(FRAGCOORD.xy / dither_scale);
 		// Muster verschiebt sich schrittweise -> animiertes Dithering

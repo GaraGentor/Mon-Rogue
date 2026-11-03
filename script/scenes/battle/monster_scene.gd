@@ -2,6 +2,8 @@ extends Control
 
 @export var mon_slot: int
 @export var home_mons: bool
+## Vorderansicht auch für eigene Monster, z.B. im Lager außerhalb des Kampfes
+@export var show_front: bool
 
 @export var texture_rect: TextureRect
 
@@ -35,7 +37,7 @@ func _ready() -> void:
 		mon = mons[mon_slot]
 		visible = true
 		# eigene Monster stehen mit dem Rücken zur Kamera, Gegner schauen her
-		texture_rect.texture = Monmap.texture(mon._name, Monmap.SMALL, home_mons)
+		Monmap.show_on(texture_rect, mon._name, Monmap.SMALL, home_mons and not show_front)
 		name_label.text = Helper.mon_battle_name(mon)
 		name_label.tooltip_text = name_label.text
 		# Name in der Typfarbe, wie im Infobereich
@@ -118,7 +120,7 @@ func _icon_row(items: Array, color: Color, font_size: int) -> HBoxContainer:
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if item is Monster:
-			icon.texture = Monmap.texture(item._name, Monmap.TINY)
+			Monmap.show_on(icon, item._name, Monmap.TINY)
 			icon.custom_minimum_size = Vector2.ONE * font_size * 1.8
 		else:
 			icon.texture = item

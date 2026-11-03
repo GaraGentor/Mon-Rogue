@@ -10,6 +10,8 @@ const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 @export var turn_wheel: Control
 @export var name_label: Label
 @export var element_chip: Control
+## Seltenheit der Art, rechts neben dem Typ
+@export var rarity_chip: Control
 @export var stats_grid: GridContainer
 @export var skill_grid: GridContainer
 @export var skill_info_container: ScrollContainer
@@ -39,8 +41,11 @@ func refresh() -> void:
 	name_label.text = "%s  Lv. %d" % [Helper.mon_battle_name(monster), monster._level]
 	name_label.self_modulate = Helper.color_by_mon(monster)
 	element_chip._init_color(monster)
+	if rarity_chip:
+		var rarity := Monmap.rarity_of(monster._name)
+		rarity_chip._init_with_element({"label": Monmap.RARITY_LABELS[rarity], "color": Monmap.RARITY_COLORS[rarity]})
 	if monster_texture:
-		monster_texture.texture = Monmap.texture(monster._name, Monmap.MEDIUM)
+		Monmap.show_on(monster_texture, monster._name, Monmap.MEDIUM)
 		_reveal_monster_pixels()
 	# eigene Stats sind bekannt, gegnerische erst nachdem die Art in diesem Run besiegt wurde
 	var stats_known := reveal_all or State.mons.has(monster) or State.is_mon_defeated(monster._name)
@@ -49,9 +54,12 @@ func refresh() -> void:
 
 ## Pixel-Partikel des Monsterbilds tauchen nacheinander auf (nur mit living_pixels-Shader)
 func _reveal_monster_pixels() -> void:
-	var mat := monster_texture.material as ShaderMaterial
-	if mat == null or mat.get_shader_parameter("reveal") == null:
+	var shared := monster_texture.material as ShaderMaterial
+	if shared == null or shared.get_shader_parameter("reveal") == null:
 		return
+	# eigene Kopie, sonst blenden alle Monsterbilder mit dem gleichen Material neu ein
+	var mat := shared.duplicate() as ShaderMaterial
+	monster_texture.material = mat
 	create_tween().tween_method(func(v: float): mat.set_shader_parameter("reveal", v), 0.0, 1.0, 0.5)
 
 func _build_skill_list() -> void:
@@ -72,6 +80,7 @@ func _build_skill_list() -> void:
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		if is_egg_skill:
 			icon.texture = EGG_TEXTURE
+			icon.material = Monmap.egg_material(Monmap.rarity_of(monster._name))
 			icon.tooltip_text = tr("EGG_SKILL_HINT")
 		elif known:
 			icon.texture = physical_texture if skill.damage_type == Enums.SKILL_DAMAGE_TYPE.PHYSICAL else magic_texture

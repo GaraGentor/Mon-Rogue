@@ -1,7 +1,5 @@
 extends Control
 
-var select_egg_material = preload("res://script/scenes/battle/selected_monster_material.tres")
-
 var mons = []
 var egg_picked_index = 1
 var selected: int:
@@ -27,13 +25,18 @@ func _ready() -> void:
 	# display_mons()
 	Events.select_initial_mon.connect(select_egg)
 	# Events.select_initial_mon.emit(0)
+	for i in mons.size():
+		egg_rect(i).material = Monmap.egg_material(Monmap.rarity_of(mons[i]._name))
+
+## Ei-Bild an Position index (0-2)
+func egg_rect(index: int) -> TextureRect:
+	return $Selection.get_node("HBoxContainer/ColorRect%d/TextureRect%d" % [index + 1, index + 1])
 
 func select_egg(index):
 	go_button.disabled = false
-	$Selection.get_node("HBoxContainer/ColorRect1/TextureRect1").material = null
-	$Selection.get_node("HBoxContainer/ColorRect2/TextureRect2").material = null
-	$Selection.get_node("HBoxContainer/ColorRect3/TextureRect3").material = null
-	$Selection.get_node("HBoxContainer/ColorRect"+str(index+1)+"/TextureRect" + str(index+1)).material = select_egg_material
+	# Eier nach Seltenheit der Art eingefärbt, das gewählte zusätzlich mit gelbem Umriss
+	for i in mons.size():
+		egg_rect(i).material = Monmap.egg_material(Monmap.rarity_of(mons[i]._name), i == index)
 
 	selected_egg = index
 	info_panel.visible = true

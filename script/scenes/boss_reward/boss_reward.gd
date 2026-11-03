@@ -7,6 +7,9 @@ extends Control
 @export var unlock_label: Label
 
 var missing_mon_egg = []
+# Art im Ei, wird beim Öffnen gelost
+var mon_to_save: Monster
+@onready var egg_rect: TextureRect = mon_reward.get_node("MarginContainer/VBoxContainer/TextureRect")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -21,6 +24,10 @@ func _ready() -> void:
 			missing_mon_egg.append(mon)
 			show_mon_reward()
 			more_label.text = tr("BOSS_REWARD_CHOOSE_ONE")
+	if not missing_mon_egg.is_empty():
+		# Art steht schon fest, damit das Ei nach ihrer Seltenheit eingefärbt werden kann
+		mon_to_save = missing_mon_egg.pick_random()
+		egg_rect.material = Monmap.egg_material(Monmap.rarity_of(mon_to_save._name))
 
 func show_mon_reward() -> void:
 	mon_reward.visible = true
@@ -61,7 +68,6 @@ func _on_shard_button_pressed() -> void:
 
 
 func _on_egg_button_pressed() -> void:
-	var mon_to_save = missing_mon_egg.pick_random()
 	SaveManager.add_catched_monster_mon(mon_to_save._name)
 	finish()
 	pass # Replace with function body.

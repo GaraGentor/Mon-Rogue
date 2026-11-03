@@ -20,6 +20,11 @@ CONFIGURATOR_ABILITY,magical,magisch
 EGG_SKILL_TAG,{skill} (Egg),{skill} (Ei)
 EGG_SKILL_HINT,"Egg move: catch this monster and sacrifice it to unlock this move permanently","Ei-Attacke: Fange dieses Monster und opfere es, um die Attacke dauerhaft freizuschalten"
 EGG_SKILL_UNLOCKED,{skill} unlocked for {mon}!,{skill} für {mon} freigeschaltet!
+RARITY_COMMON,Common,Gewöhnlich
+RARITY_UNCOMMON,Uncommon,Ungewöhnlich
+RARITY_RARE,Rare,Selten
+RARITY_EPIC,Epic,Episch
+RARITY_LEGENDARY,Legendary,Legendär
 BATTLE_PHASE,Battle Phase,Kampfphase
 BATTLE_HYPNOSIS,"
 

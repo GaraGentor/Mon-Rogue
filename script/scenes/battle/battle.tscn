@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bobjnfvtlhndb" path="res://script/scenes/battle/battle.gd" id="1_08vc2"]
 [ext_resource type="Texture2D" uid="uid://cymuw7e6p5brv" path="res://assets/sczene_backgrounds/Gemini_Generated_Image_ffhltcffhltcffhl.jpg" id="3_2nwnk"]
 [ext_resource type="Script" uid="uid://1wes0enluvmo" path="res://script/scenes/battle/animation_controller.gd" id="3_cggex"]
+[ext_resource type="Shader" uid="uid://be467lblpkpfs" path="res://script/ui/shader/living_pixels.gdshader" id="3_vws2o"]
 [ext_resource type="Texture2D" uid="uid://bq0pf5g35vxjd" path="res://assets/mons/1/1_frontx256.png" id="4_hpryk"]
 [ext_resource type="PackedScene" uid="uid://dp31mv1lmyood" path="res://script/scenes/battle/monster_scene.tscn" id="5_wskai"]
 [ext_resource type="PackedScene" path="res://script/scenes/battle/battle_info_panel.tscn" id="6_5lcde"]
@@ -13,8 +14,26 @@
 [ext_resource type="Texture2D" uid="uid://b2qv7gtjjlj7u" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 3. Nov. 2025, 18_19_58.png" id="13_lhy1u"]
 [ext_resource type="PackedScene" path="res://script/scenes/battle/card_hand.tscn" id="14_hand"]
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_k0ik4"]
-blend_mode = 2
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4lrrq"]
+shader = ExtResource("3_vws2o")
+shader_parameter/pixel_size = 6.0
+shader_parameter/min_cells = 32.0
+shader_parameter/amplitude = 0.0
+shader_parameter/twitch = 0.0
+shader_parameter/twitch_chance = 0.0
+shader_parameter/loop_seconds = 30.0
+shader_parameter/particle_min_size = 1.0
+shader_parameter/particle_max_size = 1.20000004768372
+shader_parameter/flicker = 0.1670000079325
+shader_parameter/color_levels = 4.0
+shader_parameter/dither_strength = 1.0
+shader_parameter/dither_scale = 1.0
+shader_parameter/dither_fps = 10.0
+shader_parameter/alpha_cutoff = 0.35
+shader_parameter/reveal = 1.0
+shader_parameter/outline_color = Color(1, 1, 0, 0)
+shader_parameter/outline_thickness = 4.0
+shader_parameter/tint_color = Color(1, 1, 1, 0)
 
 [sub_resource type="ImageTexture" id="ImageTexture_quuqv"]
 
@@ -53,7 +72,7 @@ offset_right = 0.079895
 
 [node name="TextureRect" type="TextureRect" parent="GameWindow" unique_id=1257679029]
 modulate = Color(0.73561597, 0.7273815, 0.62138367, 1)
-material = SubResource("CanvasItemMaterial_k0ik4")
+material = SubResource("ShaderMaterial_4lrrq")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

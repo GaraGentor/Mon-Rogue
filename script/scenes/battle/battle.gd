@@ -1,7 +1,5 @@
 extends Control
 
-var selected_mon_mat = preload("res://script/scenes/battle/selected_monster_material.tres")
-
 const ENEMY_THINK_TIME := 0.6
 const ENEMY_ACTION_TIME := 0.9
 
@@ -107,7 +105,7 @@ func _select_mon(mon: Monster) -> void:
 	if State.enemy_mons.has(mon):
 		currently_selected_enemy_mon = mon
 	for scene in _monster_scenes():
-		scene.texture_rect.material = selected_mon_mat if scene.mon == mon and mon != null else null
+		scene.texture_rect.material = Monmap.living_selected_material if scene.mon == mon and mon != null else Monmap.LIVING_MATERIAL
 	battle_info.monster = mon
 
 ## nach einem K.O. oder Fang ein noch kämpfendes Monster markieren

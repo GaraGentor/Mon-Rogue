@@ -121,6 +121,7 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 home_mons = true
+show_front = true
 
 [node name="Panel2" type="Panel" parent="Panel/MarginContainer/VBoxContainer/MarginContainer2/HBoxContainer"]
 layout_mode = 2
@@ -145,6 +146,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 mon_slot = 1
 home_mons = true
+show_front = true
 
 [node name="MarginContainer3" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2

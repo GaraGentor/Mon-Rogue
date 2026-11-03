@@ -28,6 +28,54 @@ func texture(name: String, display_size: float, back := false) -> Texture2D:
 	var suffix = "" if size == LARGE else "x%d" % size
 	return load("res://assets/mons/%s/%s_%s%s.png" % [name, name, view, suffix])
 
+## "Lebende Pixel" mit animiertem Dithering für alle Monsterbilder (siehe living_pixels.gdshader)
+const LIVING_MATERIAL := preload("res://script/ui/shader/living_pixels_material.tres")
+## wie LIVING_MATERIAL, zusätzlich mit gelbem Umriss (ausgewähltes Monster im Kampf)
+var living_selected_material: ShaderMaterial
+
+func _init() -> void:
+	living_selected_material = LIVING_MATERIAL.duplicate()
+	living_selected_material.set_shader_parameter("outline_color", Color(1, 1, 0, 1))
+
+## Monsterbild samt Lebende-Pixel-Material auf ein TextureRect setzen
+func show_on(rect: TextureRect, name: String, display_size: float, back := false) -> void:
+	rect.texture = texture(name, display_size, back)
+	rect.material = LIVING_MATERIAL
+
+## Farbe und Übersetzungs-Key pro Seltenheit (Ei-Färbung, Seltenheits-Chip im Kampf)
+const RARITY_COLORS := {
+	Enums.MON_RARITY.COMMON: Color(0.75, 0.75, 0.75),
+	Enums.MON_RARITY.UNCOMMON: Color(0.35, 0.85, 0.35),
+	Enums.MON_RARITY.RARE: Color(0.3, 0.6, 1.0),
+	Enums.MON_RARITY.EPIC: Color(0.75, 0.35, 1.0),
+	Enums.MON_RARITY.LEGENDARY: Color(1.0, 0.65, 0.15),
+}
+const RARITY_LABELS := {
+	Enums.MON_RARITY.COMMON: "RARITY_COMMON",
+	Enums.MON_RARITY.UNCOMMON: "RARITY_UNCOMMON",
+	Enums.MON_RARITY.RARE: "RARITY_RARE",
+	Enums.MON_RARITY.EPIC: "RARITY_EPIC",
+	Enums.MON_RARITY.LEGENDARY: "RARITY_LEGENDARY",
+}
+
+func rarity_of(name: String) -> int:
+	return mon_metainfos_by_name(name).get("rarity", Enums.MON_RARITY.COMMON)
+
+## Lebende-Pixel-Material für Eier, je seltener die Art, desto kräftiger eingefärbt (gewöhnlich bleibt naturbraun)
+var _egg_materials := {}
+
+func egg_material(rarity: int, selected := false) -> ShaderMaterial:
+	var key = rarity * 2 + int(selected)
+	if not _egg_materials.has(key):
+		var mat: ShaderMaterial = LIVING_MATERIAL.duplicate()
+		var tint: Color = RARITY_COLORS[rarity]
+		tint.a = 0.0 if rarity == Enums.MON_RARITY.COMMON else 0.45 + 0.1 * rarity
+		mat.set_shader_parameter("tint_color", tint)
+		if selected:
+			mat.set_shader_parameter("outline_color", Color(1, 1, 0, 1))
+		_egg_materials[key] = mat
+	return _egg_materials[key]
+
 var mons = [
 	# Böenmähne: gefiederter Sturmschamane mit Weltkugel-Keule
 	{
