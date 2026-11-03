@@ -5,6 +5,8 @@ var _type: int
 var _sub_type: int
 
 var _best_points: int = 500
+# Multipliziert alle Werte, damit Schaden (ceilf) und KP (roundi) auch auf niedriger Stufe fein genug abgestuft sind
+const STAT_SCALE := 8.0
 
 var _growth: Growth
 
@@ -38,11 +40,11 @@ var _computed_moves: int = BASE_MOVES:
 		_computed_moves = value
 		Events.refresh_ui_for_monster.emit()
 
-# Edelstein-Boni für diesen Run: Stat-Key aus STATS in gems.gd -> Anteil (0.1 = +10 %)
+# Edelstein-Boni für diesen Run: Stat-Key aus STATS in gems.gd -> feste Punkte obendrauf (vor Buffs)
 var _gems: Dictionary = {}
 
 # Kampf-Zustand, wird zu Beginn jedes Kampfes zurückgesetzt (reset_battle_state)
-# Schilde fangen Schaden ab, bis sie aufgebraucht sind: physisch gegen physischen, magisch gegen magischen Schaden
+# Schilde fangen Schaden ab, bis sie aufgebraucht sind oder der nächste eigene Zug beginnt (start_turn): physisch gegen physischen, magisch gegen magischen Schaden
 var _shield: float = 0
 var _s_shield: float = 0
 # Buffs: Stat-Key (wie bei _gems) -> {"factor": 0.3 = +30 %, "turns": übrige eigene Züge}
@@ -59,8 +61,8 @@ func _init(level: int, meta_data: Dictionary) -> void:
 	var rolled_stats = State.get_mon_stats(_name)
 	_best_points = rolled_stats.best_points
 	_growth = rolled_stats.growth
-	_level = level + State.INITIAL_LEVEL
-	upgrade_by_level(level)
+	# nie unter der Startstufe (gilt für eigene und wilde Monster)
+	_level = maxi(level, State.INITIAL_LEVEL)
 	if SaveManager.save_data.monsters.has(_name):
 		var filtered = SaveManager.save_data.monsters[_name]
 		_upgrades = filtered.upgrade
@@ -92,8 +94,11 @@ func reset_battle_state() -> void:
 		skill.erase("_cooldown_left")
 	Events.monster_status_changed.emit(self)
 
-# Beginn eines eigenen Zuges (eigene Monster und Gegner): Abklingzeiten und Buffs zählen herunter.
+# Beginn eines eigenen Zuges (eigene Monster und Gegner): Abklingzeiten und Buffs zählen herunter,
+# Schilde laufen ab (sie halten also genau bis zum nächsten eigenen Zug).
 func start_turn() -> void:
+	_shield = 0
+	_s_shield = 0
 	for skill in _skills:
 		Skills.tick_cooldown(skill)
 	for stat in _buffs.keys():
@@ -150,23 +155,23 @@ func get_unlockable_egg_skill() -> Dictionary:
 	return {}
 
 func hp():
-	# passive Skills im Team (z. B. +5 KP) kommen obendrauf
-	return (_growth.hp * _level) * Helper.points_per_level(_best_points) * gem_factor("hp") + Skills.passive_bonus(self, "hp")
+	# passive Skills im Team (z. B. +15 KP) kommen obendrauf
+	return _base_stat(_growth.hp) + gem_bonus("hp") + Skills.passive_bonus(self, "hp")
 
 func attack():
-	return (_growth.atk * _level) * Helper.points_per_level(_best_points) * gem_factor("atk") * buff_factor("atk")
+	return (_base_stat(_growth.atk) + gem_bonus("atk")) * buff_factor("atk")
 
 func defense():
-	return (_growth.def * _level) * Helper.points_per_level(_best_points) * gem_factor("def") * buff_factor("def")
+	return (_base_stat(_growth.def) + gem_bonus("def")) * buff_factor("def")
 	
 func s_attack():
-	return (_growth.s_atk * _level) * Helper.points_per_level(_best_points) * gem_factor("s_atk") * buff_factor("s_atk")
+	return (_base_stat(_growth.s_atk) + gem_bonus("s_atk")) * buff_factor("s_atk")
 	
 func s_defense():
-	return (_growth.s_def * _level) * Helper.points_per_level(_best_points) * gem_factor("s_def") * buff_factor("s_def")
+	return (_base_stat(_growth.s_def) + gem_bonus("s_def")) * buff_factor("s_def")
 
 func speed():
-	return (_growth.speed * _level) * Helper.points_per_level(_best_points) * gem_factor("speed") * buff_factor("speed")
+	return (_base_stat(_growth.speed) + gem_bonus("speed")) * buff_factor("speed")
 
 func best():
 	return _best_points
@@ -175,8 +180,12 @@ func best():
 func is_alive() -> bool:
 	return roundi(hp() - _lost_hp) > 0
 
-func gem_factor(stat: String) -> float:
-	return 1.0 + _gems.get(stat, 0.0)
+# Wert aus Stufe und Basiswerten, ohne Edelsteine und Buffs
+func _base_stat(share: float) -> float:
+	return share * _level * Helper.points_per_level(_best_points) * STAT_SCALE
 
-func add_gem(stat: String, bonus: float) -> void:
-	_gems[stat] = _gems.get(stat, 0.0) + bonus
+func gem_bonus(stat: String) -> int:
+	return _gems.get(stat, 0)
+
+func add_gem(stat: String, bonus: int) -> void:
+	_gems[stat] = _gems.get(stat, 0) + bonus

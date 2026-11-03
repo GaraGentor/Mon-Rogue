@@ -83,7 +83,7 @@ func element_multiplier(skill_nature: int, target_type: int) -> float:
 	return pow(1.0 - ELEMENT_BONUS, -score)
 
 # ─────────────────────────
-# Schilde halten den ganzen Kampf, bis sie aufgebraucht sind (siehe Monster.absorb_damage).
+# Schilde halten bis zum nächsten eigenen Zug des geschützten Monsters oder bis sie aufgebraucht sind (siehe Monster.start_turn, Monster.absorb_damage).
 # Physische Schilde fangen nur physischen Schaden ab, magische nur magischen.
 
 # Physischer Block (auch die Basis-Blocks): value % der Verteidigung, magischer Block: value % der Sp. Verteidigung.
@@ -126,7 +126,7 @@ func incoming_damage(target: Monster, attackers: Array) -> Dictionary:
 		"after": maxf(physical - target._shield, 0.0) + maxf(ability - target._s_shield, 0.0),
 	}
 
-# Bonus aller passiven Skills im Team auf einen Wert (z. B. +5 KP für jedes Monster im Team).
+# Bonus aller passiven Skills im Team auf einen Wert (z. B. +15 KP für jedes Monster im Team).
 # Es gilt die Element-Regel: nur Monster, die den Skill einsetzen könnten, geben den Bonus.
 func passive_bonus(mon: Monster, stat: String) -> float:
 	var team = State.mons if State.mons.has(mon) else State.enemy_mons if State.enemy_mons.has(mon) else [mon]
@@ -431,7 +431,7 @@ var buff_skills = [
 
 # Passive Skills: nicht ausspielbar, wirken einfach, solange das Monster sie kennt (können beim Lernen ersetzt werden).
 var passive_skills = [
-	_with(_effect_skill("SKILL_LIFE_SPRING", Enums.MON_TYPES.WATER, 5.0, 2, Enums.SKILL_DAMAGE_TYPE.ABILITY, "passive",
+	_with(_effect_skill("SKILL_LIFE_SPRING", Enums.MON_TYPES.WATER, 15.0, 2, Enums.SKILL_DAMAGE_TYPE.ABILITY, "passive",
 		"SKILL_PASSIVE_HP_DESC", Enums.CARD_TARGETS.TEAM_FRIEND, 0, func(_props): pass),
 		{"cost": 0, "passive_stat": "hp"}),
 ]

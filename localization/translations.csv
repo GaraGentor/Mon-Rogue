@@ -157,13 +157,13 @@ SKILL_BASIC_BLOCK_EARTH,Stone Wall,Steinwall
 SKILL_BASIC_BLOCK_FIRE,Ember Guard,Glutschild
 SKILL_BASIC_BLOCK_WATER,Water Shield,Wasserschild
 SKILL_BASIC_BLOCK_AIR,Wind Shield,Windschild
-SKILL_BASIC_BLOCK_DESC,Shields an ally with {value}% of its DEF against physical damage,Schützt ein eigenes Monster mit {value}% seiner VER vor physischem Schaden
+SKILL_BASIC_BLOCK_DESC,Shields an ally with {value}% of its DEF against physical damage until its next turn,Schützt ein eigenes Monster mit {value}% seiner VER vor physischem Schaden bis zu seinem nächsten Zug
 SKILL_DAMAGE_PHYSICAL_DESC,Deals {value}% physical damage,Verursacht {value}% physischen Schaden
 SKILL_DAMAGE_ABILITY_DESC,Deals {value}% magical damage,Verursacht {value}% magischen Schaden
 SKILL_STONE_GUARD,Stone Guard,Felsenpanzer
 SKILL_MIST_VEIL,Mist Veil,Nebelschleier
-SKILL_SHIELD_PHYSICAL_DESC,Shields an ally with {value}% of its DEF against physical damage,Schützt ein eigenes Monster mit {value}% seiner VER vor physischem Schaden
-SKILL_SHIELD_ABILITY_DESC,Shields an ally with {value}% of its SPD against magical damage,Schützt ein eigenes Monster mit {value}% seiner SVE vor magischem Schaden
+SKILL_SHIELD_PHYSICAL_DESC,Shields an ally with {value}% of its DEF against physical damage until its next turn,Schützt ein eigenes Monster mit {value}% seiner VER vor physischem Schaden bis zu seinem nächsten Zug
+SKILL_SHIELD_ABILITY_DESC,Shields an ally with {value}% of its SPD against magical damage until its next turn,Schützt ein eigenes Monster mit {value}% seiner SVE vor magischem Schaden bis zu seinem nächsten Zug
 SKILL_TEMPERED_HIDE,Tempered Hide,Gehärtete Haut
 SKILL_BUFF_DEF_DESC,+{value}% DEF for an ally for {buff_turns} turns,+{value}% VER für ein eigenes Monster für {buff_turns} Züge
 SKILL_LIFE_SPRING,Life Spring,Lebensquell
@@ -364,8 +364,8 @@ RELIC_REWARD_CHOOSE,Choose a relic,Wähle ein Relikt
 MAP_NODE_GEM,GEMS,EDELSTEINE
 GEM_CHOOSE,Choose a gem,Wähle einen Edelstein
 GEM_CHOOSE_MON,Which monster gets the gem?,Welches Monster bekommt den Edelstein?
-GEM_DESC,{stat} +{value}% for the rest of the run,{stat} +{value} % für den restlichen Lauf
-GEM_CURRENT,Gems so far: +{value}%,Bisherige Edelsteine: +{value} %
+GEM_DESC,{stat} +{value} for the rest of the run,{stat} +{value} für den restlichen Lauf
+GEM_CURRENT,Gems so far: +{value},Bisherige Edelsteine: +{value}
 REWARD_DRAG_HINT,Drag a prize over here.,Zieh einen Preis hier herüber.
 REWARD_BAG,Bag,Tasche
 REWARD_BAG_HEADER,Into the bag!,Ab in die Tasche!

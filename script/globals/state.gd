@@ -4,8 +4,8 @@ var current_map: Array = []
 
 # settings
 var SETTING_LEVEL = 35
-# 500 / State.SETTING_LEVEL
-var INITIAL_LEVEL = 1
+# Startstufe der eigenen Monster und Mindeststufe aller Monster (Monster._init, battle.gd)
+var INITIAL_LEVEL = 5
 var INITIAL_MONS = ["2", "4", "5", "8"]
 
 var mons: Array[Monster] = []

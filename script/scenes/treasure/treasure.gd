@@ -53,7 +53,7 @@ func _add_bonus_card() -> void:
 				return
 	# Fallback, falls kein passendes Relic oder Element übrig ist
 	var stat: String = GemField.STATS.keys().pick_random()
-	var bonus: float = GemField.BONUS_BY_DEPTH[_depth]
+	var bonus: int = GemField.BONUS_BY_DEPTH[_depth]
 	GemField.add_gem_card(self, stat, bonus)
 
 func _roll_bonus() -> String:

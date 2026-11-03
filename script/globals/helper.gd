@@ -4,7 +4,7 @@ func generate_fake_uuid() -> String:
 	return "%s-%s" % [str(randi()), str(Time.get_ticks_usec())]
 
 func points_per_level(bst: int) -> float:
-	return bst / State.SETTING_LEVEL
+	return float(bst) / State.SETTING_LEVEL
 
 ## Grund-Fangchance pro Seltenheit (bei 0 HP und gleicher Stufe wie das eigene Team)
 const CATCH_RARITY_BASE := {
@@ -53,7 +53,7 @@ func generate_mons(props: Dictionary = {
 	
 	var default_props = {
 		"count": 1,
-		"level": 1,
+		"level": State.INITIAL_LEVEL,
 		"initial": false,
 	}
 	default_props.merge(props, true)

@@ -41,7 +41,7 @@ func _depth() -> int:
 	return clampi(State.map_level, 0, GEM_PRICES.size() - 1)
 
 func _add_gem_offers() -> void:
-	var bonus: float = GemField.BONUS_BY_DEPTH[_depth()]
+	var bonus: int = GemField.BONUS_BY_DEPTH[_depth()]
 	var stats = GemField.STATS.keys()
 	stats.shuffle()
 	for stat in stats.slice(0, GEM_OFFERS):

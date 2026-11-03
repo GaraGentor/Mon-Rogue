@@ -212,20 +212,20 @@ func _refresh_skill_points() -> void:
 ## Ein Team, das jeden Kampf ausfechtet (2 K.O.s = +1 Stufe), liegt etwa gleichauf;
 ## wer lieber alles fängt, levelt nicht und fällt zurück.
 const ENCOUNTERS := [
-	# Biom 1: Einstieg, fast nur Einzelkämpfe auf gleicher oder niedrigerer Stufe
-	{"fights": 4, "level": [2, 4], "offset": [-1, 0], "counts": [[100, 0, 0], [70, 30, 0]],
+	# Biom 1: Einstieg, fast nur Einzelkämpfe auf gleicher oder niedrigerer Stufe (nie unter State.INITIAL_LEVEL)
+	{"fights": 4, "level": [4, 6], "offset": [-1, 0], "counts": [[100, 0, 0], [70, 30, 0]],
 		"moves": [[100, 0, 0], [90, 10, 0]]},
 	# Biom 2: Doppelkämpfe werden normal
-	{"fights": 4, "level": [5, 9], "offset": [-1, 1], "counts": [[70, 30, 0], [40, 50, 10]],
+	{"fights": 4, "level": [7, 11], "offset": [-1, 1], "counts": [[70, 30, 0], [40, 50, 10]],
 		"moves": [[85, 15, 0], [65, 30, 5]]},
 	# Biom 3: erste 3er-Gruppen
-	{"fights": 5, "level": [10, 15], "offset": [-1, 1], "counts": [[40, 50, 10], [15, 55, 30]],
+	{"fights": 5, "level": [12, 17], "offset": [-1, 1], "counts": [[40, 50, 10], [15, 55, 30]],
 		"moves": [[60, 35, 5], [40, 45, 15]]},
 	# Biom 4: gleiche oder höhere Stufe
-	{"fights": 6, "level": [16, 23], "offset": [0, 1], "counts": [[15, 55, 30], [5, 40, 55]],
+	{"fights": 6, "level": [18, 25], "offset": [0, 1], "counts": [[15, 55, 30], [5, 40, 55]],
 		"moves": [[40, 45, 15], [20, 50, 30]]},
 	# Biom 5: 3 gegen 2 ist die Regel
-	{"fights": 7, "level": [24, 33], "offset": [0, 2], "counts": [[5, 35, 60], [0, 20, 80]],
+	{"fights": 7, "level": [26, 35], "offset": [0, 2], "counts": [[5, 35, 60], [0, 20, 80]],
 		"moves": [[20, 50, 30], [5, 45, 50]]},
 ]
 
@@ -272,9 +272,9 @@ func _generate_battle():
 		var bounty = _roll_bounty(depth)
 		if not bounty.is_empty():
 			ms[0] = Helper.generate_mons({"count": 1, "bounty": bounty})[0]
-	# Stufe direkt setzen: Monster.new(level) ergibt sonst 2 * level + 1
+	# nie unter der Startstufe des eigenen Teams
 	for mon in ms:
-		mon._level = max(1, level + randi_range(encounter.offset[0], encounter.offset[1]))
+		mon._level = maxi(State.INITIAL_LEVEL, level + randi_range(encounter.offset[0], encounter.offset[1]))
 		if mon._bounty != "":
 			mon._level += Skills.get_bounty(mon._bounty).level_bonus
 		mon._initial_moves = maxi(_roll_weighted(encounter.moves, t), min_moves)

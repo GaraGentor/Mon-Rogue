@@ -1,12 +1,12 @@
 extends RewardDialog
 
 ## Edelstein-Feld: drei Edelsteine zur Wahl, der gewählte erhöht einen Wert eines eigenen
-## Monsters prozentual für den restlichen Run. Pro Biom-Tiefe werden die Steine stärker.
+## Monsters um feste Punkte für den restlichen Run. Pro Biom-Tiefe werden die Steine stärker.
 
 const GEM_CHOICES := 3
 const ACCENT := Color(0.2, 0.6, 0.65)
 
-## Stat-Key (siehe Monster.gem_factor) -> Anzeige
+## Stat-Key (siehe Monster.gem_bonus) -> Anzeige
 const STATS := {
 	"hp": {"name": "GEM_HP", "stat": "STAT_HP", "color": Color(0.85, 0.25, 0.3)},
 	"atk": {"name": "GEM_ATK", "stat": "STAT_ATK", "color": Color(0.95, 0.55, 0.2)},
@@ -16,12 +16,12 @@ const STATS := {
 	"speed": {"name": "GEM_SPEED", "stat": "STAT_SPE", "color": Color(0.35, 0.85, 0.45)},
 }
 
-## Bonus pro Biom-Tiefe (State.map_level), 0.06 = +6 %
-const BONUS_BY_DEPTH := [0.06, 0.08, 0.10, 0.12, 0.15]
+## Bonus pro Biom-Tiefe (State.map_level) in festen Punkten auf den Wert
+const BONUS_BY_DEPTH := [15, 20, 25, 30, 35]
 
 const GEM_ICON = preload("res://assets/ui/boss_shard/a_rare_crystal_with_some_spark.jpeg")
 
-var _bonus: float
+var _bonus: int
 
 func _ready() -> void:
 	set_accent(ACCENT)
@@ -34,12 +34,12 @@ func _ready() -> void:
 
 ## Edelstein-Karte, auch von Schatz und Shop genutzt: wird auf ein Monster gezogen.
 ## Beim Drüberziehen zeigt der Tooltip, wie viel Bonus das Monster schon hat.
-static func add_gem_card(dialog: RewardDialog, stat: String, bonus: float) -> RewardDialog.RewardCard:
+static func add_gem_card(dialog: RewardDialog, stat: String, bonus: int) -> RewardDialog.RewardCard:
 	var info: Dictionary = STATS[stat]
 	var stat_name = dialog.tr(info.stat).trim_suffix(":")
-	var text = dialog.tr("GEM_DESC").format({"stat": stat_name, "value": roundi(bonus * 100)})
+	var text = dialog.tr("GEM_DESC").format({"stat": stat_name, "value": bonus})
 	var give := func(mon: Monster):
 		mon.add_gem(stat, bonus)
 	var tooltip := func(mon: Monster) -> String:
-		return "%s +%d%%\n%s" % [stat_name, roundi(bonus * 100), dialog.tr("GEM_CURRENT").format({"value": roundi((mon.gem_factor(stat) - 1.0) * 100)})]
+		return "%s +%d\n%s" % [stat_name, bonus, dialog.tr("GEM_CURRENT").format({"value": mon.gem_bonus(stat)})]
 	return dialog.add_mon_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, tooltip)
