@@ -6,6 +6,8 @@ extends Control
 const SKILLS_TO_PICK := 3
 const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
 const BG := Color(0.0627451, 0.0862745, 0.0823529, 1)
+const BG_TOP := Color(0.560784, 0.301961, 0.85098, 1)
+const MAP_BACKGROUND := preload("res://script/scenes/world_map/map_background.gdshader")
 
 @export var font: Font
 
@@ -26,7 +28,16 @@ func _ready() -> void:
 
 func _build() -> void:
 	var background := ColorRect.new()
-	background.color = BG
+	var bg_material := ShaderMaterial.new()
+	bg_material.shader = MAP_BACKGROUND
+	bg_material.set_shader_parameter("bottom_color", Color.BLACK)
+	bg_material.set_shader_parameter("top_color", BG_TOP)
+	bg_material.set_shader_parameter("wave_amp", 0.115)
+	bg_material.set_shader_parameter("wave_size", 1.0)
+	bg_material.set_shader_parameter("wave_time_mul", 0.933)
+	bg_material.set_shader_parameter("total_phases", 8)
+	background.material = bg_material
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(background)
 
