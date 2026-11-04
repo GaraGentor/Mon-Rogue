@@ -9,6 +9,7 @@ const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
 const MUTED := Color(0.75, 0.75, 0.75, 1)
 const EGG_ICON = preload("res://assets/ui/eggs/common_1.png")
 const BOX = preload("res://script/ui/materials/monster_widget_boxes.tres")
+const SKILL_LABEL_SCRIPT = preload("res://script/scenes/battle/monster_widget_skill_label.gd")
 const MAX_TEAM := 2
 const DRAG_THRESHOLD := 10.0
 # Anzeigenamen der Meilenstein-Zähler (siehe Skills.MILESTONES)
@@ -103,6 +104,9 @@ func _input(event: InputEvent) -> void:
 	if button and button.button_index == MOUSE_BUTTON_LEFT:
 		if button.pressed:
 			_press = {}
+			# Skill-Namen und das Detail-Popup öffnen bzw. schließen nur die Skill-Details
+			if _is_skill_click():
+				return
 			var mon = _card_at(button.position)
 			# Mit gehaltenem Monster sind die Team-Karten Ablageflächen, das übernimmt die Ablage selbst
 			if mon == null or (_held != null and _slot_overlay_at(button.position)):
@@ -121,6 +125,14 @@ func _input(event: InputEvent) -> void:
 			_set_held(mon)
 			_dragging = true
 			force_drag({"judgement_mon": mon}, _drag_preview(mon))
+
+func _is_skill_click() -> bool:
+	var hovered := get_viewport().gui_get_hovered_control()
+	while hovered:
+		if hovered is SkillDetailPopup or hovered.get_script() == SKILL_LABEL_SCRIPT:
+			return true
+		hovered = hovered.get_parent() as Control
+	return false
 
 func _unhandled_input(event: InputEvent) -> void:
 	var key := event as InputEventKey

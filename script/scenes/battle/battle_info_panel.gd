@@ -5,7 +5,7 @@ extends Control
 
 const SKILL_COLUMNS := ["SKILL_HEADER_SKILL", "SKILL_HEADER_COST", "SKILL_HEADER_CD", "SKILL_HEADER_POWER"]
 const EGG_SKILL_COLOR := Color(0.858824, 0.717647, 0.45098, 1)
-const MOVES_CHIP_COLOR := Color(0.25, 0.45, 0.7, 1)
+const EGG_LOCKED_COLOR := Color(0.5, 0.5, 0.5)
 const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 
 @export var turn_wheel: Control
@@ -13,8 +13,8 @@ const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 @export var element_chip: Control
 ## Seltenheit der Art, rechts neben dem Typ
 @export var rarity_chip: Control
-## optional: freigeschaltete Züge (Aktionen pro Zug) der Art, rechts neben der Seltenheit
-@export var moves_chip: Control
+## optional: freigeschaltete Züge (Aktionen pro Zug) der Art als Zahl mit Partikeln, rechts neben der Seltenheit
+@export var moves_badge: Control
 @export var stats_grid: GridContainer
 @export var skill_grid: GridContainer
 @export var skill_info_container: ScrollContainer
@@ -26,6 +26,9 @@ const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 @export var monster_texture: TextureRect
 ## Werte und Skills immer zeigen (Start-Monster, die noch nicht im Team sind)
 @export var reveal_all := false
+## Statt der Skills eine Übersicht der Ei-Attacken der Art nach Kategorie (Start-Auswahl,
+## die konkreten Attacken wählt man danach im Ei-Konfigurator)
+@export var egg_skill_overview := false
 
 var monster: Monster:
 	set(mon):
@@ -47,15 +50,19 @@ func refresh() -> void:
 	if rarity_chip:
 		var rarity := Monmap.rarity_of(monster._name)
 		rarity_chip._init_with_element({"label": Monmap.RARITY_LABELS[rarity], "color": Monmap.RARITY_COLORS[rarity]})
-	if moves_chip:
+	if moves_badge:
 		# Grundzug plus beim Kerkermeister gesprengte Ketten, von maximal möglichen
 		var max_moves: int = Monster.BASE_MOVES + Monmap.mon_metainfos_by_name(monster._name).get("max_upgrades", 0)
-		moves_chip._init_with_element({"label": "%s %d/%d" % [tr("BATTLE_MON_MOVES"), Monster.BASE_MOVES + monster._upgrades, max_moves], "color": MOVES_CHIP_COLOR})
+		moves_badge.set_moves(Monster.BASE_MOVES + monster._upgrades, max_moves)
 	if monster_texture:
 		Monmap.show_on(monster_texture, monster._name, Monmap.MEDIUM)
 		_reveal_monster_pixels()
 	stats_grid.init_with_mon(monster, _hidden_stats())
-	_build_skill_list()
+	skill_info_container.visible = false
+	if egg_skill_overview:
+		_build_egg_skill_overview()
+	else:
+		_build_skill_list()
 
 ## Eigene Werte sind bekannt. Bei Gegnern deckt ein Treffer (Sp.) Verteidigung bzw. (Sp.) Angriff auf
 ## (Skills.reveal_stats_by_hit), ein Fang der Art alle Werte.
@@ -78,9 +85,130 @@ func _reveal_monster_pixels() -> void:
 	monster_texture.material = mat
 	create_tween().tween_method(func(v: float): mat.set_shader_parameter("reveal", v), 0.0, 1.0, 0.5)
 
-func _build_skill_list() -> void:
+func _clear_skill_grid(columns: int) -> void:
 	for c in skill_grid.get_children():
 		c.queue_free()
+	skill_grid.columns = columns
+
+## Pro Kategorie: freigeschaltete / alle Ei-Attacken der Art, gesperrte Kategorien grau.
+## Ein Klick auf eine Kategorie listet ihre Attacken im Info-Fenster.
+func _build_egg_skill_overview() -> void:
+	# eine Spalte: oben die Überschrift über die ganze Breite, darunter eine Zeile pro Kategorie
+	_clear_skill_grid(1)
+	var egg_skills := Skills.get_all_egg_skills(monster._name)
+	var by_category := {}
+	for skill_name in egg_skills.available + egg_skills.locked:
+		var key := Skills.egg_skill_category(Skills.get_skill(skill_name))
+		if not by_category.has(key):
+			by_category[key] = {"available": [], "locked": []}
+		by_category[key]["available" if egg_skills.available.has(skill_name) else "locked"].append(skill_name)
+
+	var total: int = egg_skills.available.size() + egg_skills.locked.size()
+	var title := _label("%s  %d/%d" % [tr("EGG_OVERVIEW_TITLE"), egg_skills.available.size(), total], EGG_SKILL_COLOR)
+	title.add_theme_font_size_override("font_size", 22)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	skill_grid.add_child(title)
+
+	for category in Skills.EGG_SKILL_CATEGORIES:
+		if not by_category.has(category.key):
+			continue
+		var entry: Dictionary = by_category[category.key]
+		entry["hints"] = egg_skills.hints
+		var color := EGG_SKILL_COLOR if entry.available.size() > 0 else EGG_LOCKED_COLOR
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		row.mouse_filter = Control.MOUSE_FILTER_STOP
+		row.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		row.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				_show_egg_category_info(category, entry))
+		var icon := TextureRect.new()
+		icon.custom_minimum_size = Vector2(20, 20)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture = load(category.icon)
+		icon.modulate = color
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(icon)
+		var category_label := _label(tr(category.label), color)
+		category_label.add_theme_font_size_override("font_size", EGG_CATEGORY_FONT_SIZE)
+		category_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		category_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(category_label)
+		var count_label := _label("%d/%d" % [entry.available.size(), entry.available.size() + entry.locked.size()], color)
+		count_label.add_theme_font_size_override("font_size", EGG_CATEGORY_FONT_SIZE)
+		row.add_child(count_label)
+		skill_grid.add_child(row)
+
+## Attacken der Kategorie in ihrer Element-Farbe, gesperrte blasser; ein Klick öffnet die Details daneben.
+func _show_egg_category_info(category: Dictionary, entry: Dictionary) -> void:
+	if _egg_skill_list == null:
+		_egg_skill_list = VBoxContainer.new()
+		_egg_skill_list.add_theme_constant_override("separation", 6)
+		var info_box: Node = skill_info_container.skill_description.get_parent()
+		info_box.add_child(_egg_skill_list)
+		info_box.move_child(_egg_skill_list, skill_info_container.skill_description.get_index() + 1)
+	for c in _egg_skill_list.get_children():
+		c.queue_free()
+	for group in [["EGG_OVERVIEW_UNLOCKED", entry.available, false], ["EGG_OVERVIEW_LOCKED", entry.locked, true]]:
+		if group[1].is_empty():
+			continue
+		var group_label := _label(tr(group[0]), Color(0.7, 0.7, 0.7))
+		group_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		group_label.add_theme_font_size_override("font_size", 15)
+		_egg_skill_list.add_child(group_label)
+		var flow := HFlowContainer.new()
+		flow.add_theme_constant_override("h_separation", 14)
+		flow.add_theme_constant_override("v_separation", 4)
+		_egg_skill_list.add_child(flow)
+		for skill_name in group[1]:
+			var skill := Skills.get_skill(skill_name)
+			var locked: bool = group[2]
+			var skill_label := _label(tr(skill_name), Helper.color_by_type(skill.nature))
+			if locked:
+				skill_label.modulate = Color(1, 1, 1, 0.55)
+			skill_label.mouse_filter = Control.MOUSE_FILTER_STOP
+			skill_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+			skill_label.gui_input.connect(func(event: InputEvent):
+				if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+					_show_egg_skill_detail(skill, entry.hints.get(skill_name, [])))
+			flow.add_child(skill_label)
+	skill_info_container.skill_name.text = tr(category.label)
+	skill_info_container.skill_name.self_modulate = EGG_SKILL_COLOR
+	skill_info_container.skill_description.visible = false
+	_egg_skill_list.visible = true
+	skill_info_container.visible = true
+
+# ─────────────────────────
+# Details eines Skills im Popup neben dem Panel (SkillDetailPopup): Ei-Attacken der Auswahl und Skills im Kampf.
+
+const EGG_CATEGORY_FONT_SIZE := 20
+
+var _egg_skill_list: VBoxContainer
+var _detail_popup: SkillDetailPopup
+
+func _show_egg_skill_detail(skill: Dictionary, lock_hint: Array) -> void:
+	_popup().show_skill(skill, monster, self, lock_hint)
+
+func _popup() -> SkillDetailPopup:
+	if _detail_popup == null:
+		_detail_popup = SkillDetailPopup.new()
+		add_child(_detail_popup)
+		# schließt das Info-Fenster (oder wechselt das Monster), verschwindet auch das Popup
+		skill_info_container.visibility_changed.connect(func():
+			if not skill_info_container.visible:
+				_detail_popup.hide_popup())
+	return _detail_popup
+
+## Monster, zu dem ein Skill gehört (Karten auf der Hand gehören nicht unbedingt zum gezeigten Monster)
+func _skill_owner(skill: Dictionary) -> Monster:
+	for mon in State.mons + State.enemy_mons:
+		if mon._skills.has(skill):
+			return mon
+	return monster
+
+func _build_skill_list() -> void:
+	_clear_skill_grid(SKILL_COLUMNS.size() + 1)
 	skill_grid.add_child(Control.new())
 	for header in SKILL_COLUMNS:
 		skill_grid.add_child(_label(tr(header), Color(0.7, 0.7, 0.7)))
@@ -136,6 +264,9 @@ func _label(text: String, color: Color = Color.WHITE) -> Label:
 	label.add_theme_font_size_override("font_size", 18)
 	return label
 
+## Skills im Kampf (Liste im Panel und Karten auf der Hand) öffnen das Detail-Popup neben dem Panel
 func _show_skill_info(skill) -> void:
-	skill_info_container._init_with_skill(skill)
-	skill_info_container.visible = true
+	var skill_owner := _skill_owner(skill)
+	var lock_hint := ["CONFIGURATOR_LOCKED", "EGG_SKILL_HINT"] if Skills.is_unlockable_egg_skill(skill_owner, skill) else []
+	skill_info_container.visible = false
+	_popup().show_skill(skill, skill_owner, self, lock_hint)

@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://cc0iba7o70h8m" path="res://assets/mons/4/4_front.png" id="1_oxh2b"]
 [ext_resource type="Script" uid="uid://0mkejswpipjh" path="res://script/scenes/battle/monster_scene.gd" id="1_qfx22"]
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="2_theme"]
+[ext_resource type="Material" path="res://script/ui/moves_badge/moves_particles.tres" id="3_moves"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
 bg_color = Color(0.75, 0.1, 0.1, 1)
@@ -21,27 +22,6 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0, 0, 0, 1)
-
-[sub_resource type="Gradient" id="Gradient_2nwnk"]
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_g1akr"]
-gradient = SubResource("Gradient_2nwnk")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_tfo81"]
-particle_flag_disable_z = true
-emission_shape = 1
-emission_sphere_radius = 19.71
-initial_velocity_min = 53.0
-initial_velocity_max = 53.0
-orbit_velocity_min = -2.0
-orbit_velocity_max = 2.0000002
-gravity = Vector3(0, -98, 0)
-scale_min = 8.0
-scale_max = 8.0
-color = Color(0, 1, 1, 1)
-color_ramp = SubResource("GradientTexture1D_g1akr")
-hue_variation_min = -0.100000024
-hue_variation_max = 0.17999998
 
 [node name="MonsterScene" type="Control" unique_id=1545540616 node_paths=PackedStringArray("texture_rect", "name_label", "level_label", "hp_bar", "hp_label", "status_box", "intent_box", "moves_particles")]
 layout_mode = 3
@@ -159,6 +139,6 @@ trail_enabled = true
 trail_lifetime = 0.55
 trail_sections = 6
 trail_section_subdivisions = 2
-process_material = SubResource("ParticleProcessMaterial_tfo81")
+process_material = ExtResource("3_moves")
 
 [connection signal="gui_input" from="." to="." method="_on_gui_input"]

@@ -3,6 +3,8 @@ extends Control
 var monster: Monster:
 	set(mon):
 		monster = mon
+		if _detail_popup:
+			_detail_popup.hide_popup()
 		if mon:
 			info_container.init_with_mon(mon)
 			# is egg selection view
@@ -142,9 +144,20 @@ func remove_panel() -> void:
 	if get_tree():
 		get_tree().create_tween().tween_method(first_panel.set_size, first_panel.size, Vector2(first_panel.size.x,0), 1)
 
+var _detail_popup: SkillDetailPopup
+
+## Details im Popup neben dem Widget; das Signal ist global, daher reagiert nur das Widget, dem der Skill gehört
 func skill_label_pressed(skill) -> void:
-	skill_info_container._init_with_skill(skill)
-	skill_info_container.visible = true
+	if monster == null or not monster._skills.has(skill):
+		# Skill eines anderen Widgets: dessen Popup ersetzt unseres
+		if _detail_popup:
+			_detail_popup.hide_popup()
+		return
+	if _detail_popup == null:
+		_detail_popup = SkillDetailPopup.new()
+		add_child(_detail_popup)
+	var lock_hint := ["CONFIGURATOR_LOCKED", "EGG_SKILL_HINT"] if Skills.is_unlockable_egg_skill(monster, skill) else []
+	_detail_popup.show_skill(skill, monster, self, lock_hint)
 
 func select_watching_mon(mon: Monster) -> void:
 	if is_in_selection:

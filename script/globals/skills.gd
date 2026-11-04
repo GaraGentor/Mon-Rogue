@@ -300,6 +300,41 @@ func get_locked_egg_skills(mon_name: String) -> Array:
 func is_unlockable_egg_skill(mon: Monster, skill: Dictionary) -> bool:
 	return skill.get("egg_skill", false) and get_locked_egg_skills(mon._name).has(skill.name)
 
+# Alle Ei-Attacken der Art: {"available": freigeschaltete, "locked": noch gesperrte (fangen & opfern, Meilensteine, Kopfgelder),
+# "hints": gesperrter Skill -> [Sperr-Label, Freischalt-Hinweis] wie im Konfigurator}.
+func get_all_egg_skills(mon_name: String) -> Dictionary:
+	var locked = []
+	var hints = {}
+	for skill_name in get_locked_egg_skills(mon_name):
+		locked.append(skill_name)
+		hints[skill_name] = ["CONFIGURATOR_LOCKED", "EGG_SKILL_HINT"]
+	for entry in get_locked_milestones(mon_name):
+		locked.append(entry.skill)
+		hints[entry.skill] = ["CONFIGURATOR_LOCKED_MILESTONE", entry.hint]
+	for entry in get_locked_bounties(mon_name):
+		locked.append(entry.skill)
+		hints[entry.skill] = ["CONFIGURATOR_LOCKED_BOUNTY", entry.hint]
+	return {"available": get_available_egg_skills(mon_name), "locked": locked, "hints": hints}
+
+# Kategorien der Ei-Attacken für die Übersicht in der Start-Auswahl, in Anzeigereihenfolge.
+# Neue Kategorie: hier eintragen und in egg_skill_category zuordnen.
+const EGG_SKILL_CATEGORIES = [
+	{"key": "physical", "label": "EGG_CATEGORY_PHYSICAL", "icon": "res://assets/ui/icons/fist.svg"},
+	{"key": "magic", "label": "EGG_CATEGORY_MAGIC", "icon": "res://assets/ui/icons/sparkle.svg"},
+	{"key": "shield", "label": "EGG_CATEGORY_SHIELD", "icon": "res://assets/ui/icons/battle/shield.svg"},
+	{"key": "buff", "label": "EGG_CATEGORY_BUFF", "icon": "res://assets/ui/icons/battle/buff.svg"},
+	{"key": "passive", "label": "EGG_CATEGORY_PASSIVE", "icon": "res://assets/ui/icons/parchment.svg"},
+]
+
+func egg_skill_category(skill: Dictionary) -> String:
+	if is_passive(skill):
+		return "passive"
+	if skill.get("effect", "") == "buff":
+		return "buff"
+	if not is_damage_skill(skill):
+		return "shield"
+	return "physical" if is_physical(skill) else "magic"
+
 # ─────────────────────────
 # Meilenstein-Ei-Attacken: feste Freischaltungen pro Art, gezählt wird nur mit der Art als Start-Monster
 # und nur, solange das Start-Monster selbst noch im Team ist (ausgetauscht oder K.O. = kein Fortschritt).

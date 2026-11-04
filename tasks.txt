@@ -23,7 +23,10 @@ Tasks:
 		> Skill-System mit Effekt-Bausteinen, Synergien und Passiven (siehe skill_system_idee.txt)
 	> KI ist noch zu blöd
 	> EI Attacke für das erste mal Chaos erreicht
-	> Direkte Wirkung anzeigen der Skills
+	> Direkte Wirkung anzeigen der Skills z.B.: 20% von 100 atk = 20 damage.
+	> Auswahl anpassen, statt Züge, den Kreis, sowie die Skills überarbeiten weil macht weniger sinn durch die EI Attacken
+	> Alle 5 Runden soll es die möglichkeit geben sein Favorit Monster selber auszu suchen
+	> Wenn man "Werbung schaut" wird man mit seinem Favorit Monster belohnt, dass man spielen darf
 	> Status Effekte
 
 	> Relics

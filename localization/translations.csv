@@ -489,3 +489,12 @@ HUB_REST,REST,AUSRUHEN
 HUB_DONE,{station} (done),{station} (erledigt)
 HUB_CONTINUE,Move on,Weiterziehen
 MAP_HEADER_ROUTE,Route:,Route:
+EGG_OVERVIEW_TITLE,Egg moves unlocked,Ei-Attacken freigeschaltet
+EGG_OVERVIEW_UNLOCKED,Unlocked,Freigeschaltet
+EGG_OVERVIEW_LOCKED,Locked,Gesperrt
+EGG_DETAIL_ELEMENT,Element: {element},Element: {element}
+EGG_CATEGORY_PHYSICAL,Physical,Physisch
+EGG_CATEGORY_MAGIC,Magical,Magisch
+EGG_CATEGORY_SHIELD,Shield,Schild
+EGG_CATEGORY_BUFF,Buff,Buff
+EGG_CATEGORY_PASSIVE,Passive,Passiv
