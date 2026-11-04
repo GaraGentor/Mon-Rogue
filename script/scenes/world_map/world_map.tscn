@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://ct8ovcic8ewvm"]
+[gd_scene load_steps=25 format=3 uid="uid://ct8ovcic8ewvm"]
 
 [ext_resource type="Script" path="res://script/scenes/world_map/world_map.gd" id="1_fque0"]
 [ext_resource type="Script" path="res://script/scenes/world_map/event_handler.gd" id="2_7tuf0"]
@@ -13,7 +13,7 @@
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="5_pvajd"]
 [ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="6_4ileh"]
 [ext_resource type="Script" path="res://script/scenes/world_map/node_container.gd" id="6_334vr"]
-[ext_resource type="Texture2D" uid="uid://b2qv7gtjjlj7u" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 3. Nov. 2025, 18_19_58.png" id="7_w2axr"]
+[ext_resource type="Texture2D" uid="uid://ck0te7vt8u4p2" path="res://assets/ui/map/node_boss.svg" id="7_w2axr"]
 [ext_resource type="Shader" path="res://script/scenes/world_map/ui_line_wave.gdshader" id="15_qkwaq"]
 [ext_resource type="Script" path="res://script/scenes/world_map/line_control.gd" id="15_w2ou5"]
 [ext_resource type="Script" path="res://script/ui/relic_bar/relic_bar.gd" id="16_relic"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://b0n4cvwqlulqv" path="res://assets/ui/boss_shard/ChatGPT Image 25. Dez. 2025, 21_33_55.png" id="19_shard"]
 [ext_resource type="Script" path="res://script/scenes/world_map/team_bar.gd" id="20_team"]
 [ext_resource type="Script" path="res://script/scenes/world_map/map_legend.gd" id="21_legend"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/parchment.svg" id="22_parch"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hmv0x"]
 shader = ExtResource("5_23h7f")
@@ -262,6 +263,25 @@ texture = ExtResource("17_bag")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="LegendButton" type="Button" parent="HBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -72.0
+offset_top = -72.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+tooltip_text = "MAP_LEGEND"
+theme = ExtResource("6_4ileh")
+icon = ExtResource("22_parch")
+icon_alignment = 1
+expand_icon = true
+
 [node name="Panel2" type="Panel" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -301,8 +321,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("6_4ileh")
-theme_override_font_sizes/font_size = 40
-text = "WORLDMAP_BOSS"
+tooltip_text = "WORLDMAP_BOSS"
 icon = ExtResource("7_w2axr")
 icon_alignment = 1
 
@@ -398,3 +417,4 @@ wave_speed = 3.7
 [connection signal="gui_input" from="BattleIcon" to="BattleIcon" method="_on_gui_input"]
 [connection signal="pressed" from="DEBUG/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/Panel2/ScrollContainer/MarginContainer/VBoxContainer/Panel/BossButton" to="." method="_on_boss_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/Panel/LegendButton" to="MapLegend" method="toggle"]

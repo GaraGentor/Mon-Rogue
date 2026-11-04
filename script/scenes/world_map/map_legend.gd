@@ -1,17 +1,15 @@
 extends Control
 
-## Legende der Kartenfelder am rechten Rand. Ein Klick auf den Reiter fährt sie von rechts herein
-## (und wieder hinaus), ein Klick auf einen Eintrag klappt darunter die ausführliche Beschreibung auf.
+## Legende der Kartenfelder am rechten Rand. Der Pergament-Button im Header ruft toggle() auf und fährt
+## sie von rechts herein (und wieder hinaus), ein Klick auf einen Eintrag klappt darunter die ausführliche Beschreibung auf.
 
 const PANEL_STYLE = preload("res://script/ui/materials/monster_widget_boxes.tres")
 const LABEL_THEME = preload("res://script/ui/materials/battle_labels.tres")
-const INFO_ICON = preload("res://assets/ui/icons/info.svg")
 
 const PANEL_WIDTH := 340.0
 ## Abstand oben (unter dem Header der Karte) und unten
-const TOP_OFFSET := 170.0
+const TOP_OFFSET := 190.0
 const BOTTOM_OFFSET := 16.0
-const TAB_SIZE := Vector2(150, 48)
 const ICON_SIZE := 36
 const SLIDE_TIME := 0.35
 const TITLE_SIZE := 28
@@ -19,7 +17,7 @@ const ENTRY_SIZE := 20
 const DESCRIPTION_SIZE := 16
 const OPEN_COLOR := Color(1.0, 0.85, 0.45)
 
-## Panel samt Reiter, wird über die Offsets seitlich verschoben
+## Panel, wird über die Offsets seitlich verschoben
 var _slider: Control
 var _open := false
 var _tween: Tween
@@ -40,24 +38,6 @@ func _ready() -> void:
 	_slider.offset_bottom = -BOTTOM_OFFSET
 	add_child(_slider)
 	_set_shift(0.0)
-
-	var tab := Button.new()
-	tab.text = tr("MAP_LEGEND")
-	tab.icon = INFO_ICON
-	tab.expand_icon = true
-	tab.add_theme_constant_override("icon_max_width", 24)
-	tab.add_theme_font_size_override("font_size", ENTRY_SIZE)
-	tab.position = Vector2(-TAB_SIZE.x, 0)
-	tab.size = TAB_SIZE
-	# deckend, sonst scheinen die Pfadlinien der Karte durch
-	var hover_style: StyleBoxFlat = PANEL_STYLE.duplicate()
-	hover_style.border_color = OPEN_COLOR
-	for state in ["normal", "pressed"]:
-		tab.add_theme_stylebox_override(state, PANEL_STYLE)
-	tab.add_theme_stylebox_override("hover", hover_style)
-	tab.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-	tab.pressed.connect(toggle)
-	_slider.add_child(tab)
 
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", PANEL_STYLE)
@@ -102,7 +82,7 @@ func _add_entry(list: VBoxContainer, type: Map.PATH_TYPE) -> void:
 	var button := Button.new()
 	button.flat = true
 	button.text = tr(Map.type_label(type))
-	button.icon = Map.icon(type)
+	button.icon = Map.ICONS[type]
 	button.expand_icon = true
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.custom_minimum_size = Vector2(0, ICON_SIZE + 8)
@@ -144,7 +124,7 @@ func toggle() -> void:
 	_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_tween.tween_method(_set_shift, _slider.offset_left, -PANEL_WIDTH if _open else 0.0, SLIDE_TIME)
 
-## shift = 0: Panel ganz rechts außerhalb, nur der Reiter schaut heraus; -PANEL_WIDTH: ganz sichtbar
+## shift = 0: Panel ganz rechts außerhalb; -PANEL_WIDTH: ganz sichtbar
 func _set_shift(shift: float) -> void:
 	_slider.offset_left = shift
 	_slider.offset_right = shift + PANEL_WIDTH

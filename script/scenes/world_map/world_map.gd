@@ -102,7 +102,7 @@ func set_map():
 			var g_container = grid_children[y_path_index * State.current_map.size() + x_path_index]
 			var d: Button = node_name.duplicate()
 			if y_path != null:
-				d.icon = Map.icon(y_path._type)
+				d.icon = Map.ICONS[y_path._type]
 				d.tooltip_text = tr(Map.type_label(y_path._type))
 				d.pressed.connect(func(): call_map_event(y_path))
 				d.visible = true
