@@ -96,10 +96,10 @@ func element_multiplier(skill_nature: int, target_type: int) -> float:
 # Schilde halten bis zum nächsten eigenen Zug des geschützten Monsters oder bis sie aufgebraucht sind (siehe Monster.start_turn, Monster.absorb_damage).
 # Physische Schilde fangen nur physischen Schaden ab, magische nur magischen.
 
-# Physischer Block (auch die Basis-Blocks): value % der Verteidigung, magischer Block: value % der Sp. Verteidigung.
+# Physischer Block (auch die Basis-Blocks): value % der Verteidigung des Wirkers, magischer Block: value % seiner Sp. Verteidigung.
 func add_shield(props):
 	var physical = is_physical(props.skill)
-	var def = props.mon.defense() if physical else props.mon.s_defense()
+	var def = props.from.defense() if physical else props.from.s_defense()
 	props.mon.add_shield(ceilf(def * props.skill.value / 100), physical)
 
 # Buff: value % mehr auf buff_stat für buff_turns eigene Züge des Ziels.

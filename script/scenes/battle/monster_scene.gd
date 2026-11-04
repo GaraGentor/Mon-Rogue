@@ -347,8 +347,8 @@ func _enemy_intent_rows() -> Array:
 			var stat = tr(BUFF_STAT_KEYS.get(skill.buff_stat, "")).trim_suffix(":")
 			rows.append(_icon_row([ICON_BUFF, "+%d%% %s" % [roundi(skill.value), stat]] + targets, BUFF_COLOR, INTENT_FONT_SIZE))
 		else:
-			# gleiche Rechnung wie Skills.add_shield, für das erste Ziel
-			var def = target.defense() if physical else target.s_defense()
+			# gleiche Rechnung wie Skills.add_shield, Wert kommt vom Wirker
+			var def = mon.defense() if physical else mon.s_defense()
 			var amount = ceilf(def * skill.value / 100)
 			rows.append(_icon_row([ICON_SHIELD if physical else ICON_S_SHIELD, "+%d" % amount] + targets,
 				INTENT_BLOCKED_COLOR if physical else SPECIAL_COLOR, INTENT_FONT_SIZE))
