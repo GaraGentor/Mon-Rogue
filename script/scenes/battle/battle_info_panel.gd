@@ -54,10 +54,19 @@ func refresh() -> void:
 	if monster_texture:
 		Monmap.show_on(monster_texture, monster._name, Monmap.MEDIUM)
 		_reveal_monster_pixels()
-	# eigene Stats sind bekannt, gegnerische erst nachdem die Art in diesem Run besiegt wurde
-	var stats_known := reveal_all or State.mons.has(monster) or State.is_mon_defeated(monster._name)
-	stats_grid.init_with_mon(monster, not stats_known)
+	stats_grid.init_with_mon(monster, _hidden_stats())
 	_build_skill_list()
+
+## Eigene Werte sind bekannt. Bei Gegnern deckt ein Treffer (Sp.) Verteidigung bzw. (Sp.) Angriff auf
+## (Skills.reveal_stats_by_hit), ein Fang der Art alle Werte.
+func _hidden_stats() -> Array:
+	if reveal_all or State.mons.has(monster) or State.is_mon_known(monster._name):
+		return []
+	var hidden := ["hp", "speed", "bst"]
+	for stat in ["atk", "def", "s_atk", "s_def"]:
+		if not State.is_mon_stat_revealed(monster._name, stat):
+			hidden.append(stat)
+	return hidden
 
 ## Pixel-Partikel des Monsterbilds tauchen nacheinander auf (nur mit living_pixels-Shader)
 func _reveal_monster_pixels() -> void:

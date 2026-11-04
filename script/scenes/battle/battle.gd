@@ -186,6 +186,9 @@ func _use_skill(from: Monster, skill: Dictionary, target: Monster) -> void:
 		skill.handle.call({"from": from, "skill": skill, "mon": mon})
 	Skills.start_cooldown(skill)
 	Events.monster_status_changed.emit(from)
+	# Treffer decken Werte auf (Skills.reveal_stats_by_hit)
+	if selected_mon == from or targets.has(selected_mon):
+		battle_info.refresh()
 
 func subract_skill_points(selected_skill, mon) -> bool:
 	if mon._computed_moves >= selected_skill.cost:

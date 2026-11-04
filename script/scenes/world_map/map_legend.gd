@@ -102,7 +102,7 @@ func _add_entry(list: VBoxContainer, type: Map.PATH_TYPE) -> void:
 	var button := Button.new()
 	button.flat = true
 	button.text = tr(Map.type_label(type))
-	button.icon = Map.ICONS[type]
+	button.icon = Map.icon(type)
 	button.expand_icon = true
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.custom_minimum_size = Vector2(0, ICON_SIZE + 8)

@@ -1,5 +1,5 @@
 extends GridContainer
- 
+
 @export var label: Label
 @export var is_leveling: bool = false
 ## Werte nebeneinander: oben eine Zeile mit Namen, darunter die Zahlen
@@ -9,30 +9,37 @@ var plabels: Array[Label] = []
 
 var map = [
 	{
+		"key": "hp",
 		"label": "STAT_HP",
 		"value": func(monster:Monster): return monster.hp(),
 	},
 	{
+		"key": "atk",
 		"label": "STAT_ATK",
 		"value": func(monster:Monster): return monster.attack(),
 	},
 	{
+		"key": "def",
 		"label": "STAT_DEF",
 		"value": func(monster:Monster): return monster.defense(),
 	},
 	{
+		"key": "s_atk",
 		"label": "STAT_SPA",
 		"value": func(monster:Monster): return monster.s_attack(),
 	},
 	{
+		"key": "s_def",
 		"label": "STAT_SPD",
 		"value": func(monster:Monster): return monster.s_defense(),
 	},
 	{
+		"key": "speed",
 		"label": "STAT_SPE",
 		"value": func(monster:Monster): return monster.speed(),
 	},
 	{
+		"key": "bst",
 		"label": "STAT_BST",
 		"value": func(monster:Monster): return monster._best_points,
 	}
@@ -45,9 +52,8 @@ func clear():
 			remove_child(child)
 			child.queue_free()
 
-# Called when the node enters the scene tree for the first time.
-## hidden: Werte als "?" anzeigen (Gegner, deren Art in diesem Run noch nicht besiegt wurde)
-func init_with_mon(monster, hidden: bool = false) -> void:
+## hidden: Keys der Werte, die als "?" angezeigt werden (noch nicht aufgedeckte Werte von Gegnern)
+func init_with_mon(monster, hidden: Array = []) -> void:
 	if (is_leveling):
 		columns = 3
 		plabels = []
@@ -66,7 +72,7 @@ func init_with_mon(monster, hidden: bool = false) -> void:
 		vlabel.visible = true
 		add_child(tlabel)
 		add_child(vlabel)
-		
+
 		if is_leveling:
 			var plabel = label.duplicate()
 			plabel.visible = true
@@ -74,10 +80,10 @@ func init_with_mon(monster, hidden: bool = false) -> void:
 			plabels.append(plabel)
 			add_child(plabel)
 
-func _value_text(obj: Dictionary, monster, hidden: bool) -> String:
-	return "?" if hidden else str(int(obj.value.call(monster)))
+func _value_text(obj: Dictionary, monster, hidden: Array) -> String:
+	return "?" if hidden.has(obj.key) else str(int(obj.value.call(monster)))
 
-func _init_horizontal(monster, hidden: bool = false) -> void:
+func _init_horizontal(monster, hidden: Array = []) -> void:
 	columns = map.size()
 	for obj in map:
 		var tlabel = label.duplicate()

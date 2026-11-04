@@ -4,6 +4,7 @@ func deal_damage(props):
 	# für Kopfgelder: wer zuletzt getroffen hat, hat das Monster besiegt
 	props.mon._last_hit_by = props.from
 	var full_damage = calc_damage(props.from, props.mon, props.skill)
+	reveal_stats_by_hit(props.from, props.mon, props.skill)
 	# Schilde fangen den Schaden zuerst ab
 	var damage = props.mon.absorb_damage(full_damage, is_physical(props.skill))
 	var multiplier = element_multiplier(props.skill.nature, props.mon._type)
@@ -17,6 +18,15 @@ func deal_damage(props):
 # Schadensformel
 # Physisch: Angriff gegen Verteidigung, Magisch: Sp. Angriff gegen Sp. Verteidigung.
 # Bei gleichen Werten bleibt der Schaden wie vorher (Faktor 1), mehr Angriff -> bis zu x2, mehr Verteidigung -> gegen 0.
+
+# Aus dem Schaden lässt sich der beteiligte Wert des Gegners zurückrechnen:
+# trifft man ihn, wird seine (Sp.) Verteidigung aufgedeckt, trifft er einen selbst, sein (Sp.) Angriff.
+func reveal_stats_by_hit(from: Monster, to: Monster, skill: Dictionary) -> void:
+	var physical = is_physical(skill)
+	if State.mons.has(from) and not State.mons.has(to):
+		State.reveal_mon_stat(to._name, "def" if physical else "s_def")
+	elif State.mons.has(to) and not State.mons.has(from):
+		State.reveal_mon_stat(from._name, "atk" if physical else "s_atk")
 
 func is_physical(skill: Dictionary) -> bool:
 	return skill.get("damage_type", Enums.SKILL_DAMAGE_TYPE.PHYSICAL) == Enums.SKILL_DAMAGE_TYPE.PHYSICAL

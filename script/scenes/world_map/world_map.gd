@@ -62,8 +62,8 @@ func _ready() -> void:
 	if not State.current_map:
 		Map.generate_starting_points()
 	set_map()
-	# direct from movement...
-	scroll_container_to_bottom()
+	# Fahrt von oben nach unten nur bei Run-Start oder neuem Biom, sonst direkt an die alte Stelle
+	scroll_container_to_bottom(State.current_map_position == State.NO_MAP_POSITION)
 	if State.current_map_position == State.NO_MAP_POSITION:
 		change_position(Vector3.ZERO, true)
 	else:
@@ -102,7 +102,7 @@ func set_map():
 			var g_container = grid_children[y_path_index * State.current_map.size() + x_path_index]
 			var d: Button = node_name.duplicate()
 			if y_path != null:
-				d.icon = Map.ICONS[y_path._type]
+				d.icon = Map.icon(y_path._type)
 				d.tooltip_text = tr(Map.type_label(y_path._type))
 				d.pressed.connect(func(): call_map_event(y_path))
 				d.visible = true
@@ -159,14 +159,15 @@ func _call_map_event(map_node) -> void:
 		print("same level, go!")
 		get_tree().change_scene_to_file("res://script/scenes/battle/battle.tscn")
 
-func scroll_container_to_bottom() -> void:
+func scroll_container_to_bottom(animate := true) -> void:
 	var cur_pos = State.current_map_position
 	var map_height = grid_container.get_child_count() / grid_container.columns
 	var damn_bro = scroll_container.get_v_scroll_bar().max_value - scroll_container.size.y
-	grid_container.get_combined_minimum_size().y
 	var scroll_pos = damn_bro - ((damn_bro / map_height) * cur_pos.y)
+	if not animate:
+		scroll_container.scroll_vertical = int(scroll_pos)
+		return
 	var tween = get_tree().create_tween()
-	var max_scroll = damn_bro
 	tween.tween_property(
 		scroll_container, "scroll_vertical",
 		scroll_pos, map_height * .1 + 1

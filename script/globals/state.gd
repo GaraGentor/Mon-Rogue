@@ -33,10 +33,12 @@ var biome_pools: Array = []
 # Stats pro Monster-Art, einmal pro Run gewürfelt: name -> {"best_points": int, "growth": Growth}
 var rolled_mon_stats: Dictionary = {}
 
-# Monster-Arten, die in diesem Run schon besiegt wurden (deren Stats sind im Kampf sichtbar)
+# Monster-Arten, die in diesem Run schon besiegt wurden
 var defeated_mon_names: Array[String] = []
-# Monster-Arten, die in diesem Run schon gefangen wurden (deren genaue HP sind im Kampf sichtbar)
+# Monster-Arten, die in diesem Run schon gefangen wurden (deren Stats und genaue HP sind im Kampf sichtbar)
 var caught_mon_names: Array[String] = []
+# Im Kampf durch Treffer aufgedeckte Einzelwerte pro Art: name -> Array der Stat-Keys (siehe Skills.reveal_stats_by_hit)
+var revealed_mon_stats: Dictionary = {}
 
 var is_boss_fight: bool = false
 var is_final_boss: bool = false
@@ -115,6 +117,7 @@ func reset() -> void:
 	rolled_mon_stats = {}
 	defeated_mon_names = []
 	caught_mon_names = []
+	revealed_mon_stats = {}
 	run_won = false
 	run_kills = 0
 	run_catches = 0
@@ -159,6 +162,14 @@ func is_mon_defeated(mon_name: String) -> bool:
 func mark_mon_caught(mon_name: String) -> void:
 	if not caught_mon_names.has(mon_name):
 		caught_mon_names.append(mon_name)
+
+func reveal_mon_stat(mon_name: String, stat: String) -> void:
+	var stats: Array = revealed_mon_stats.get_or_add(mon_name, [])
+	if not stats.has(stat):
+		stats.append(stat)
+
+func is_mon_stat_revealed(mon_name: String, stat: String) -> bool:
+	return revealed_mon_stats.get(mon_name, []).has(stat)
 
 # Art im Team oder in diesem Run schon gefangen: genaue HP von Gegnern dieser Art sind sichtbar
 func is_mon_known(mon_name: String) -> bool:
