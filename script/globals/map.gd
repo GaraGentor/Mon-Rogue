@@ -10,6 +10,8 @@ enum PATH_TYPE {
 	EVENT,
 	TREASURE,
 	GEM,
+	# Rastlager am Ende jedes Pfads vor dem Boss: Ausruhen, Laden und Trainer (hub_camp.gd)
+	HUB,
 }
 
 class path:
@@ -27,6 +29,7 @@ class path:
 		6: "EVENT",
 		7: "TREASURE",
 		8: "GEM",
+		9: "HUB",
 	}
 
 	func _init(pos: Vector3):
@@ -40,6 +43,7 @@ const ICONS := {
 	PATH_TYPE.COMBAT: preload("res://assets/ui/map/node_combat.svg"),
 	PATH_TYPE.BOSS: preload("res://assets/ui/map/node_boss.svg"),
 	PATH_TYPE.CAMP: preload("res://assets/ui/map/node_camp.svg"),
+	PATH_TYPE.HUB: preload("res://assets/ui/map/node_hub.svg"),
 	PATH_TYPE.SHOP: preload("res://assets/ui/map/node_shop.svg"),
 	PATH_TYPE.TRAINER: preload("res://assets/ui/map/node_trainer.svg"),
 	PATH_TYPE.JAILER: preload("res://assets/ui/map/node_jailer.svg"),
@@ -247,7 +251,7 @@ func generate_last_fire_camps(grid: Array):
 	for x_paths in grid:
 		var index = grid.find(x_paths)
 		var camp_node = path.new(Vector3(index,x_paths.size(),index))
-		camp_node._type = PATH_TYPE.CAMP
+		camp_node._type = PATH_TYPE.HUB
 		if starting_nodes.has(index):
 			x_paths.append(camp_node)
 			all_nodes.append(camp_node)

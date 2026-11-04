@@ -36,13 +36,21 @@ static func element_count(nature: int) -> int:
 	return Enums.MON_TYPES.values().filter(func(element): return nature & element).size()
 
 ## Ei-Attacken ab MIN_TIER, je zur Hälfte mit einem und mit mehreren Elementen.
+## Nur Skills, die mindestens ein Monster im Team sofort einsetzen kann und noch nicht kennt;
+## fehlen davon welche, wird mit den übrigen passenden Skills aufgefüllt.
 ## Mit der Biom-Tiefe werden höhere Stufen wahrscheinlicher.
 func _pick_offers() -> Array:
 	var rare = Skills.egg_skills.filter(func(skill): return skill.tier >= MIN_TIER)
-	var single = rare.filter(func(skill): return element_count(skill.nature) == 1).map(func(skill): return skill.name)
-	var multi = rare.filter(func(skill): return element_count(skill.nature) > 1).map(func(skill): return skill.name)
+	var usable = rare.filter(func(skill): return State.mons.any(func(mon): return Skills.can_use(mon, skill) and not Skills.knows_skill(mon, skill.name)))
+	# passt gar nichts (sollte nicht vorkommen), lieber unpassende Skills als ein leerer Trainer
+	if usable.is_empty():
+		usable = rare
+	var single = usable.filter(func(skill): return element_count(skill.nature) == 1).map(func(skill): return skill.name)
+	var multi = usable.filter(func(skill): return element_count(skill.nature) > 1).map(func(skill): return skill.name)
 	var names = Skills.pick_weighted_unique(single, SINGLE_ELEMENT_OFFERS, State.map_level)
 	names.append_array(Skills.pick_weighted_unique(multi, MULTI_ELEMENT_OFFERS, State.map_level))
+	var rest = usable.map(func(skill): return skill.name).filter(func(skill_name): return not names.has(skill_name))
+	names.append_array(Skills.pick_weighted_unique(rest, SINGLE_ELEMENT_OFFERS + MULTI_ELEMENT_OFFERS - names.size(), State.map_level))
 	return names.map(func(skill_name): return Skills.get_skill(skill_name))
 
 func _add_skill_card(skill: Dictionary) -> void:

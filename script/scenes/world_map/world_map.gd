@@ -17,6 +17,7 @@ extends Control
 @export var boss_shard_label: Label
 @export var money_label: Label
 @export var depth_level: Label
+@export var biome_path_label: RichTextLabel
 @export var team_bar: HBoxContainer
 
 @export var heal_camp_scene: PackedScene
@@ -29,6 +30,7 @@ extends Control
 const RELIC_REWARD_SCENE := preload("res://script/scenes/relic_reward/relic_reward.tscn")
 const GEM_SCENE := preload("res://script/scenes/gems/gems.tscn")
 const WHEEL_EVENT := preload("res://script/scenes/wheel_event/wheel_event.gd")
+const HUB_CAMP := preload("res://script/scenes/hub_camp/hub_camp.gd")
 
 @export var view_container: Panel
 
@@ -190,6 +192,8 @@ func call_event_by_type(type) -> void:
 		get_tree().change_scene_to_file("res://script/scenes/battle/battle.tscn")
 	if type == Map.PATH_TYPE.CAMP:
 		open_heal_camp()
+	if type == Map.PATH_TYPE.HUB:
+		view_container.add_child(HUB_CAMP.new())
 	if type == Map.PATH_TYPE.EVENT:
 		call_random_event()
 	if type == Map.PATH_TYPE.SHOP:
@@ -277,6 +281,21 @@ func show_biome() -> void:
 	var biome = ColorMap.get_combo(State.current_biome())
 	depth_level.text = tr("MAP_HEADER_BIOME").format({"biome": tr(biome.label), "depth": State.map_level + 1})
 	depth_level.add_theme_color_override("font_color", Color(biome.color).lightened(0.4))
+	show_biome_path()
+
+# Alle Biome des Runs als Route: geschaffte blass, das aktuelle hervorgehoben, kommende in ihrer Farbe
+func show_biome_path() -> void:
+	var parts = []
+	for depth in State.biome_path.size():
+		var combo = ColorMap.get_combo(State.biome_path[depth])
+		var text = "%d %s" % [depth + 1, tr(combo.label)]
+		if depth < State.map_level:
+			parts.append("[color=#ffffff59]%s[/color]" % text)
+		elif depth == State.map_level:
+			parts.append("[b][u][color=#%s]%s[/color][/u][/b]" % [Color(combo.color).lightened(0.4).to_html(false), text])
+		else:
+			parts.append("[color=#%s]%s[/color]" % [Color(combo.color).lightened(0.2).to_html(false), text])
+	biome_path_label.text = "[color=#ffffff99]%s[/color] %s" % [tr("MAP_HEADER_ROUTE"), " [color=#ffffff59]›[/color] ".join(parts)]
 
 func reset_animation_state(ele) -> void:
 	ele._ui_item.scale = Vector2(1,1)
