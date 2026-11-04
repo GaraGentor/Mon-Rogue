@@ -35,11 +35,25 @@ const HUB_CAMP := preload("res://script/scenes/hub_camp/hub_camp.gd")
 @export var view_container: Panel
 
 @onready var map_ui: Control = $HBoxContainer
+@onready var map_paper: Control = $HBoxContainer/Panel2/ScrollContainer/MarginContainer/MapPaper
+@onready var map_panel: Control = $HBoxContainer/Panel2
+@onready var desk_background: CanvasItem = $ColorRect
 
 var tweens = []
+var lines: Array[UILine] = []
+var weather: MapWeather
+# Biom, dessen Aussehen gerade gezeigt wird (weicht nur in der Vorschau mit Taste B vom echten Biom ab)
+var shown_biome := 0
 
 # Felder unter der aktuellen Position sind abgehakt und werden blass
 const PASSED_MODULATE := Color(0.45, 0.45, 0.45, 0.8)
+# Felder bleiben von Deko frei, der Wert ist der Radius ab Feldmitte
+const NODE_CLEARANCE := 58.0
+const BOSS_CLEARANCE := 110.0
+# Der Hintergrund neben der Karte soll nur noch sanft wogen
+const DESK_WAVE_BANDS := 5
+const DESK_WAVE_AMP := 0.025
+const DESK_WAVE_SPEED := 0.25
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -52,6 +66,10 @@ func _ready() -> void:
 
 	show_biome()
 	monster_shard_changed(State.boss_shards)
+	weather = MapWeather.new()
+	weather.scroll_container = scroll_container
+	map_panel.add_child(weather)
+	shown_biome = State.current_biome()
 	# nach Lager, Shop & Co. haben sich KP oder Elemente des Teams evtl. geändert
 	view_container.child_exiting_tree.connect(func(_child): team_bar.refresh.call_deferred())
 
@@ -67,6 +85,7 @@ func _ready() -> void:
 	if not State.current_map:
 		Map.generate_starting_points()
 	set_map()
+	apply_biome_look()
 	# Fahrt von oben nach unten nur bei Run-Start oder neuem Biom, sonst direkt an die alte Stelle
 	scroll_container_to_bottom(State.current_map_position == State.NO_MAP_POSITION)
 	map_ui.modulate.a = 1.0
@@ -90,7 +109,10 @@ func set_map():
 	for child in _to_clear_children:
 		grid_container.remove_child(child)
 		child.queue_free()
-	
+	for line in lines:
+		line.queue_free()
+	lines.clear()
+
 	var screen_width = grid_container.size.x
 	var gap = 100
 	var map_y_height = State.current_map[0].size()
@@ -149,6 +171,7 @@ func draw_lines() -> void:
 				line.from_node = y_node
 				line.to_node = next_node
 				map_layout.add_child(line)
+				lines.append(line)
 			pass
 		pass
 	pass
@@ -157,8 +180,9 @@ func _on_button_pressed() -> void:
 	print("Map.gen_map()", State.current_map)
 	Map.generate_starting_points()
 	set_map()
+	apply_biome_look()
 	change_position(Vector3.ZERO, true)
-	
+
 
 func _call_map_event(map_node) -> void:
 	if map_node._pos.y == State.map_progress_level:
@@ -265,6 +289,7 @@ func change_position(pos, initial = false) -> void:
 	var walked_ndoes = all_nodes.filter(func(node): return node != null).filter(func(node): return node._pos.y == pos.y)
 	for walked_nodes in walked_ndoes:
 		reset_animation_state(walked_nodes)
+	update_line_states(State.NO_MAP_POSITION if initial else pos)
 
 	for walkable_node in possible_walkable_nodes:
 		if (walkable_node._ui_item):
@@ -277,6 +302,61 @@ func change_position(pos, initial = false) -> void:
 			tweens.append(tween)
 			ub.modulate = Color.WHITE
 
+# Wege ab der aktuellen Position leuchten, zurückgelegte Abschnitte treten zurück
+func update_line_states(pos: Vector3) -> void:
+	for line in lines:
+		var from_pos: Vector3 = line.from_node._path._pos
+		var to_pos: Vector3 = line.to_node._path._pos
+		if from_pos == pos:
+			line.set_state(UILine.LineState.WALKABLE)
+		elif to_pos.y <= pos.y:
+			line.set_state(UILine.LineState.PASSED)
+		else:
+			line.set_state(UILine.LineState.LOCKED)
+
+# Hintergrund, Papier, Wege, Deko und Wetter passend zum Biom. Der Seed hängt am Run und der Tiefe,
+# damit die Deko nach einem Kampf wieder an derselben Stelle steht.
+func apply_biome_look() -> void:
+	var look := MapBiomeTheme.get_look(shown_biome)
+	var rng_seed := absi(hash([State.map_level, shown_biome, State.biome_pools]))
+	var paper_dark := Color(look.paper_dark)
+	var desk: ShaderMaterial = desk_background.material
+	desk.set_shader_parameter("top_color", paper_dark.darkened(0.45))
+	desk.set_shader_parameter("bottom_color", paper_dark.darkened(0.72))
+	desk.set_shader_parameter("total_phases", DESK_WAVE_BANDS)
+	desk.set_shader_parameter("wave_amp", DESK_WAVE_AMP)
+	desk.set_shader_parameter("wave_time_mul", DESK_WAVE_SPEED)
+	desk.set_shader_parameter("flicker", 0.04)
+	map_paper.apply_look(look, rng_seed)
+	for line in lines:
+		line.apply_look(Color(look.ink), Color(look.accent))
+	weather.apply_look(look)
+	# Deko braucht die endgültigen Positionen der Felder, die stehen erst nach dem Layout
+	await get_tree().process_frame
+	scatter_deco(look.deco, rng_seed)
+
+func scatter_deco(deco: Array, rng_seed: int) -> void:
+	var origin: Vector2 = map_paper.deco_layer.get_global_rect().position
+	var clear_points := [[boss_button.get_global_rect().get_center() - origin, BOSS_CLEARANCE]]
+	for child in grid_container.get_children():
+		if child._path != null and child._path._ui_item != null:
+			clear_points.append([child._path._ui_item.get_global_rect().get_center() - origin, NODE_CLEARANCE])
+	var clear_segments := []
+	for line in lines:
+		var ends: Array[Vector2] = line.endpoints()
+		clear_segments.append([ends[0] - origin, ends[1] - origin])
+	map_paper.deco_layer.scatter(deco, rng_seed, clear_points, clear_segments)
+
+# Vorschau zum Ausprobieren: B schaltet das Aussehen durch alle Biome, der Run selbst bleibt unverändert.
+func _input(event: InputEvent) -> void:
+	if not OS.is_debug_build() or not event is InputEventKey:
+		return
+	if event.pressed and not event.echo and event.keycode == KEY_B and not lines.is_empty():
+		var order := MapBiomeTheme.PREVIEW_ORDER
+		shown_biome = order[(order.find(shown_biome) + 1) % order.size()]
+		show_biome(shown_biome)
+		apply_biome_look()
+
 func monster_shard_changed(amount) -> void:
 	boss_shard_label.text = str(amount)
 
@@ -284,8 +364,8 @@ func change_ep_text(ep) -> void:
 	money_label.text = str(ep)
 
 # Name des aktuellen Bioms in seiner Farbe, dazu die Tiefe
-func show_biome() -> void:
-	var biome = ColorMap.get_combo(State.current_biome())
+func show_biome(mask := State.current_biome()) -> void:
+	var biome = ColorMap.get_combo(mask)
 	depth_level.text = tr("MAP_HEADER_BIOME").format({"biome": tr(biome.label), "depth": State.map_level + 1})
 	depth_level.add_theme_color_override("font_color", Color(biome.color).lightened(0.4))
 	show_biome_path()

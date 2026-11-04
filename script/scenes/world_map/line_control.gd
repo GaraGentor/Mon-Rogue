@@ -1,13 +1,14 @@
 class_name UILine
 extends Control
 
+## Weg zwischen zwei Feldern. Gestrichelt in der Tintenfarbe des Bioms, leuchtend, sobald er begehbar ist.
+
+enum LineState { LOCKED, WALKABLE, PASSED }
+
 ## Verbindungspunkte
 @export var from_node: Control
 @export var to_node: Control
 
-## Basisfarben der Linie (abhängig von is_premium)
-@export var color := Color.WHITE
-@export var color2 := Color.DARK_GOLDENROD
 @export var width := 4.0
 
 @export_group("Wellen-Effekt")
@@ -33,24 +34,72 @@ extends Control
 ## Auflösung der Linie (mehr Segmente = glattere Welle, aber etwas teurer)
 @export_range(4, 128, 1) var segments := 32
 
-var is_premium: bool
+## gesperrte und abgelaufene Wege treten hinter die Karte zurück
+const LOCKED_ALPHA := 0.6
+const PASSED_ALPHA := 0.22
+const DASH := 12.0
+const THIN_WIDTH := 3.0
+## Heller Saum um den begehbaren Weg
+const HALO_WIDTH := 2.6
+const HALO_ALPHA := 0.28
+
+var state := LineState.LOCKED
+var ink := Color.WHITE
+var accent := Color.GOLD
 
 var _time := 0.0
 var _shader_material: ShaderMaterial
 
-# Pfad ggf. anpassen, falls du die .gdshader Datei woanders ablegst
 const WAVE_SHADER: Shader = preload("res://script/scenes/world_map/ui_line_wave.gdshader")
 
 
 func _ready() -> void:
 	_shader_material = ShaderMaterial.new()
 	_shader_material.shader = WAVE_SHADER
-	material = _shader_material
 	_update_shader_params()
+	_apply_state()
+	# Items/UILine ist nur die Vorlage zum Duplizieren und verbindet nichts
+	if not from_node or not to_node:
+		set_process(false)
+		return
+	# Gesperrte Wege zeichnen nicht jeden Frame neu, müssen aber dem Layout folgen
+	from_node.item_rect_changed.connect(queue_redraw)
+	to_node.item_rect_changed.connect(queue_redraw)
+	from_node._path._ui_item.item_rect_changed.connect(queue_redraw)
+	to_node._path._ui_item.item_rect_changed.connect(queue_redraw)
 
 
 func _process(delta: float) -> void:
 	_time += delta
+	queue_redraw()
+
+
+func set_state(new_state: LineState) -> void:
+	state = new_state
+	if is_node_ready():
+		_apply_state()
+
+
+func apply_look(new_ink: Color, new_accent: Color) -> void:
+	ink = new_ink
+	accent = new_accent
+	# Der Lichtpuls ist eine aufgehellte Version der Wegfarbe
+	wave_color = new_accent.lerp(Color.WHITE, 0.5)
+	queue_redraw()
+
+
+## Start und Ende des Wegs in globalen Koordinaten
+func endpoints() -> Array[Vector2]:
+	return [
+		rect_center_top(from_node._path._ui_item.get_global_rect()),
+		rect_center_bottom(to_node._path._ui_item.get_global_rect()),
+	]
+
+
+func _apply_state() -> void:
+	var walkable := state == LineState.WALKABLE
+	set_process(walkable)
+	material = _shader_material if walkable else null
 	queue_redraw()
 
 
@@ -67,18 +116,28 @@ func _draw() -> void:
 		return
 
 	var origin := get_global_rect().position
-	var a := rect_center_top(from_node._path._ui_item.get_global_rect()) - origin
-	var b := rect_center_bottom(to_node._path._ui_item.get_global_rect()) - origin
+	var ends := endpoints()
+	var a := ends[0] - origin
+	var b := ends[1] - origin
 
-	var diff := b - a
-	var length := diff.length()
-	if length < 0.01:
+	if a.distance_to(b) < 0.01:
 		return
 
-	var dir := diff / length
+	match state:
+		LineState.LOCKED:
+			draw_dashed_line(a, b, Color(ink, LOCKED_ALPHA), THIN_WIDTH, DASH)
+		LineState.PASSED:
+			draw_line(a, b, Color(ink, PASSED_ALPHA), THIN_WIDTH)
+		LineState.WALKABLE:
+			_draw_ribbon(a, b, width * HALO_WIDTH, Color(accent, HALO_ALPHA))
+			_draw_ribbon(a, b, width, accent)
+
+
+func _draw_ribbon(a: Vector2, b: Vector2, ribbon_width: float, ribbon_color: Color) -> void:
+	var diff := b - a
+	var dir := diff.normalized()
 	var perp := Vector2(-dir.y, dir.x)
-	var line_color := color if is_premium else color2
-	var half_width := width * 0.5
+	var half_width := ribbon_width * 0.5
 	var amplitude := wave_intensity * 8.0
 
 	var left_points := PackedVector2Array()
@@ -108,7 +167,7 @@ func _draw() -> void:
 		points.append(right_points[i])
 		uvs.append(uvs_right[i])
 
-	draw_polygon(points, PackedColorArray([line_color]), uvs)
+	draw_polygon(points, PackedColorArray([ribbon_color]), uvs)
 
 
 func rect_center_top(r: Rect2) -> Vector2:

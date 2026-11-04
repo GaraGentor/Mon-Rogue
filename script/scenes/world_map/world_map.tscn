@@ -23,6 +23,7 @@
 [ext_resource type="Script" path="res://script/scenes/world_map/team_bar.gd" id="20_team"]
 [ext_resource type="Script" path="res://script/scenes/world_map/map_legend.gd" id="21_legend"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/parchment.svg" id="22_parch"]
+[ext_resource type="Script" path="res://script/scenes/world_map/map_paper.gd" id="23_paper"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hmv0x"]
 shader = ExtResource("5_23h7f")
@@ -306,12 +307,18 @@ theme_override_constants/margin_top = 60
 theme_override_constants/margin_right = 60
 theme_override_constants/margin_bottom = 60
 
+[node name="MapPaper" type="Control" parent="HBoxContainer/Panel2/ScrollContainer/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("23_paper")
+
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel2/ScrollContainer/MarginContainer"]
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="HBoxContainer/Panel2/ScrollContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_vjn3m")
 
 [node name="BossButton" type="Button" parent="HBoxContainer/Panel2/ScrollContainer/MarginContainer/VBoxContainer/Panel"]
 layout_mode = 1
@@ -322,13 +329,14 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("6_4ileh")
 tooltip_text = "WORLDMAP_BOSS"
+flat = true
 icon = ExtResource("7_w2axr")
 icon_alignment = 1
 
 [node name="MapLayout" type="ColorRect" parent="HBoxContainer/Panel2/ScrollContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(900, 2000)
 layout_mode = 2
-color = Color(0.207379, 0.181525, 0.0236749, 1)
+color = Color(0, 0, 0, 0)
 
 [node name="GridContainer" type="GridContainer" parent="HBoxContainer/Panel2/ScrollContainer/MarginContainer/VBoxContainer/MapLayout"]
 layout_mode = 1
@@ -393,6 +401,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxEmpty_vjn3m")
 script = ExtResource("6_334vr")
 
 [node name="UILine" type="Control" parent="Items"]
@@ -407,12 +416,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 2
 script = ExtResource("15_w2ou5")
-color = Color(0.933578, 0.910567, 0.334993, 1)
-color2 = Color(0.909867, 0.371003, 0.118403, 1)
-width = 8.0
-wave_color = Color(0, 0.955957, 0.776497, 1)
-wave_intensity = 1.95
-wave_speed = 3.7
+width = 7.0
+wave_color = Color(1, 0.95, 0.7, 1)
+wave_intensity = 0.4
+wave_speed = 1.6
 
 [connection signal="gui_input" from="BattleIcon" to="BattleIcon" method="_on_gui_input"]
 [connection signal="pressed" from="DEBUG/Button" to="." method="_on_button_pressed"]
