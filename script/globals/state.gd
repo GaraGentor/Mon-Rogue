@@ -148,6 +148,13 @@ func get_mon_stats(mon_name: String) -> Dictionary:
 		roll_mon_stats()
 	return rolled_mon_stats[mon_name]
 
+# Setzt die Stats einer Art auf gespeicherte Werte (Ei aus dem Spielstand, siehe Helper.mon_from_egg).
+func restore_mon_stats(mon_name: String, best_points: int, growth: Dictionary) -> void:
+	var stats = get_mon_stats(mon_name)
+	stats.best_points = best_points
+	for attr in Growth.ATTRS:
+		stats.growth[attr] = growth[attr]
+
 # Ist das Start-Monster noch im Team? K.O. gegangene (battle.gd _clear_fainted_mons) und abgegebene Monster
 # (leaving_screen.gd) stehen nicht mehr in mons.
 func is_starter_in_team() -> bool:
@@ -217,6 +224,8 @@ func is_mon_seen(mon_name: String, depth := -1) -> bool:
 # Beendet den Run und merkt sich das Team, die Szene wechselt der Aufrufer (run_end.tscn).
 func end_run(won: bool) -> void:
 	run_won = won
+	# erst das Run-Ende gibt neue Eier und einen neuen Biom-Pfad frei
+	SaveManager.clear_run_start()
 	run_team.assign(mons.map(func(mon: Monster): return mon._name))
 	run_team_levels = {}
 	for mon in mons:

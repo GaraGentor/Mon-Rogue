@@ -20,6 +20,7 @@ func _ready() -> void:
 	shard_amount_label.text = tr("BOSS_REWARD_SHARD_AMOUNT").format({"amount": SHARD_REWARD})
 	# hier landet man nur nach Biom-Bossen, Boss-Felder auf der Karte zählen nicht
 	show_unlocks(unlock_label, Skills.add_milestone_progress(State.starter_name, "biome_boss_kills"))
+	SaveManager.add_reroll_charge()
 	var catched_mons = SaveManager.save_data.catched_monsters.duplicate(true)
 	catched_mons.append_array(State.INITIAL_MONS)
 	var missing_mon = false

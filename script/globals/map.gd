@@ -89,6 +89,22 @@ var starting_nodes = []
 
 const MAX_BIOME_TIER = 4
 
+# Pfad und Pools aus dem Spielstand, neu gewürfelt wird nur ohne gespeicherte (erster Start oder nach einem Run-Ende).
+func load_biome_path() -> Array[int]:
+	var saved_path: Array = SaveManager.save_data["biome_path"]
+	if saved_path.is_empty():
+		var biomes := generate_biome_path()
+		SaveManager.set_biome_path(biomes, State.biome_pools)
+		return biomes
+	# JSON liefert Zahlen als float und untypisierte Arrays
+	State.biome_path.assign(saved_path.map(func(mask): return int(mask)))
+	State.biome_pools = []
+	for saved_pool in SaveManager.save_data["biome_pools"]:
+		var pool: Array[String] = []
+		pool.assign(saved_pool)
+		State.biome_pools.append(pool)
+	return State.biome_path
+
 # Würfelt pro Run einen Biom-Pfad (Element-Masken aus ColorMap), eine Tiefe pro map_settings-Eintrag.
 # Tiefe 1 ist immer ein Einzelelement, die letzte Tiefe immer Chaos (alle 4 Elemente).
 func generate_biome_path() -> Array[int]:

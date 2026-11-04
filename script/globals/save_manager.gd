@@ -1,6 +1,8 @@
 extends Node
 
 const SAVE_PATH := "user://savegame.json"
+# Biom-Boss-Siege, bis in der Ei-Auswahl der Neu-Würfeln-Button erscheint (für Spieler unsichtbar)
+const REROLL_CHARGES_NEEDED := 3
 
 var save_data := {
 	"version": 1,
@@ -14,6 +16,14 @@ var save_data := {
 	# Meilenstein-Fortschritt pro Art als Start-Monster: Monster-Name -> {Zähler -> Anzahl} (siehe Skills.MILESTONES)
 	# freigeschaltete Meilenstein-Ei-Attacken landen wie die anderen in egg_skills
 	"milestones": {},
+	"reroll_charges": 0,
+	# wurden die gespeicherten Eier neu gewürfelt? Dann verbraucht der nächste Aufbruch die Ladungen
+	"eggs_rerolled": false,
+	# Eier der Start-Auswahl (Helper.egg_to_save), bleiben bis zum nächsten Run-Ende gleich
+	"starter_eggs": [],
+	# Biom-Pfad und Monster-Pools pro Tiefe (Map.load_biome_path), bleiben ebenfalls bis zum nächsten Run-Ende gleich
+	"biome_path": [],
+	"biome_pools": [],
 }
 
 # Called when the node enters the scene tree for the first time.
@@ -83,6 +93,34 @@ func add_milestone_progress(monster_name: String, stat: String, amount := 1):
 
 func get_milestone_progress(monster_name: String, stat: String) -> int:
 	return int(save_data["milestones"].get(monster_name, {}).get(stat, 0))
+
+func add_reroll_charge():
+	save_data["reroll_charges"] = mini(int(save_data["reroll_charges"]) + 1, REROLL_CHARGES_NEEDED)
+	save_game()
+
+func has_full_reroll_charges() -> bool:
+	return int(save_data["reroll_charges"]) >= REROLL_CHARGES_NEEDED
+
+func spend_reroll_charges():
+	save_data["reroll_charges"] = 0
+	save_data["eggs_rerolled"] = false
+	save_game()
+
+func set_starter_eggs(eggs: Array):
+	save_data["starter_eggs"] = eggs
+	save_game()
+
+func set_biome_path(path: Array, pools: Array):
+	save_data["biome_path"] = path
+	save_data["biome_pools"] = pools
+	save_game()
+
+# Nach Sieg oder Niederlage: der nächste Run würfelt Eier und Biom-Pfad neu
+func clear_run_start():
+	save_data["starter_eggs"] = []
+	save_data["biome_path"] = []
+	save_data["biome_pools"] = []
+	save_game()
 
 func add_catched_monster_mon(monster_name = "1"):
 	if not save_data["catched_monsters"].has(monster_name):

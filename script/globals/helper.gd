@@ -217,6 +217,28 @@ func get_all_owned_monster_names() -> Array:
 		if not all_mons.has(mon_name):
 			all_mons.append(mon_name)
 	return all_mons
+
+# Ei der Start-Auswahl als JSON-taugliche Daten für den Spielstand: Art, gewürfelte Stats, Attacken-Vorschlag
+func egg_to_save(mon: Monster) -> Dictionary:
+	var growth := {}
+	for attr in Growth.ATTRS:
+		growth[attr] = mon._growth[attr]
+	return {
+		"name": mon._name,
+		"best_points": mon._best_points,
+		"growth": growth,
+		"skills": mon._skills.map(func(skill): return skill.name),
+	}
+
+# Gegenstück zu egg_to_save. Stats gelten pro Art, daher zuerst die Art wiederherstellen und dann das Monster erzeugen.
+func mon_from_egg(egg: Dictionary) -> Monster:
+	State.restore_mon_stats(egg.name, int(egg.best_points), egg.growth)
+	var mon := Monster.new(State.INITIAL_LEVEL, Monmap.mon_metainfos_by_name(egg.name))
+	for skill_name in egg.skills:
+		var skill = Skills.get_skill(skill_name)
+		skill.scouted = true
+		mon._skills.append(skill)
+	return mon
 #func balance_growth_rate(max_level) -> Dictionary:
 	
 # send message

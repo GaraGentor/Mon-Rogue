@@ -57,7 +57,7 @@ gradient = SubResource("Gradient_7ag31")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0.196581, 1)
 
-[node name="Control" type="Control" unique_id=114657079 node_paths=PackedStringArray("title_label", "go_button", "info_panel", "biome_path")]
+[node name="Control" type="Control" unique_id=114657079 node_paths=PackedStringArray("title_label", "go_button", "reroll_button", "info_panel", "biome_path")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -69,6 +69,7 @@ size_flags_vertical = 3
 script = ExtResource("1_7et7b")
 title_label = NodePath("Selection/ChatGptImage26_Juni2025,124247/Label")
 go_button = NodePath("Selection/MarginContainer/VBoxContainer/Button2")
+reroll_button = NodePath("Selection/MarginContainer/VBoxContainer/RerollButton")
 info_panel = NodePath("UI/StarterInfoPanel")
 biome_path = NodePath("Selection/BiomePath")
 
@@ -214,6 +215,14 @@ theme_override_font_sizes/font_size = 32
 text = "SELECTION_DRAW_EGG"
 flat = true
 
+[node name="RerollButton" type="Button" parent="Selection/MarginContainer/VBoxContainer" unique_id=1584207361]
+visible = false
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_tpsnj")
+theme_override_font_sizes/font_size = 32
+text = "SELECTION_REROLL_EGGS"
+flat = true
+
 [node name="Button2" type="Button" parent="Selection/MarginContainer/VBoxContainer" unique_id=238439135]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_tpsnj")
@@ -254,4 +263,5 @@ layout_mode = 1
 [connection signal="gui_input" from="Selection/HBoxContainer/ColorRect2/TextureRect2" to="." method="_on_gui_input2"]
 [connection signal="gui_input" from="Selection/HBoxContainer/ColorRect3/TextureRect3" to="." method="_on_gui_input3"]
 [connection signal="pressed" from="Selection/MarginContainer/VBoxContainer/Button" to="." method="_on_pick_egg_button_pressed"]
+[connection signal="pressed" from="Selection/MarginContainer/VBoxContainer/RerollButton" to="." method="_on_reroll_button_pressed"]
 [connection signal="pressed" from="Selection/MarginContainer/VBoxContainer/Button2" to="." method="_on_button_pressed"]
