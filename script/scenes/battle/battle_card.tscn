@@ -5,7 +5,7 @@
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="3_theme"]
 [ext_resource type="Texture2D" uid="uid://bxoeupl6ad2ke" path="res://assets/ui/icons/firework (1).svg" id="4_phys"]
 [ext_resource type="Texture2D" uid="uid://djt3q5aymms0i" path="res://assets/ui/icons/sparkle.svg" id="5_magic"]
-[ext_resource type="Texture2D" uid="uid://cfrcn60nkchoe" path="res://assets/ui/icons/sword.svg" id="6_sword"]
+[ext_resource type="Texture2D" uid="uid://yg6oxnmiu0pd" path="res://assets/ui/icons/fist.svg" id="6_fist"]
 
 [node name="BattleCard" type="PanelContainer" node_paths=PackedStringArray("name_label", "cost_label", "value_label", "type_icon", "description_label")]
 custom_minimum_size = Vector2(150, 0)
@@ -74,11 +74,11 @@ layout_mode = 2
 mouse_filter = 2
 alignment = 1
 
-[node name="SwordIcon" type="TextureRect" parent="MarginContainer/VBoxContainer/BottomRow"]
+[node name="PowerIcon" type="TextureRect" parent="MarginContainer/VBoxContainer/BottomRow"]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 mouse_filter = 2
-texture = ExtResource("6_sword")
+texture = ExtResource("6_fist")
 expand_mode = 1
 stretch_mode = 5
 

@@ -44,9 +44,9 @@ func _init_card() -> void:
 	name_label.text = tr(skill.name)
 	name_label.self_modulate = Helper.color_by_type(skill.nature)
 	cost_label.text = str(skill.cost)
-	value_label.text = str(skill.get("value", skill.get("damage", "")))
+	value_label.text = Helper.format_number(skill.get("value", skill.get("damage", "")))
 	type_icon.texture = physical_texture if skill.damage_type == Enums.SKILL_DAMAGE_TYPE.PHYSICAL else magic_texture
-	description_label.text = tr(skill.description).format(skill)
+	description_label.text = Helper.skill_description(skill)
 	description_label.self_modulate = Color.WHITE
 
 ## Fehlen dem Monster Elemente für diesen Skill oder läuft die Abklingzeit noch,

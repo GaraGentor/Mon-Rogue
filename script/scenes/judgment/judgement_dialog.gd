@@ -150,8 +150,8 @@ func _skill_card(skill: Dictionary, note: String) -> Button:
 	if skill.scouted:
 		stats.text = "{cost}: {c}    {cd}: {d}    {power}: {v}".format({
 			"cost": tr("SKILL_HEADER_COST"), "cd": tr("SKILL_HEADER_CD"), "power": tr("SKILL_HEADER_POWER"),
-			"c": skill.cost, "d": skill.cooldown, "v": skill.value})
-		desc.text = tr(skill.description).format(skill)
+			"c": skill.cost, "d": skill.cooldown, "v": Helper.format_number(skill.value)})
+		desc.text = Helper.skill_description(skill)
 	else:
 		desc.text = tr("BATTLE_UNKNOWN_SKILL_HINT")
 	lines.add_child(stats)

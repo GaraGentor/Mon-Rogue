@@ -185,6 +185,19 @@ func type_name_by_mon(mon: Monster) -> String:
 func color_by_type(type: int) -> Color:
 	return ColorMap.get_combo(type).color
 
+## Zahlen für die Anzeige: ganze Floats ohne ".0" (78.0 -> 78), sonst eine Nachkommastelle
+func format_number(v) -> String:
+	if v is float:
+		return str(roundi(v)) if is_equal_approx(v, roundf(v)) else str(snappedf(v, 0.1))
+	return str(v)
+
+## Skill-Beschreibung mit eingesetzten Werten, Zahlen wie in format_number
+func skill_description(skill: Dictionary) -> String:
+	var values := {}
+	for key in skill:
+		values[key] = format_number(skill[key]) if skill[key] is float else skill[key]
+	return tr(skill.description).format(values)
+
 func between(v, min, max) -> bool:
 	return v >= min and v <= max
 

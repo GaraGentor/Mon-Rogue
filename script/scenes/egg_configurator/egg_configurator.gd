@@ -7,7 +7,13 @@ const SKILLS_TO_PICK := 3
 const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
 const BG := Color(0.0627451, 0.0862745, 0.0823529, 1)
 const BG_TOP := Color(0.560784, 0.301961, 0.85098, 1)
+const LOCKED_COLOR := Color(0.5, 0.5, 0.5)
+const MISSING_COLOR := Color(1, 0.45, 0.45)
 const MAP_BACKGROUND := preload("res://script/scenes/world_map/map_background.gdshader")
+const BATTLE_CARD := preload("res://script/scenes/battle/battle_card.tscn")
+const PHYSICAL_TEXTURE := preload("res://assets/ui/icons/firework (1).svg")
+const MAGIC_TEXTURE := preload("res://assets/ui/icons/sparkle.svg")
+const POWER_TEXTURE := preload("res://assets/ui/icons/fist.svg")
 
 @export var font: Font
 
@@ -16,6 +22,10 @@ var _selected: Array[String] = []
 var _cards := {}
 var _counter_label: Label
 var _go_button: Button
+## Spielkarte der zuletzt angeklickten Attacke, wie sie im Kampf aussieht
+var _detail_card: Control
+## Hinweis unter der Karte: wie man sie freischaltet oder welche Elemente fehlen
+var _detail_note: Label
 
 func _ready() -> void:
 	_mon = State.mons[0]
@@ -58,19 +68,31 @@ func _build() -> void:
 	content.add_theme_constant_override("separation", 40)
 	root.add_child(content)
 
-	# links: das gewählte Monster
+	# links: oben das gewählte Monster, darunter die Karte der angeklickten Attacke
 	var mon_box := VBoxContainer.new()
 	mon_box.custom_minimum_size = Vector2(300, 0)
-	mon_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	mon_box.add_theme_constant_override("separation", 4)
 	content.add_child(mon_box)
 	var texture := TextureRect.new()
 	Monmap.show_on(texture, _mon._name, Monmap.MEDIUM)
-	texture.custom_minimum_size = Vector2(260, 260)
+	texture.custom_minimum_size = Vector2(120, 120)
 	texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	mon_box.add_child(texture)
-	mon_box.add_child(_label(Helper.mon_display_name(_mon._name), 28, Helper.color_by_mon(_mon)))
-	mon_box.add_child(_label(tr(Helper.type_name_by_mon(_mon)), 18, Color(1, 1, 1, 0.6)))
+	mon_box.add_child(_label(Helper.mon_display_name(_mon._name), 26, Helper.color_by_mon(_mon)))
+	mon_box.add_child(_label(tr(Helper.type_name_by_mon(_mon)), 16, Color(1, 1, 1, 0.6)))
+
+	_detail_card = BATTLE_CARD.instantiate()
+	_detail_card.custom_minimum_size = Vector2(220, 200)
+	_detail_card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_detail_card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	_detail_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_detail_card.visible = false
+	mon_box.add_child(_detail_card)
+	_detail_note = _label(tr("CONFIGURATOR_PICK_HINT"), 14, Color(1, 1, 1, 0.6))
+	_detail_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_detail_note.custom_minimum_size = Vector2(300, 0)
+	mon_box.add_child(_detail_note)
 
 	# rechts: verfügbare und noch gesperrte Ei-Attacken
 	var scroll := ScrollContainer.new()
@@ -86,15 +108,15 @@ func _build() -> void:
 
 	for skill_name in Skills.get_available_egg_skills(_mon._name):
 		var card := _create_card(Skills.get_skill(skill_name), false)
-		card.pressed.connect(_toggle.bind(skill_name))
+		card.pressed.connect(_on_card_pressed.bind(skill_name))
 		_cards[skill_name] = card
 		grid.add_child(card)
 	for skill_name in Skills.get_locked_egg_skills(_mon._name):
-		grid.add_child(_create_card(Skills.get_skill(skill_name), true))
+		_add_locked_card(grid, Skills.get_skill(skill_name), "CONFIGURATOR_LOCKED", "EGG_SKILL_HINT")
 	for milestone in Skills.get_locked_milestones(_mon._name):
-		grid.add_child(_create_card(Skills.get_skill(milestone.skill), true, "CONFIGURATOR_LOCKED_MILESTONE", milestone.hint))
+		_add_locked_card(grid, Skills.get_skill(milestone.skill), "CONFIGURATOR_LOCKED_MILESTONE", milestone.hint)
 	for bounty in Skills.get_locked_bounties(_mon._name):
-		grid.add_child(_create_card(Skills.get_skill(bounty.skill), true, "CONFIGURATOR_LOCKED_BOUNTY", bounty.hint))
+		_add_locked_card(grid, Skills.get_skill(bounty.skill), "CONFIGURATOR_LOCKED_BOUNTY", bounty.hint)
 
 	# unten: Zähler und Aufbrechen
 	var footer := HBoxContainer.new()
@@ -112,51 +134,88 @@ func _build() -> void:
 	_go_button.pressed.connect(_on_go_pressed)
 	footer.add_child(_go_button)
 
-func _create_card(skill: Dictionary, locked: bool, locked_label := "CONFIGURATOR_LOCKED", hint := "EGG_SKILL_HINT") -> Button:
+func _add_locked_card(grid: GridContainer, skill: Dictionary, locked_label: String, hint: String) -> void:
+	var card := _create_card(skill, true, locked_label)
+	card.pressed.connect(_show_detail.bind(skill, tr(locked_label) + "\n" + tr(hint), GOLD, true))
+	grid.add_child(card)
+
+func _create_card(skill: Dictionary, locked: bool, locked_label := "") -> Button:
 	var color := Helper.color_by_type(skill.nature)
 	var card := Button.new()
-	card.custom_minimum_size = Vector2(0, 110)
+	card.custom_minimum_size = Vector2(0, 118)
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	card.toggle_mode = not locked
-	card.disabled = locked
 	card.focus_mode = Control.FOCUS_NONE
-	card.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	card.add_theme_font_size_override("font_size", 18)
-	if font:
-		card.add_theme_font_override("font", font)
 
-	var damage_type := tr("CONFIGURATOR_PHYSICAL") if skill.damage_type == Enums.SKILL_DAMAGE_TYPE.PHYSICAL else tr("CONFIGURATOR_ABILITY")
-	var lines := [
-		tr(skill.name),
-		tr("CONFIGURATOR_SKILL_STATS").format({"cost": skill.cost, "cooldown": skill.cooldown, "value": int(skill.value), "type": damage_type}),
-		tr("CONFIGURATOR_TIER").format({"tier": skill.tier}),
-	]
 	if locked:
-		lines[2] = tr(locked_label)
-	elif not Skills.can_use(_mon, skill):
-		# wählbar, aber erst spielbar, wenn das Monster die fehlenden Elemente bekommt (z. B. im Shop)
-		lines.append(Skills.missing_elements_text(_mon, skill))
-	card.text = "\n".join(PackedStringArray(lines))
-	card.tooltip_text = tr(skill.description).format(skill)
-	if locked:
-		card.tooltip_text += "\n" + tr(hint)
+		var style := _card_style(Color(0.4, 0.4, 0.4), Color(BG, 0.6), 2)
+		card.add_theme_stylebox_override("normal", style)
+		card.add_theme_stylebox_override("hover", _card_style(Color(0.6, 0.6, 0.6), Color(BG.lightened(0.08), 0.7), 2))
+		card.add_theme_stylebox_override("pressed", style)
+	else:
+		var pressed := _card_style(GOLD, Color(color.darkened(0.55), 1.0), 4)
+		card.add_theme_stylebox_override("normal", _card_style(color, Color(BG.lightened(0.05), 0.95), 2))
+		card.add_theme_stylebox_override("hover", _card_style(color.lightened(0.2), Color(BG.lightened(0.12), 0.95), 2))
+		card.add_theme_stylebox_override("pressed", pressed)
+		card.add_theme_stylebox_override("hover_pressed", pressed)
 
-	var normal := _card_style(color, Color(BG.lightened(0.05), 0.95), 2)
-	var hover := _card_style(color.lightened(0.2), Color(BG.lightened(0.12), 0.95), 2)
-	var pressed := _card_style(GOLD, Color(color.darkened(0.55), 1.0), 4)
-	var disabled := _card_style(Color(0.4, 0.4, 0.4), Color(BG, 0.6), 2)
-	card.add_theme_stylebox_override("normal", normal)
-	card.add_theme_stylebox_override("hover", hover)
-	card.add_theme_stylebox_override("pressed", pressed)
-	card.add_theme_stylebox_override("hover_pressed", pressed)
-	card.add_theme_stylebox_override("disabled", disabled)
-	card.add_theme_color_override("font_color", color.lightened(0.3))
-	card.add_theme_color_override("font_hover_color", color.lightened(0.4))
-	card.add_theme_color_override("font_pressed_color", Color.WHITE)
-	card.add_theme_color_override("font_hover_pressed_color", Color.WHITE)
-	card.add_theme_color_override("font_disabled_color", Color(0.5, 0.5, 0.5))
+	# Inhalt als eigene Controls, damit Schadensart und Stärke als Icons erscheinen
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_theme_constant_override("margin_left", 14)
+	margin.add_theme_constant_override("margin_right", 14)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_bottom", 10)
+	card.add_child(margin)
+	var lines := VBoxContainer.new()
+	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lines.alignment = BoxContainer.ALIGNMENT_CENTER
+	lines.add_theme_constant_override("separation", 4)
+	margin.add_child(lines)
+
+	var tint := LOCKED_COLOR if locked else Color.WHITE
+	var name_row := HBoxContainer.new()
+	name_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lines.add_child(name_row)
+	var name_label := _card_label(tr(skill.name), 18, LOCKED_COLOR if locked else color.lightened(0.3))
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	name_row.add_child(name_label)
+	name_row.add_child(_icon(PHYSICAL_TEXTURE if Skills.is_physical(skill) else MAGIC_TEXTURE, 20, tint))
+
+	var stats_row := HBoxContainer.new()
+	stats_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stats_row.add_theme_constant_override("separation", 6)
+	lines.add_child(stats_row)
+	stats_row.add_child(_card_label(tr("CONFIGURATOR_SKILL_STATS").format({"cost": skill.cost, "cooldown": skill.cooldown}), 16, tint))
+	stats_row.add_child(_icon(POWER_TEXTURE, 18, tint))
+	stats_row.add_child(_card_label(Helper.format_number(skill.value), 16, tint))
+
+	if locked:
+		lines.add_child(_card_label(tr(locked_label), 15, LOCKED_COLOR))
+	else:
+		lines.add_child(_card_label(tr("CONFIGURATOR_TIER").format({"tier": skill.tier}), 15, Color(1, 1, 1, 0.6)))
+		if not Skills.can_use(_mon, skill):
+			# wählbar, aber erst spielbar, wenn das Monster die fehlenden Elemente bekommt (z. B. im Shop)
+			lines.add_child(_card_label(Skills.missing_elements_text(_mon, skill), 14, MISSING_COLOR))
 	return card
+
+func _card_label(text: String, font_size: int, color: Color) -> Label:
+	var label := _label(text, font_size, color)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	return label
+
+func _icon(texture: Texture2D, icon_size: int, color: Color) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.texture = texture
+	icon.custom_minimum_size = Vector2(icon_size, icon_size)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.modulate = color
+	return icon
 
 func _card_style(border: Color, bg: Color, border_width: int) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -177,6 +236,18 @@ func _label(text: String, font_size: int, color: Color) -> Label:
 	if font:
 		label.add_theme_font_override("font", font)
 	return label
+
+func _show_detail(skill: Dictionary, note: String, note_color: Color, locked: bool) -> void:
+	_detail_card.skill = skill
+	_detail_card.modulate = Color(0.6, 0.6, 0.6) if locked else Color.WHITE
+	_detail_card.visible = true
+	_detail_note.text = note
+	_detail_note.add_theme_color_override("font_color", note_color)
+
+func _on_card_pressed(skill_name: String) -> void:
+	_toggle(skill_name)
+	var skill := Skills.get_skill(skill_name)
+	_show_detail(skill, Skills.missing_elements_text(_mon, skill), MISSING_COLOR, false)
 
 func _toggle(skill_name: String) -> void:
 	if _selected.has(skill_name):

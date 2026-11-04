@@ -11,12 +11,11 @@ BIOME_DEPTH,Depth {depth},Tiefe {depth}
 CONFIGURATOR_TITLE,Choose 3 egg moves for your journey,Wähle 3 Ei-Attacken für deine Reise
 CONFIGURATOR_GO,Set off...,Aufbrechen...
 CONFIGURATOR_COUNTER,{count}/{max} selected,{count}/{max} gewählt
-CONFIGURATOR_SKILL_STATS,Cost {cost} · CD {cooldown} · Power {value} · {type},Kosten {cost} · CD {cooldown} · Stärke {value} · {type}
+CONFIGURATOR_SKILL_STATS,Cost {cost} · CD {cooldown} ·,Kosten {cost} · CD {cooldown} ·
 CONFIGURATOR_TIER,Tier {tier},Stufe {tier}
 CONFIGURATOR_LOCKED,Locked (catch & sacrifice),Gesperrt (fangen & opfern)
 CONFIGURATOR_LOCKED_MILESTONE,Locked (milestone),Gesperrt (Meilenstein)
-CONFIGURATOR_PHYSICAL,physical,physisch
-CONFIGURATOR_ABILITY,magical,magisch
+CONFIGURATOR_PICK_HINT,Tap a move to see its card,Tippe auf eine Attacke für ihre Karte
 EGG_SKILL_TAG,{skill} (Egg),{skill} (Ei)
 EGG_SKILL_HINT,"Egg move: catch this monster and sacrifice it to unlock this move permanently","Ei-Attacke: Fange dieses Monster und opfere es, um die Attacke dauerhaft freizuschalten"
 EGG_SKILL_UNLOCKED,{skill} unlocked for {mon}!,{skill} für {mon} freigeschaltet!

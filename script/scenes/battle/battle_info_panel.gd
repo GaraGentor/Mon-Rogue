@@ -117,7 +117,7 @@ func _build_skill_list() -> void:
 					_show_skill_info(skill))
 		skill_grid.add_child(skill_name)
 		for value in [skill.cost, skill.cooldown, skill.get("value", skill.get("damage", ""))]:
-			skill_grid.add_child(_label(str(value) if known else "?"))
+			skill_grid.add_child(_label(Helper.format_number(value) if known else "?"))
 
 func _label(text: String, color: Color = Color.WHITE) -> Label:
 	var label := Label.new()

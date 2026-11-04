@@ -22,7 +22,8 @@ Tasks:
 	> Mehr Skills
 		> Skill-System mit Effekt-Bausteinen, Synergien und Passiven (siehe skill_system_idee.txt)
 	> KI ist noch zu blöd
-	> 
+	> EI Attacke für das erste mal Chaos erreicht
+	> Direkte Wirkung anzeigen der Skills
 	> Status Effekte
 
 	> Relics
