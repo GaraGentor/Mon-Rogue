@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://script/ui/moves_badge/moves_badge.gd" id="1_badge"]
-[ext_resource type="Material" path="res://script/ui/moves_badge/moves_particles.tres" id="2_particles"]
+[ext_resource type="PackedScene" path="res://script/ui/moves_badge/moves_particles_view.tscn" id="2_particles"]
 
 [node name="MovesBadge" type="Control" node_paths=PackedStringArray("label", "particles")]
 custom_minimum_size = Vector2(40, 32)
@@ -14,13 +14,8 @@ script = ExtResource("1_badge")
 label = NodePath("Label")
 particles = NodePath("Particles")
 
-[node name="Particles" type="GPUParticles2D" parent="."]
-amount = 26
-trail_enabled = true
-trail_lifetime = 0.55
-trail_sections = 6
-trail_section_subdivisions = 2
-process_material = ExtResource("2_particles")
+[node name="Particles" parent="." instance=ExtResource("2_particles")]
+layout_mode = 0
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 1

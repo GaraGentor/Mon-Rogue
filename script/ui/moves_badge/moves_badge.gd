@@ -3,7 +3,7 @@ extends Control
 ## Züge-Zahl mit den gleichen Partikeln wie über eigenen Monstern im Kampf (monster_scene).
 
 @export var label: Label
-@export var particles: GPUParticles2D
+@export var particles: MovesParticlesView
 
 func _ready() -> void:
 	resized.connect(_center)
@@ -22,4 +22,4 @@ func set_moves(moves: int, max_moves: int) -> void:
 	tween.tween_property(self, "modulate", Color.WHITE, 0.35)
 
 func _center() -> void:
-	particles.position = size / 2
+	particles.center_on(size / 2)

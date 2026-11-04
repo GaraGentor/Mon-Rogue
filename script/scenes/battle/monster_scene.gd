@@ -19,7 +19,7 @@ var mon: Monster
 ## Absichten, eine Zeile pro Zug, unter dem Status
 @export var intent_box: VBoxContainer
 ## Partikel hinter der Züge-Zahl eigener Monster, laufen nur solange noch Züge übrig sind
-@export var moves_particles: GPUParticles2D
+@export var moves_particles: MovesParticlesView
 
 @export var is_healing: bool
 
@@ -217,7 +217,7 @@ func _place_moves_label() -> void:
 	_moves_label.size = _moves_label.get_combined_minimum_size()
 	_moves_label.position = _texture_offset() + Vector2((texture_rect.size.x - _moves_label.size.x) / 2, -_moves_label.size.y * 0.3)
 	if moves_particles:
-		moves_particles.position = _moves_label.position + _moves_label.size / 2
+		moves_particles.center_on(_moves_label.position + _moves_label.size / 2)
 
 func printStuff() -> void:
 	if mon:

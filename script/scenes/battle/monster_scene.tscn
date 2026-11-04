@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://cc0iba7o70h8m" path="res://assets/mons/4/4_front.png" id="1_oxh2b"]
 [ext_resource type="Script" uid="uid://0mkejswpipjh" path="res://script/scenes/battle/monster_scene.gd" id="1_qfx22"]
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="2_theme"]
-[ext_resource type="Material" path="res://script/ui/moves_badge/moves_particles.tres" id="3_moves"]
+[ext_resource type="PackedScene" path="res://script/ui/moves_badge/moves_particles_view.tscn" id="3_moves"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
 bg_color = Color(0.75, 0.1, 0.1, 1)
@@ -131,14 +131,9 @@ texture = ExtResource("1_oxh2b")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MovesParticles" type="GPUParticles2D" parent="." unique_id=2143914963]
+[node name="MovesParticles" parent="." unique_id=2143914963 instance=ExtResource("3_moves")]
 visible = false
 z_index = 5
-amount = 26
-trail_enabled = true
-trail_lifetime = 0.55
-trail_sections = 6
-trail_section_subdivisions = 2
-process_material = ExtResource("3_moves")
+layout_mode = 0
 
 [connection signal="gui_input" from="." to="." method="_on_gui_input"]
