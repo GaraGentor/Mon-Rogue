@@ -129,7 +129,7 @@ func _create_card(skill: Dictionary, locked: bool, locked_label := "CONFIGURATOR
 	var damage_type := tr("CONFIGURATOR_PHYSICAL") if skill.damage_type == Enums.SKILL_DAMAGE_TYPE.PHYSICAL else tr("CONFIGURATOR_ABILITY")
 	var lines := [
 		tr(skill.name),
-		tr("CONFIGURATOR_SKILL_STATS").format({"cost": skill.cost, "value": int(skill.value), "type": damage_type}),
+		tr("CONFIGURATOR_SKILL_STATS").format({"cost": skill.cost, "cooldown": skill.cooldown, "value": int(skill.value), "type": damage_type}),
 		tr("CONFIGURATOR_TIER").format({"tier": skill.tier}),
 	]
 	if locked:

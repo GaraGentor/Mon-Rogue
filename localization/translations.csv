@@ -11,7 +11,7 @@ BIOME_DEPTH,Depth {depth},Tiefe {depth}
 CONFIGURATOR_TITLE,Choose 3 egg moves for your journey,Wähle 3 Ei-Attacken für deine Reise
 CONFIGURATOR_GO,Set off...,Aufbrechen...
 CONFIGURATOR_COUNTER,{count}/{max} selected,{count}/{max} gewählt
-CONFIGURATOR_SKILL_STATS,Cost {cost} · Power {value} · {type},Kosten {cost} · Stärke {value} · {type}
+CONFIGURATOR_SKILL_STATS,Cost {cost} · CD {cooldown} · Power {value} · {type},Kosten {cost} · CD {cooldown} · Stärke {value} · {type}
 CONFIGURATOR_TIER,Tier {tier},Stufe {tier}
 CONFIGURATOR_LOCKED,Locked (catch & sacrifice),Gesperrt (fangen & opfern)
 CONFIGURATOR_LOCKED_MILESTONE,Locked (milestone),Gesperrt (Meilenstein)
