@@ -20,6 +20,10 @@ const TARGET_SIZE := Vector2(120, 150)
 const TARGET_COLUMNS := 2
 ## Tasche im Szenen-Layout (use_scene_layout)
 const BAG_FILL_SIZE := Vector2(220, 260)
+## Monster im Szenen-Layout: feste Größe, zwei passen untereinander
+const MON_FILL_SIZE := Vector2(220, 225)
+## so weit darf sich die Maus bei einem Klick auf eine Karte bewegen, sonst ist es ein Ziehen
+const CLICK_MAX_MOVE := 10.0
 const BOX = preload("res://script/ui/materials/monster_widget_boxes.tres")
 const LABEL_THEME = preload("res://script/ui/materials/battle_labels.tres")
 const BAG_ICON = preload("res://assets/ui/icons/bag.svg")
@@ -36,6 +40,17 @@ class RewardCard extends PanelContainer:
 	## Titel und Beschreibung, Unterklassen können dazwischen etwas einfügen (insert_detail)
 	var info: VBoxContainer
 	var sold := false
+	## optional: wird beim Klick ohne Ziehen aufgerufen (Trainer: Skill-Details)
+	var on_click: Callable
+	var _press_pos := Vector2.ZERO
+
+	func _gui_input(event: InputEvent) -> void:
+		if not on_click.is_valid() or not event is InputEventMouseButton or event.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if event.pressed:
+			_press_pos = event.position
+		elif event.position.distance_to(_press_pos) < CLICK_MAX_MOVE:
+			on_click.call()
 
 	## Zeile direkt unter dem Titel, z. B. der Preis im Shop
 	func insert_detail(control: Control) -> void:
@@ -345,13 +360,14 @@ func _show_targets(card: RewardCard) -> void:
 ## Ziele der Karte anlegen: die Tasche oder die Monster aus drag.mons
 func _build_targets(card: RewardCard) -> void:
 	_clear_targets()
+	if _fill_targets:
+		# Ziele mittig im Platz unter der Überschrift, nicht gestreckt
+		_target_grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_target_grid.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
 	if card.drag.get("bag", false):
 		_target_grid.columns = 1
 		_add_target(tr("REWARD_BAG"), texture_icon(BAG_ICON), null)
 		if _fill_targets:
-			# Tasche mittig im Platz unter der Überschrift, nicht gestreckt
-			_target_grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-			_target_grid.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
 			_target_grid.get_child(0).custom_minimum_size = BAG_FILL_SIZE
 		return
 	var mons: Array = card.drag.mons.call() if card.drag.mons is Callable else card.drag.mons
@@ -365,12 +381,10 @@ func _build_targets(card: RewardCard) -> void:
 		var target_title: String = title_of.call(mon) if title_of.is_valid() else Helper.mon_display_name(mon_name(mon))
 		_add_target(target_title, mon_icon(mon), mon, can_drop.is_valid() and not can_drop.call(mon))
 	if _fill_targets:
-		# Monster übereinander, zusammen so groß wie die ganze rechte Seite
-		_target_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		_target_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		# Monster untereinander in fester Größe und ohne Box, egal ob eins oder zwei da sind
 		for target: Control in _target_grid.get_children():
-			target.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			target.size_flags_vertical = Control.SIZE_EXPAND_FILL
+			target.custom_minimum_size = MON_FILL_SIZE
+			target.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 
 func _hide_targets() -> void:
 	_clear_targets()

@@ -16,6 +16,8 @@ var _ep: int = 5
 var _upgrades: int = 0
 # Key aus Skills.BOUNTIES, wenn dieses wilde Monster ein Kopfgeld-Monster ist, sonst ""
 var _bounty: String = ""
+# Gegner aus einem Boss-Kampf (Biom-Boss oder Boss-Feld)
+var _is_boss: bool = false
 # Monster, das zuletzt Schaden verursacht hat (entscheidet, wer ein Kopfgeld bekommt)
 var _last_hit_by: Monster
 var _lost_hp: float = 0:

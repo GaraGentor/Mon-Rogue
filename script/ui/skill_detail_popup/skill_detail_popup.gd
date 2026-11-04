@@ -6,6 +6,7 @@ extends PanelContainer
 ## Liegt per top_level frei über der Szene, der Host hängt es nur als Kind an.
 
 const BATTLE_CARD := preload("res://script/scenes/battle/battle_card.tscn")
+const BOX := preload("res://script/ui/materials/monster_widget_boxes.tres")
 const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
 const MISSING_COLOR := Color(1, 0.45, 0.45)
 const WIDTH := 300.0
@@ -24,11 +25,8 @@ func _init() -> void:
 	z_index = 10
 	visible = false
 	custom_minimum_size = Vector2(WIDTH, 0)
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.08, 0.08, 0.08, 0.97)
-	style.border_color = GOLD
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(8)
+	# gleicher Rahmen wie alle anderen Boxen
+	var style := BOX.duplicate() as StyleBoxFlat
 	style.set_content_margin_all(16)
 	add_theme_stylebox_override("panel", style)
 	# umbrechende Labels kennen ihre Höhe erst nach dem Layout, dann nochmal auf den Inhalt schrumpfen
@@ -56,8 +54,6 @@ func _init() -> void:
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	close.focus_mode = Control.FOCUS_NONE
 	close.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	close.add_theme_color_override("font_color", GOLD)
-	close.add_theme_color_override("font_hover_color", Color(1, 0.85, 0.55))
 	for state in ["normal", "hover", "pressed"]:
 		close.add_theme_stylebox_override(state, load("res://script/ui/materials/info_button_%s.tres" % state))
 	close.pressed.connect(hide_popup)

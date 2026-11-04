@@ -275,6 +275,7 @@ func _generate_battle():
 			ms[0] = Helper.generate_mons({"count": 1, "bounty": bounty})[0]
 	# nie unter der Startstufe des eigenen Teams
 	for mon in ms:
+		mon._is_boss = is_boss_battle
 		mon._level = maxi(State.INITIAL_LEVEL, level + randi_range(encounter.offset[0], encounter.offset[1]))
 		if mon._bounty != "":
 			mon._level += Skills.get_bounty(mon._bounty).level_bonus

@@ -28,7 +28,7 @@ element_chip = NodePath("MarginContainer/VBoxContainer/TypeRow/ElementChip")
 rarity_chip = NodePath("MarginContainer/VBoxContainer/TypeRow/RarityChip")
 stats_grid = NodePath("MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsGrid")
 skill_grid = NodePath("MarginContainer/VBoxContainer/SkillPanel/ScrollContainer/MarginContainer/SkillGrid")
-skill_info_container = NodePath("MarginContainer/VBoxContainer/SkillPanel/SkillInfoScrollContainer")
+skill_info_container = NodePath("MarginContainer/VBoxContainer/SkillPanel/SkillInfo")
 physical_texture = ExtResource("7_phys")
 magic_texture = ExtResource("8_magic")
 
@@ -132,7 +132,7 @@ theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 8
 columns = 5
 
-[node name="SkillInfoScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/SkillPanel" node_paths=PackedStringArray("skill_name", "skill_description")]
+[node name="SkillInfo" type="PanelContainer" parent="MarginContainer/VBoxContainer/SkillPanel" node_paths=PackedStringArray("skill_name", "skill_description")]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -142,39 +142,45 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_box")
 script = ExtResource("6_skillinfo")
-skill_name = NodePath("MarginContainer/VBoxContainer/SkillName")
-skill_description = NodePath("MarginContainer/VBoxContainer/SkillDescription")
+skill_name = NodePath("MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/SkillName")
+skill_description = NodePath("MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/SkillDescription")
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfoScrollContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfo"]
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_bottom = 12
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfoScrollContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfo/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfo/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfo/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SkillName" type="Label" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfo/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="SkillName" type="Label" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfoScrollContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="SkillDescription" type="Label" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfoScrollContainer/MarginContainer/VBoxContainer"]
+[node name="SkillDescription" type="Label" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfo/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 autowrap_mode = 3
 
-[node name="CloseInfoButton" type="Button" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfoScrollContainer/MarginContainer/VBoxContainer"]
+[node name="CloseInfoButton" type="Button" parent="MarginContainer/VBoxContainer/SkillPanel/SkillInfo/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
-theme_override_colors/font_hover_color = Color(1, 0.85, 0.55, 1)
 theme_override_styles/normal = ExtResource("12_btn_normal")
 theme_override_styles/hover = ExtResource("13_btn_hover")
 theme_override_styles/pressed = ExtResource("14_btn_pressed")
 text = "MONSTER_CLOSE_INFO"
 
-[connection signal="pressed" from="MarginContainer/VBoxContainer/SkillPanel/SkillInfoScrollContainer/MarginContainer/VBoxContainer/CloseInfoButton" to="MarginContainer/VBoxContainer/SkillPanel/SkillInfoScrollContainer" method="_on_close_info_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/SkillPanel/SkillInfo/MarginContainer/VBoxContainer/CloseInfoButton" to="MarginContainer/VBoxContainer/SkillPanel/SkillInfo" method="_on_close_info_button_pressed"]

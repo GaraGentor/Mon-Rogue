@@ -1,11 +1,10 @@
 extends Control
 
-@export var ms1: Control
-@export var ms2: Control
+const CAMP_MONSTER = preload("res://script/scenes/heal_camp/camp_monster.tscn")
+
+@export var monster_row: HBoxContainer
 
 @export var button: Button
-
-@export var second_monster_panel: Panel
 
 var debug = false
 
@@ -17,13 +16,10 @@ func _enter_tree() -> void:
 		#var mon2:Monster = Helper.generate_mons({"count": 1, "level": randi_range(10,30)})[0]
 		#mon2._lost_hp = mon2.hp() / 1.5
 		#State.mons.append(mon2)
-	if State.mons.size() == 1:
-		second_monster_panel.visible = false
 
 func _play() -> void:
-	_heal_mon(State.mons[0])
-	if State.mons.size() > 1:
-		_heal_mon(State.mons[1])
+	for mon in State.mons:
+		_heal_mon(mon)
 
 func _heal_mon(mon: Monster) -> void:
 	var h_to_heal = mon.hp() / 2
@@ -32,6 +28,10 @@ func _heal_mon(mon: Monster) -> void:
 	button.disabled = false
 
 func _ready() -> void:
+	for mon in State.mons:
+		var camp_monster := CAMP_MONSTER.instantiate()
+		camp_monster.mon = mon
+		monster_row.add_child(camp_monster)
 	visible = true
 
 func _on_ok_button_pressed() -> void:

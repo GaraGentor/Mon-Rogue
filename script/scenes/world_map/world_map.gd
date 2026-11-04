@@ -34,6 +34,8 @@ const HUB_CAMP := preload("res://script/scenes/hub_camp/hub_camp.gd")
 
 @export var view_container: Panel
 
+@onready var map_ui: Control = $HBoxContainer
+
 var tweens = []
 
 # Felder unter der aktuellen Position sind abgehakt und werden blass
@@ -41,6 +43,9 @@ const PASSED_MODULATE := Color(0.45, 0.45, 0.45, 0.8)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# bis die Karte steht unsichtbar: sonst blitzt einen Frame lang der Boss oben auf der noch
+	# ungescrollten Karte auf, auch wenn gleich zu Level-Up oder Boss-Belohnung weitergeleitet wird
+	map_ui.modulate.a = 0.0
 	State.ep_changed.connect(change_ep_text)
 	State.boss_shards_changed.connect(monster_shard_changed)
 	State.pos_changed.connect(change_position)
@@ -64,6 +69,7 @@ func _ready() -> void:
 	set_map()
 	# Fahrt von oben nach unten nur bei Run-Start oder neuem Biom, sonst direkt an die alte Stelle
 	scroll_container_to_bottom(State.current_map_position == State.NO_MAP_POSITION)
+	map_ui.modulate.a = 1.0
 	if State.current_map_position == State.NO_MAP_POSITION:
 		change_position(Vector3.ZERO, true)
 	else:

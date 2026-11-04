@@ -68,9 +68,6 @@ func _gui_input(event: InputEvent) -> void:
 			_swiping = false
 			_press_pos = event.global_position
 		else:
-			# kurzer Tap ohne Bewegung zeigt die Skill-Info
-			if _pressed and not _swiping:
-				Events.skill_label_pressed.emit(skill)
 			_pressed = false
 			_swiping = false
 		accept_event()

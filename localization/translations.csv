@@ -498,3 +498,4 @@ EGG_CATEGORY_MAGIC,Magical,Magisch
 EGG_CATEGORY_SHIELD,Shield,Schild
 EGG_CATEGORY_BUFF,Buff,Buff
 EGG_CATEGORY_PASSIVE,Passive,Passiv
+BOSS_REWARD_SHARD_AMOUNT,+{amount} Boss Shard,+{amount} Boss-Splitter

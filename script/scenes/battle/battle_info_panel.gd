@@ -17,7 +17,7 @@ const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 @export var moves_badge: Control
 @export var stats_grid: GridContainer
 @export var skill_grid: GridContainer
-@export var skill_info_container: ScrollContainer
+@export var skill_info_container: Control
 
 @export var physical_texture: Texture2D
 @export var magic_texture: Texture2D
@@ -34,12 +34,6 @@ var monster: Monster:
 	set(mon):
 		monster = mon
 		refresh()
-
-func _ready() -> void:
-	Events.skill_label_pressed.connect(_show_skill_info)
-
-func _exit_tree() -> void:
-	Events.skill_label_pressed.disconnect(_show_skill_info)
 
 func refresh() -> void:
 	if monster == null:
@@ -90,7 +84,7 @@ func _clear_skill_grid(columns: int) -> void:
 		c.queue_free()
 	skill_grid.columns = columns
 
-## Pro Kategorie: freigeschaltete / alle Ei-Attacken der Art, gesperrte Kategorien grau.
+## Pro Kategorie: freigeschaltete / alle Ei-Attacken der Art in Weiß, gesperrte Kategorien grau.
 ## Ein Klick auf eine Kategorie listet ihre Attacken im Info-Fenster.
 func _build_egg_skill_overview() -> void:
 	# eine Spalte: oben die Überschrift über die ganze Breite, darunter eine Zeile pro Kategorie
@@ -114,7 +108,7 @@ func _build_egg_skill_overview() -> void:
 			continue
 		var entry: Dictionary = by_category[category.key]
 		entry["hints"] = egg_skills.hints
-		var color := EGG_SKILL_COLOR if entry.available.size() > 0 else EGG_LOCKED_COLOR
+		var color := Color.WHITE if entry.available.size() > 0 else EGG_LOCKED_COLOR
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
 		row.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -144,7 +138,8 @@ func _build_egg_skill_overview() -> void:
 func _show_egg_category_info(category: Dictionary, entry: Dictionary) -> void:
 	if _egg_skill_list == null:
 		_egg_skill_list = VBoxContainer.new()
-		_egg_skill_list.add_theme_constant_override("separation", 6)
+		# Abstand zwischen den Blöcken "Freigeschaltet" und "Gesperrt"
+		_egg_skill_list.add_theme_constant_override("separation", EGG_GROUP_SEPARATION)
 		var info_box: Node = skill_info_container.skill_description.get_parent()
 		info_box.add_child(_egg_skill_list)
 		info_box.move_child(_egg_skill_list, skill_info_container.skill_description.get_index() + 1)
@@ -153,18 +148,20 @@ func _show_egg_category_info(category: Dictionary, entry: Dictionary) -> void:
 	for group in [["EGG_OVERVIEW_UNLOCKED", entry.available, false], ["EGG_OVERVIEW_LOCKED", entry.locked, true]]:
 		if group[1].is_empty():
 			continue
+		var group_box := VBoxContainer.new()
+		group_box.add_theme_constant_override("separation", 4)
+		_egg_skill_list.add_child(group_box)
 		var group_label := _label(tr(group[0]), Color(0.7, 0.7, 0.7))
 		group_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		group_label.add_theme_font_size_override("font_size", 15)
-		_egg_skill_list.add_child(group_label)
-		var flow := HFlowContainer.new()
-		flow.add_theme_constant_override("h_separation", 14)
-		flow.add_theme_constant_override("v_separation", 4)
-		_egg_skill_list.add_child(flow)
+		group_box.add_child(group_label)
 		for skill_name in group[1]:
 			var skill := Skills.get_skill(skill_name)
 			var locked: bool = group[2]
 			var skill_label := _label(tr(skill_name), Helper.color_by_type(skill.nature))
+			skill_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			# lange Namen brechen um, statt aus der Box zu laufen
+			skill_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			if locked:
 				skill_label.modulate = Color(1, 1, 1, 0.55)
 			skill_label.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -172,9 +169,10 @@ func _show_egg_category_info(category: Dictionary, entry: Dictionary) -> void:
 			skill_label.gui_input.connect(func(event: InputEvent):
 				if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 					_show_egg_skill_detail(skill, entry.hints.get(skill_name, [])))
-			flow.add_child(skill_label)
+			group_box.add_child(skill_label)
 	skill_info_container.skill_name.text = tr(category.label)
 	skill_info_container.skill_name.self_modulate = EGG_SKILL_COLOR
+	skill_info_container.skill_name.add_theme_font_size_override("font_size", SKILL_FONT_SIZE)
 	skill_info_container.skill_description.visible = false
 	_egg_skill_list.visible = true
 	skill_info_container.visible = true
@@ -183,6 +181,8 @@ func _show_egg_category_info(category: Dictionary, entry: Dictionary) -> void:
 # Details eines Skills im Popup neben dem Panel (SkillDetailPopup): Ei-Attacken der Auswahl und Skills im Kampf.
 
 const EGG_CATEGORY_FONT_SIZE := 20
+const EGG_GROUP_SEPARATION := 20
+const SKILL_FONT_SIZE := 18
 
 var _egg_skill_list: VBoxContainer
 var _detail_popup: SkillDetailPopup
@@ -199,13 +199,6 @@ func _popup() -> SkillDetailPopup:
 			if not skill_info_container.visible:
 				_detail_popup.hide_popup())
 	return _detail_popup
-
-## Monster, zu dem ein Skill gehört (Karten auf der Hand gehören nicht unbedingt zum gezeigten Monster)
-func _skill_owner(skill: Dictionary) -> Monster:
-	for mon in State.mons + State.enemy_mons:
-		if mon._skills.has(skill):
-			return mon
-	return monster
 
 func _build_skill_list() -> void:
 	_clear_skill_grid(SKILL_COLUMNS.size() + 1)
@@ -261,12 +254,11 @@ func _label(text: String, color: Color = Color.WHITE) -> Label:
 	label.text = text
 	label.self_modulate = color
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 18)
+	label.add_theme_font_size_override("font_size", SKILL_FONT_SIZE)
 	return label
 
-## Skills im Kampf (Liste im Panel und Karten auf der Hand) öffnen das Detail-Popup neben dem Panel
+## Skills in der Liste öffnen das Detail-Popup neben dem Panel (Karten auf der Hand nicht)
 func _show_skill_info(skill) -> void:
-	var skill_owner := _skill_owner(skill)
-	var lock_hint := ["CONFIGURATOR_LOCKED", "EGG_SKILL_HINT"] if Skills.is_unlockable_egg_skill(skill_owner, skill) else []
+	var lock_hint := ["CONFIGURATOR_LOCKED", "EGG_SKILL_HINT"] if Skills.is_unlockable_egg_skill(monster, skill) else []
 	skill_info_container.visible = false
-	_popup().show_skill(skill, skill_owner, self, lock_hint)
+	_popup().show_skill(skill, monster, self, lock_hint)

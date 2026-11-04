@@ -1,6 +1,11 @@
 extends Control
 
-@export var mon_reward: Panel
+## Boss-Splitter, die man als Belohnung bekommt
+const SHARD_REWARD := 1
+
+@export var mon_reward: Control
+@export var egg_rect: TextureRect
+@export var shard_amount_label: Label
 @export var more_label: Label
 
 # Hinweis auf neu freigeschaltete Meilenstein-Ei-Attacken (Spielende: run_end.gd)
@@ -9,10 +14,10 @@ extends Control
 var missing_mon_egg = []
 # Art im Ei, wird beim Öffnen gelost
 var mon_to_save: Monster
-@onready var egg_rect: TextureRect = mon_reward.get_node("MarginContainer/VBoxContainer/TextureRect")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	shard_amount_label.text = tr("BOSS_REWARD_SHARD_AMOUNT").format({"amount": SHARD_REWARD})
 	# hier landet man nur nach Biom-Bossen, Boss-Felder auf der Karte zählen nicht
 	show_unlocks(unlock_label, Skills.add_milestone_progress(State.starter_name, "biome_boss_kills"))
 	var catched_mons = SaveManager.save_data.catched_monsters.duplicate(true)
@@ -47,9 +52,6 @@ func _process(delta: float) -> void:
 	pass
 
 
-func _on_ok_button_pressed() -> void:
-	pass
-
 func finish() -> void:
 	State.map_level += 1
 	State.biome_fight_index = 0
@@ -61,8 +63,8 @@ func finish() -> void:
 	get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")
 
 func _on_shard_button_pressed() -> void:
-	SaveManager.add_boss_shard(1)
-	State.boss_shards += 1
+	SaveManager.add_boss_shard(SHARD_REWARD)
+	State.boss_shards += SHARD_REWARD
 	finish()
 	pass # Replace with function body.
 

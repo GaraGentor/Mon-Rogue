@@ -20,6 +20,10 @@ const CATCH_HP_WEIGHT := 0.75
 const CATCH_LEVEL_STEP := 0.08
 const CATCH_LEVEL_FACTOR_RANGE := [0.25, 1.3]
 const CATCH_CHANCE_RANGE := [0.02, 0.95]
+## Letzte Not: normale wilde Monster (kein Boss, kein Kopfgeld) mit höchstens so vielen KP ...
+const CATCH_LAST_STAND_HP := 8.0
+## ... sind um so viele Prozentpunkte leichter zu fangen
+const CATCH_LAST_STAND_BONUS := 0.25
 
 ## Fangchance 0..1: je weniger HP, desto leichter; höhere Stufe und Seltenheit machen es schwerer.
 func catch_chance(mon: Monster) -> float:
@@ -32,8 +36,13 @@ func catch_chance(mon: Monster) -> float:
 	var level_factor = clampf(1.0 - CATCH_LEVEL_STEP * (mon._level - _team_level()),
 		CATCH_LEVEL_FACTOR_RANGE[0], CATCH_LEVEL_FACTOR_RANGE[1])
 	var chance = Relics.modify("catch_chance", CATCH_RARITY_BASE[rarity] * hp_factor * level_factor, mon)
+	if _is_last_stand(mon):
+		chance += CATCH_LAST_STAND_BONUS
 	return clampf(chance,
 		CATCH_CHANCE_RANGE[0], CATCH_CHANCE_RANGE[1])
+
+func _is_last_stand(mon: Monster) -> bool:
+	return mon._bounty == "" and not mon._is_boss and mon._lost_hp > 0 and mon.hp() - mon._lost_hp <= CATCH_LAST_STAND_HP
 
 ## Durchschnittsstufe der noch kämpfenden eigenen Monster
 func _team_level() -> float:

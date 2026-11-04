@@ -27,8 +27,6 @@ shader_parameter/vibration_effect_timelength = 7.68
 shader_parameter/vibration_speed = -1.05
 shader_parameter/vibration_magnitude = 0.25
 shader_parameter/vibration_wave_ci = 1.55
-shader_parameter/refraction_ratio_glass = 1.75
-shader_parameter/refraction_ratio_water = 2.6
 
 [node name="ElementPill" type="Control" node_paths=PackedStringArray("money_label", "element_label", "mat")]
 layout_mode = 3

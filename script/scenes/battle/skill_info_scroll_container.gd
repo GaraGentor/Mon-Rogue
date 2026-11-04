@@ -1,4 +1,4 @@
-extends ScrollContainer
+extends Control
 
 @export var skill_name: Label
 @export var skill_description: Label

@@ -10,18 +10,19 @@ const CARD_COLUMNS := 4
 const MIN_TIER := 2
 const SINGLE_ELEMENT_OFFERS := 2
 const MULTI_ELEMENT_OFFERS := 2
-const PORTRAIT_SIZE := Vector2(60, 60)
+## zusätzliche Skills in der zweiten Reihe, müssen zu keinem Monster passen
+const EXTRA_OFFERS := 4
+const PORTRAIT_SIZE := Vector2(48, 48)
 ## Bilder auf der Karte: Monster fehlen Elemente / kennt den Skill schon
 const UNUSABLE_MODULATE := Color(0.3, 0.3, 0.3)
 const KNOWN_MODULATE := Color(1, 1, 1, 0.25)
-const FITS_COLOR := Color(0.45, 1.0, 0.45)
-const FITS_NONE_COLOR := Color(1.0, 0.5, 0.5)
 
 ## Wellen-Hintergrund aus der Szene
 @export var background: Control
 
 ## gerade offene Auswahl, welcher Skill vergessen wird (null = keine)
 var _picker: SkillReplacePicker
+var _detail_popup: SkillDetailPopup
 
 func _ready() -> void:
 	use_scene_layout(background)
@@ -38,6 +39,7 @@ static func element_count(nature: int) -> int:
 ## Ei-Attacken ab MIN_TIER, je zur Hälfte mit einem und mit mehreren Elementen.
 ## Nur Skills, die mindestens ein Monster im Team sofort einsetzen kann und noch nicht kennt;
 ## fehlen davon welche, wird mit den übrigen passenden Skills aufgefüllt.
+## Dazu kommen EXTRA_OFFERS beliebige Skills, die noch mindestens ein Monster lernen kann.
 ## Mit der Biom-Tiefe werden höhere Stufen wahrscheinlicher.
 func _pick_offers() -> Array:
 	var rare = Skills.egg_skills.filter(func(skill): return skill.tier >= MIN_TIER)
@@ -51,6 +53,10 @@ func _pick_offers() -> Array:
 	names.append_array(Skills.pick_weighted_unique(multi, MULTI_ELEMENT_OFFERS, State.map_level))
 	var rest = usable.map(func(skill): return skill.name).filter(func(skill_name): return not names.has(skill_name))
 	names.append_array(Skills.pick_weighted_unique(rest, SINGLE_ELEMENT_OFFERS + MULTI_ELEMENT_OFFERS - names.size(), State.map_level))
+	# reichen die seltenen Skills nicht für alle Plätze, kommen niedrigere Stufen dazu
+	for pool in [rare, Skills.egg_skills]:
+		var learnable = pool.filter(func(skill): return not names.has(skill.name) and State.mons.any(func(mon): return not Skills.knows_skill(mon, skill.name)))
+		names.append_array(Skills.pick_weighted_unique(learnable.map(func(skill): return skill.name), SINGLE_ELEMENT_OFFERS + MULTI_ELEMENT_OFFERS + EXTRA_OFFERS - names.size(), State.map_level))
 	return names.map(func(skill_name): return Skills.get_skill(skill_name))
 
 func _add_skill_card(skill: Dictionary) -> void:
@@ -60,11 +66,25 @@ func _add_skill_card(skill: Dictionary) -> void:
 	var card := add_mon_card(tr(skill.name), text, _portraits(skill), tr("TRAINER_CHOOSE_MON"), learners,
 		func(mon: Monster): _learn(_dragged, mon), _target_tooltip.bind(skill), {"no_target": tr("TRAINER_ALL_KNOW")})
 	card.drag.skill = skill
+	card.on_click = _show_skill_detail.bind(skill, card)
 	# Titel in der Farbe des Elements
 	card.info.get_child(0).add_theme_color_override("font_color", Helper.color_by_type(skill.nature))
 	set_price(card, randi_range(skill.shop_cost.min, skill.shop_cost.max))
-	card.info.add_child(_fits_label(skill))
+	card.tooltip_text = _fits_text(skill)
 	ignore_mouse_below(card)
+
+## Klick auf eine Karte zeigt Kosten, Abklingzeit usw. im gleichen Popup wie in den anderen Szenen
+func _show_skill_detail(skill: Dictionary, card: RewardCard) -> void:
+	if _detail_popup == null:
+		_detail_popup = SkillDetailPopup.new()
+		add_child(_detail_popup)
+	_detail_popup.show_skill(skill, null, card)
+
+## Beim Ziehen darf das Popup nicht über den Zielen liegen
+func _show_targets(card: RewardCard) -> void:
+	super(card)
+	if _detail_popup:
+		_detail_popup.hide_popup()
 
 ## Bilder der eigenen Monster: hell = kann den Skill einsetzen, dunkel = Elemente fehlen,
 ## durchscheinend = kennt ihn schon
@@ -82,19 +102,12 @@ func _portraits(skill: Dictionary) -> Control:
 	return row
 
 ## "Passt zu: ..." mit den Monstern, die den Skill lernen und sofort einsetzen können
-func _fits_label(skill: Dictionary) -> Label:
+func _fits_text(skill: Dictionary) -> String:
 	var fits = State.mons.filter(func(mon): return Skills.can_use(mon, skill) and not Skills.knows_skill(mon, skill.name))
-	var label := Label.new()
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if fits.is_empty():
-		label.text = tr("TRAINER_FITS_NONE")
-		label.modulate = FITS_NONE_COLOR
-	else:
-		var names = fits.map(func(mon): return Helper.mon_display_name(mon._name))
-		label.text = tr("TRAINER_FITS").format({"mons": ", ".join(PackedStringArray(names))})
-		label.modulate = FITS_COLOR
-	return label
+		return tr("TRAINER_FITS_NONE")
+	var names = fits.map(func(mon): return Helper.mon_display_name(mon._name))
+	return tr("TRAINER_FITS").format({"mons": ", ".join(PackedStringArray(names))})
 
 ## Beim Drüberziehen: kann es den Skill einsetzen, und muss es dafür einen vergessen?
 func _target_tooltip(mon: Monster, skill: Dictionary) -> String:
