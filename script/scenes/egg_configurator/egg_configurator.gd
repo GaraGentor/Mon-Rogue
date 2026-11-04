@@ -11,9 +11,8 @@ const LOCKED_COLOR := Color(0.5, 0.5, 0.5)
 const MISSING_COLOR := Color(1, 0.45, 0.45)
 const MAP_BACKGROUND := preload("res://script/scenes/world_map/map_background.gdshader")
 const BATTLE_CARD := preload("res://script/scenes/battle/battle_card.tscn")
-const PHYSICAL_TEXTURE := preload("res://assets/ui/icons/firework (1).svg")
+const PHYSICAL_TEXTURE := preload("res://assets/ui/icons/fist.svg")
 const MAGIC_TEXTURE := preload("res://assets/ui/icons/sparkle.svg")
-const POWER_TEXTURE := preload("res://assets/ui/icons/fist.svg")
 
 @export var font: Font
 
@@ -189,7 +188,6 @@ func _create_card(skill: Dictionary, locked: bool, locked_label := "") -> Button
 	stats_row.add_theme_constant_override("separation", 6)
 	lines.add_child(stats_row)
 	stats_row.add_child(_card_label(tr("CONFIGURATOR_SKILL_STATS").format({"cost": skill.cost, "cooldown": skill.cooldown}), 16, tint))
-	stats_row.add_child(_icon(POWER_TEXTURE, 18, tint))
 	stats_row.add_child(_card_label(Helper.format_number(skill.value), 16, tint))
 
 	if locked:

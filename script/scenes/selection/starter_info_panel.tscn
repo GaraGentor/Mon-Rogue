@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://script/scenes/battle/stats_grid_container.gd" id="4_stats"]
 [ext_resource type="FontFile" uid="uid://cbavibkhidesl" path="res://script/ui/fonts/pxelfont/PixelifySans-VariableFont_wght.ttf" id="5_font"]
 [ext_resource type="Script" path="res://script/scenes/battle/skill_info_scroll_container.gd" id="6_skillinfo"]
-[ext_resource type="Texture2D" uid="uid://bxoeupl6ad2ke" path="res://assets/ui/icons/firework (1).svg" id="7_phys"]
+[ext_resource type="Texture2D" uid="uid://yg6oxnmiu0pd" path="res://assets/ui/icons/fist.svg" id="7_phys"]
 [ext_resource type="Texture2D" uid="uid://djt3q5aymms0i" path="res://assets/ui/icons/sparkle.svg" id="8_magic"]
 [ext_resource type="PackedScene" uid="uid://owmyxu3qq3so" path="res://script/ui/element_chip/element_chip.tscn" id="9_chip"]
 [ext_resource type="Material" path="res://script/ui/shader/living_pixels_material.tres" id="10_living"]
