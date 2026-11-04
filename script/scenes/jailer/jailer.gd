@@ -7,6 +7,11 @@ extends RewardDialog
 
 const SHARD_ICON = preload("res://assets/ui/boss_shard/ChatGPT Image 25. Dez. 2025, 21_33_55.png")
 const BUTTON_THEME = preload("res://script/scenes/battle/flat_button_theme.tres")
+const CHAIN_TEXTURE = preload("res://assets/ui/jailer/chain.svg")
+const CHAIN_BROKEN_TEXTURE = preload("res://assets/ui/jailer/chain_broken.svg")
+const BAR_TEXTURE = preload("res://assets/ui/jailer/cell_bar.svg")
+const CROSSBAR_TEXTURE = preload("res://assets/ui/jailer/cell_crossbar.svg")
+const RIVET_TEXTURE = preload("res://assets/ui/jailer/cell_rivet.svg")
 const MON_OFFERS := 3
 const REROLL_COST := 25
 ## Fundorte für die Ansage des Kerkermeisters (JAILER_PLACE_0 ...)
@@ -58,44 +63,37 @@ class CellBars extends Control:
 	func _init() -> void:
 		mouse_filter = MOUSE_FILTER_IGNORE
 
+	## Stäbe und Streben werden nur in der Länge gestreckt, damit sie bei jeder Zellengröße gleich dick bleiben
 	func _draw() -> void:
 		var top := -size.y * open
-		var iron := Color(0.2, 0.2, 0.24)
-		var shine := Color(0.5, 0.5, 0.56)
 		var count := 6
+		var thickness := 16.0
+		var rivet := Vector2(14, 14)
 		for i in count:
 			var x := size.x * (i + 0.5) / count + shake
-			draw_rect(Rect2(x - 4, top, 8, size.y), iron)
-			draw_rect(Rect2(x - 2, top, 2, size.y), shine)
-		for y in [0.1, 0.9]:
-			draw_rect(Rect2(shake, top + size.y * y - 5, size.x, 10), iron)
+			draw_texture_rect(BAR_TEXTURE, Rect2(x - thickness / 2, top, thickness, size.y), false)
+		for y_ratio: float in [0.1, 0.9]:
+			var y := top + size.y * y_ratio
+			# läuft über den Rand hinaus, damit beim Rütteln dort keine Lücke entsteht
+			draw_texture_rect(CROSSBAR_TEXTURE, Rect2(-thickness, y - thickness / 2, size.x + thickness * 2, thickness), false)
+			for i in count:
+				var x := size.x * (i + 0.5) / count + shake
+				draw_texture_rect(RIVET_TEXTURE, Rect2(Vector2(x, y) - rivet / 2, rivet), false)
 
-## Ein Kettenglied-Paar, gesprengte Ketten sind offen und blass
-class ChainLink extends Control:
+## Ein Kettenstück, gesprengte Ketten sind offen und rostig
+class ChainLink extends TextureRect:
 	var broken := false:
 		set(value):
 			broken = value
-			queue_redraw()
+			texture = CHAIN_BROKEN_TEXTURE if broken else CHAIN_TEXTURE
 
 	func _init() -> void:
-		custom_minimum_size = Vector2(40, 24)
+		texture = CHAIN_TEXTURE
+		expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		custom_minimum_size = Vector2(48, 28)
 		size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		mouse_filter = MOUSE_FILTER_IGNORE
-
-	func _draw() -> void:
-		var color := Color(0.45, 0.4, 0.35, 0.6) if broken else Color(0.78, 0.78, 0.84)
-		var gap := 0.7 if broken else 0.0
-		# gesprengt: die Glieder sind an der Bruchstelle offen und rücken auseinander
-		var apart := 4.0 if broken else 0.0
-		var mid := custom_minimum_size.y / 2
-		_link(Vector2(size.x * 0.33 - apart, mid), 0.0, gap, color)
-		_link(Vector2(size.x * 0.67 + apart, mid), PI, gap, color)
-
-	## Glied mit Lücke um den Winkel start (gap = 0: geschlossen)
-	func _link(center: Vector2, start: float, gap: float, color: Color) -> void:
-		draw_set_transform(center, 0, Vector2(1.5, 1))
-		draw_arc(Vector2.ZERO, custom_minimum_size.y * 0.35, start + gap, start + TAU - gap, 24, color, 2.5)
-		draw_set_transform(Vector2.ZERO)
 
 ## Zelle einer Monster-Art: Name, Stufe, Ketten, Bild hinter Gittern, Fundort, Preis, Wirkung
 class JailCell extends PanelContainer:

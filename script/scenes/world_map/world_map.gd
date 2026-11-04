@@ -54,6 +54,20 @@ const BOSS_CLEARANCE := 110.0
 const DESK_WAVE_BANDS := 5
 const DESK_WAVE_AMP := 0.025
 const DESK_WAVE_SPEED := 0.25
+const NOISE_SHADER := preload("res://script/scenes/world_map/map_noise.gdshader")
+
+# Körniger, düsterer Look wie im Kampf über Papier, Deko und Wetter.
+# All das liegt auf z_index -1 (auch in world_map.tscn), damit Felder, Wege, Lager, Shop & Co. normal darüber bleiben.
+func add_noise_layer() -> void:
+	var noise_material := ShaderMaterial.new()
+	noise_material.shader = NOISE_SHADER
+	var noise := ColorRect.new()
+	noise.material = noise_material
+	noise.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	noise.z_index = -1
+	map_panel.add_child(noise)
+	noise.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	boss_button.material = Monmap.LIVING_MATERIAL
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -68,7 +82,9 @@ func _ready() -> void:
 	monster_shard_changed(State.boss_shards)
 	weather = MapWeather.new()
 	weather.scroll_container = scroll_container
+	weather.z_index = -1
 	map_panel.add_child(weather)
+	add_noise_layer()
 	shown_biome = State.current_biome()
 	# nach Lager, Shop & Co. haben sich KP oder Elemente des Teams evtl. geändert
 	view_container.child_exiting_tree.connect(func(_child): team_bar.refresh.call_deferred())
@@ -131,6 +147,7 @@ func set_map():
 			var d: Button = node_name.duplicate()
 			if y_path != null:
 				d.icon = Map.ICONS[y_path._type]
+				d.material = Monmap.LIVING_MATERIAL
 				d.tooltip_text = tr(Map.type_label(y_path._type))
 				d.pressed.connect(func(): call_map_event(y_path))
 				d.visible = true
@@ -329,7 +346,8 @@ func apply_biome_look() -> void:
 	desk.set_shader_parameter("flicker", 0.04)
 	map_paper.apply_look(look, rng_seed)
 	for line in lines:
-		line.apply_look(Color(look.ink), Color(look.accent))
+		# auf der abgedunkelten Karte ist nur helle Tinte noch sichtbar
+		line.apply_look(Color(look.paper_light).lightened(0.3), Color(look.accent))
 	weather.apply_look(look)
 	# Deko braucht die endgültigen Positionen der Felder, die stehen erst nach dem Layout
 	await get_tree().process_frame

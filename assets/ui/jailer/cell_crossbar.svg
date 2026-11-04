@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="32" viewBox="0 0 128 32">
+  <!-- waagerechte Querstrebe, wird nur in der Länge gestreckt -->
+  <rect x="0" y="0" width="128" height="32" fill="#1e140a"/>
+  <rect x="0" y="4" width="128" height="24" fill="#4c4f5a"/>
+  <rect x="0" y="8" width="128" height="5" fill="#8a8e9a"/>
+  <rect x="0" y="21" width="128" height="7" fill="#30323b"/>
+</svg>

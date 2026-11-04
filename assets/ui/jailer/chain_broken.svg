@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="56" viewBox="0 0 96 56">
+  <!-- aufgesprengte Glieder, an der Bruchstelle offen und auseinandergerückt -->
+  <path d="M30 13 H20 a15 15 0 0 0 0 30 H30" fill="none" stroke="#1e140a" stroke-width="11" stroke-opacity="0.75"/>
+  <path d="M29 13 H20 a15 15 0 0 0 0 30 H29" fill="none" stroke="#7b6a58" stroke-width="5.5"/>
+  <path d="M66 13 H76 a15 15 0 0 1 0 30 H66" fill="none" stroke="#1e140a" stroke-width="11" stroke-opacity="0.75"/>
+  <path d="M67 13 H76 a15 15 0 0 1 0 30 H67" fill="none" stroke="#7b6a58" stroke-width="5.5"/>
+  <!-- Bruchstücke des mittleren Glieds -->
+  <path d="M42 24 L47 19" fill="none" stroke="#1e140a" stroke-width="7" stroke-linecap="round" stroke-opacity="0.75"/>
+  <path d="M42 24 L47 19" fill="none" stroke="#7b6a58" stroke-width="3" stroke-linecap="round"/>
+  <path d="M50 37 L55 32" fill="none" stroke="#1e140a" stroke-width="7" stroke-linecap="round" stroke-opacity="0.75"/>
+  <path d="M50 37 L55 32" fill="none" stroke="#7b6a58" stroke-width="3" stroke-linecap="round"/>
+</svg>
