@@ -355,16 +355,20 @@ func _check_game_over(last_fainted:Monster) -> void:
 		print("state ep", State.ep)
 		# clear dead monsters.
 		# open stats.
-		_clear_fainted_mons()
-		if State.catched_mons.size() > 0:
+		var fallen = _clear_fainted_mons()
+		# nach dem finalen Boss kommt kein Kampf mehr, Wiederbelebung und Letzter Wille brächten nichts
+		if not State.is_final_boss:
+			State.fainted_own_mons.append_array(fallen)
+		if State.catched_mons.size() > 0 or not State.fainted_own_mons.is_empty():
 			get_tree().change_scene_to_file("res://script/scenes/judgment/judgement.tscn")
 			return
 		get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")
 
-func _clear_fainted_mons():
+func _clear_fainted_mons() -> Array:
 	var v = State.mons.filter(func(mon:Monster): return not mon.is_alive())
 	for item: Monster in v:
 		State.mons.erase(item)
+	return v
 
 ## Plant den nächsten Zug eines Gegners (Monster._intent): zufällige Skills, bis seine Aktionen aufgebraucht sind,
 ## jeweils auf ein zufälliges lebendes Ziel (Angriffe auf eigene Monster, Schilde und Buffs auf sich selbst oder einen Verbündeten).

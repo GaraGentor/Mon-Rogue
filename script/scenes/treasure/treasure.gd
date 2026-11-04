@@ -76,7 +76,7 @@ static func add_potion_card(dialog: RewardDialog, element: int) -> RewardDialog.
 	var text = dialog.tr("TREASURE_POTION_DESC").format({"element": element_name})
 	var potion_title = dialog.tr("TREASURE_POTION").format({"element": element_name})
 	var give := func(mon: Monster):
-		mon._type = ColorMap.add_element(mon._type, element)
+		mon.gain_element(element)
 	# Tooltip beim Drüberziehen: altes Element und was daraus wird
 	var tooltip := func(mon: Monster) -> String:
 		var new_type = ColorMap.add_element(mon._type, element)

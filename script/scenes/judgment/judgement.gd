@@ -4,6 +4,8 @@ extends Control
 ## Monster werden per Drag & Drop (oder Klick auf das Monster, dann Klick auf das Ziel) auf einen Team-Platz
 ## oder eine Ablage (Lehren, Opfern, Freilassen) gelegt. Die Teamaufstellung bleibt bis zum Bestätigen frei
 ## änderbar, Lehren, Opfern und Freilassen gelten sofort. Was beim Bestätigen noch im Karussell liegt, wird freigelassen.
+## Ist im Kampf ein eigenes Monster gefallen, kann es zuerst einmalig durch einen neuen Fang wiederbelebt werden.
+## Wird das übersprungen oder ist es nicht möglich, vererbt es eine Sache (Letzter Wille). Ohne übrige Fänge geht es danach direkt zur Karte.
 
 const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
 const MUTED := Color(0.75, 0.75, 0.75, 1)
@@ -12,6 +14,8 @@ const BOX = preload("res://script/ui/materials/monster_widget_boxes.tres")
 const SKILL_LABEL_SCRIPT = preload("res://script/scenes/battle/monster_widget_skill_label.gd")
 const MAX_TEAM := 2
 const DRAG_THRESHOLD := 10.0
+# Anteil der KP, mit dem ein wiederbelebtes Monster zurückkommt
+const REVIVE_HP_SHARE := 0.3
 # Anzeigenamen der Meilenstein-Zähler (siehe Skills.MILESTONES)
 const MILESTONE_STAT_LABELS = {
 	"biome_boss_kills": "MILESTONE_STAT_BIOME_BOSS_KILLS",
@@ -67,7 +71,7 @@ func _ready() -> void:
 	_pool = State.catched_mons.duplicate()
 	_new_mons = _pool.duplicate()
 	_initial_team = State.mons.duplicate()
-	if _pool.is_empty():
+	if _pool.is_empty() and State.fainted_own_mons.is_empty():
 		get_tree().change_scene_to_file.call_deferred("res://script/scenes/world_map/world_map.tscn")
 		return
 	# Die Karten sind hier flacher als im Kampf: dem Werte-Bereich mehr Höhe geben, die Attacken-Liste scrollt
@@ -79,6 +83,13 @@ func _ready() -> void:
 		_zones[Zone.SLOT_1 + slot] = _make_slot_overlay(slot)
 	for area in _card_areas():
 		_frames[area] = _make_frame(area)
+	_refresh()
+	await _handle_fallen()
+	if _pool.is_empty():
+		get_tree().change_scene_to_file.call_deferred("res://script/scenes/world_map/world_map.tscn")
+		return
+	# Wiederbelebte gehören schon zur jetzigen Aufstellung
+	_initial_team = State.mons.duplicate()
 	_refresh()
 
 func _process(_delta: float) -> void:
@@ -253,13 +264,69 @@ func _teach(teacher: Monster) -> void:
 	var result = await dialog.teach(teacher, _teach_targets(teacher), warning)
 	if result.is_empty():
 		return
-	var learned = Skills.learnable_copy(result.skill)
-	if result.replace == -1:
-		result.target._skills.append(learned)
-	else:
-		result.target._skills[result.replace] = learned
+	_learn(result.target, result.skill, result.replace)
 	_remove(teacher)
 	Helper.show_unlock_message(tr("JUDGEMENT_LEARNED").format({"mon": Helper.mon_battle_name(result.target), "skill": tr(result.skill.name)}))
+
+func _learn(target: Monster, skill: Dictionary, replace: int) -> void:
+	var learned = Skills.learnable_copy(skill)
+	if replace == -1:
+		target._skills.append(learned)
+	else:
+		target._skills[replace] = learned
+
+# ─────────────────────────
+# Gefallene Monster: Wiederbelebung, sonst Letzter Wille
+
+func _handle_fallen() -> void:
+	var fallen_mons = State.fainted_own_mons.duplicate()
+	State.fainted_own_mons.clear()
+	for fallen in fallen_mons:
+		if not await _offer_revive(fallen):
+			await _last_will(fallen)
+
+# Liefert true, wenn das Monster wiederbelebt wurde.
+func _offer_revive(fallen: Monster) -> bool:
+	if fallen._revived or _pool.is_empty():
+		return false
+	var hp_percent = roundi(REVIVE_HP_SHARE * 100)
+	var catch: Monster = await dialog.revive(fallen, _pool, hp_percent)
+	if catch == null:
+		return false
+	_remove(catch)
+	State.mons.append(fallen)
+	fallen.revive(REVIVE_HP_SHARE)
+	_refresh()
+	Helper.show_unlock_message(tr("REVIVE_DONE").format({"mon": Helper.mon_battle_name(fallen), "hp": hp_percent}))
+	return true
+
+# Erben können das Team und die neuen Fänge. Abgelehnt wird nur nach Rückfrage, das Erbe ist danach weg.
+func _last_will(fallen: Monster) -> void:
+	var heirs: Array = State.mons.duplicate()
+	heirs.append_array(_pool)
+	if not dialog.can_inherit(fallen, heirs):
+		return
+	while true:
+		var result: Dictionary = await dialog.last_will(fallen, heirs)
+		if not result.is_empty():
+			_inherit(fallen, result)
+			_refresh()
+			return
+		var text = tr("LAST_WILL_DECLINE_TEXT").format({"mon": Helper.mon_battle_name(fallen)})
+		if await dialog.confirm(tr("LAST_WILL_DECLINE_TITLE"), text, tr("LAST_WILL_DECLINE")):
+			return
+
+func _inherit(fallen: Monster, result: Dictionary) -> void:
+	var heir: Monster = result.target
+	match result.gift.kind:
+		"gems":
+			for stat in fallen._gems:
+				heir.add_gem(stat, fallen._gems[stat])
+		"element":
+			heir.gain_element(result.gift.element)
+		"skill":
+			_learn(heir, result.gift.skill, result.replace)
+	Helper.show_unlock_message(tr("LAST_WILL_INHERITED").format({"mon": Helper.mon_battle_name(heir), "gift": dialog.gift_name(result.gift)}))
 
 func _sacrifice(mon: Monster) -> void:
 	var egg_skill = mon.get_unlockable_egg_skill()

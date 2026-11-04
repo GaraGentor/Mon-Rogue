@@ -1,8 +1,9 @@
 class_name JudgementDialog
 extends Control
 
-## Modaler Dialog im Judgement-Screen: Attacke lehren (Attacke -> Ziel-Monster -> ggf. zu vergessende Attacke)
-## und einfache Rückfragen. Beide Abläufe laufen per await und liefern das Ergebnis zurück.
+## Modaler Dialog im Judgement-Screen: Attacke lehren (Attacke -> Ziel-Monster -> ggf. zu vergessende Attacke),
+## Wiederbelebung (welcher Fang opfert sich), Letzter Wille (Erbstück -> Erbe -> ggf. zu vergessende Attacke) und einfache Rückfragen.
+## Alle Abläufe laufen per await und liefern das Ergebnis zurück.
 
 signal _choice(result: Dictionary)
 
@@ -10,7 +11,13 @@ const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
 const MUTED := Color(0.75, 0.75, 0.75, 1)
 const BOX = preload("res://script/ui/materials/monster_widget_boxes.tres")
 const FLAT_THEME = preload("res://script/scenes/battle/flat_button_theme.tres")
+const GemField = preload("res://script/scenes/gems/gems.gd")
+const PANEL_WIDTH := 900.0
+# Vier statt drei Karten pro Reihe, sonst passen sehr viele Erbstücke nicht in die Höhe
+const WIDE_PANEL_WIDTH := 1180.0
+const MAX_CARDS_NORMAL_WIDTH := 9
 
+var _panel: PanelContainer
 var _title: Label
 var _warning: Label
 var _content: HFlowContainer
@@ -28,13 +35,12 @@ func _ready() -> void:
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	add_child(center)
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(900, 0)
-	panel.add_theme_stylebox_override("panel", _box(BOX.border_color, 20))
-	center.add_child(panel)
+	_panel = PanelContainer.new()
+	_panel.add_theme_stylebox_override("panel", _box(BOX.border_color, 20))
+	center.add_child(_panel)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 14)
-	panel.add_child(box)
+	_panel.add_child(box)
 
 	_title = _label(22, GOLD)
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -84,7 +90,7 @@ func teach(teacher: Monster, targets: Array, warning: String) -> Dictionary:
 			1:
 				_title.text = tr("JUDGEMENT_TEACH_PICK_TARGET").format({"skill": _skill_name(skill)})
 				for member in targets:
-					var card = _mon_card(member, skill)
+					var card = _mon_card(member, _learn_note(member, skill), Skills.knows_skill(member, skill.name))
 					card.pressed.connect(_choice.emit.bind({"value": member}))
 			2:
 				_title.text = tr("JUDGEMENT_TEACH_PICK_REPLACE").format({
@@ -114,6 +120,151 @@ func teach(teacher: Monster, targets: Array, warning: String) -> Dictionary:
 	visible = false
 	return {}
 
+# Liefert den Fang, der sein Leben gibt, oder null beim Überspringen.
+func revive(fallen: Monster, catches: Array, hp_percent: int) -> Monster:
+	var fallen_name = Helper.mon_battle_name(fallen)
+	_reset(tr("REVIVE_INTRO").format({"mon": fallen_name, "hp": hp_percent}))
+	_cancel.text = "REVIVE_SKIP"
+	_back.visible = false
+	_title.text = tr("REVIVE_TITLE").format({"mon": fallen_name})
+	for catch in catches:
+		var card = _mon_card(catch, tr("REVIVE_CARD_NOTE"), false)
+		card.pressed.connect(_choice.emit.bind({"value": catch}))
+	visible = true
+	var result: Dictionary = await _choice
+	visible = false
+	return result.get("value")
+
+# Liefert {gift, target, replace} oder {} bei Ablehnung. gift siehe _will_gifts.
+func last_will(fallen: Monster, heirs: Array) -> Dictionary:
+	var step := 0
+	var gift := {}
+	var target: Monster = null
+	var fallen_name = Helper.mon_battle_name(fallen)
+	visible = true
+	while true:
+		_reset(tr("LAST_WILL_INTRO").format({"mon": fallen_name}))
+		_cancel.text = "LAST_WILL_DECLINE"
+		_back.visible = step > 0
+		match step:
+			0:
+				_title.text = tr("LAST_WILL_PICK_GIFT").format({"mon": fallen_name})
+				var gifts = _will_gifts(fallen)
+				if gifts.size() > MAX_CARDS_NORMAL_WIDTH:
+					_panel.custom_minimum_size.x = WIDE_PANEL_WIDTH
+				for option in gifts:
+					var card = _gift_card(option, heirs)
+					card.pressed.connect(_choice.emit.bind({"value": option}))
+			1:
+				_title.text = tr("LAST_WILL_PICK_HEIR").format({"gift": gift_name(gift)})
+				for heir in heirs:
+					var card = _mon_card(heir, _heir_note(heir, gift), not _accepts(heir, gift))
+					card.pressed.connect(_choice.emit.bind({"value": heir}))
+			2:
+				_title.text = tr("JUDGEMENT_TEACH_PICK_REPLACE").format({
+					"mon": Helper.mon_battle_name(target), "max": Skills.MAX_SKILLS, "skill": gift_name(gift)})
+				for i in target._skills.size():
+					var card = _skill_card(target._skills[i], "")
+					card.pressed.connect(_choice.emit.bind({"value": i}))
+		var result: Dictionary = await _choice
+		if result.has("cancel"):
+			break
+		if result.has("back"):
+			step -= 1
+			continue
+		match step:
+			0:
+				gift = result.value
+				step = 1
+			1:
+				target = result.value
+				if gift.kind != "skill" or target._skills.size() < Skills.MAX_SKILLS:
+					visible = false
+					return {"gift": gift, "target": target, "replace": -1}
+				step = 2
+			2:
+				visible = false
+				return {"gift": gift, "target": target, "replace": result.value}
+	visible = false
+	return {}
+
+# Gibt es etwas, das mindestens ein Erbe annehmen kann?
+func can_inherit(fallen: Monster, heirs: Array) -> bool:
+	return _will_gifts(fallen).any(func(gift): return _accepted_by_any(gift, heirs))
+
+func gift_name(gift: Dictionary) -> String:
+	match gift.kind:
+		"gems":
+			return tr("LAST_WILL_GEMS")
+		"element":
+			return tr(ColorMap.get_combo(gift.element).label)
+	return _skill_name(gift.skill)
+
+# Mögliche Erbstücke: {"kind": "gems", "gems": Dictionary}, {"kind": "element", "element": int} oder {"kind": "skill", "skill": Dictionary}
+func _will_gifts(fallen: Monster) -> Array:
+	var gifts = []
+	if not fallen._gems.is_empty():
+		gifts.append({"kind": "gems", "gems": fallen._gems})
+	for element in Enums.MON_TYPES.values():
+		if fallen._gained_elements & element:
+			gifts.append({"kind": "element", "element": element})
+	for skill in fallen._skills:
+		gifts.append({"kind": "skill", "skill": skill})
+	return gifts
+
+func _accepts(heir: Monster, gift: Dictionary) -> bool:
+	match gift.kind:
+		"element":
+			return not ColorMap.has_element(heir._type, gift.element)
+		"skill":
+			return not Skills.knows_skill(heir, gift.skill.name)
+	return true
+
+func _accepted_by_any(gift: Dictionary, heirs: Array) -> bool:
+	return heirs.any(func(heir): return _accepts(heir, gift))
+
+func _gift_card(gift: Dictionary, heirs: Array) -> Button:
+	var possible = _accepted_by_any(gift, heirs)
+	var card: Button
+	if gift.kind == "skill":
+		card = _skill_card(gift.skill, "" if possible else tr("JUDGEMENT_TEACH_KNOWN_ALL"))
+	else:
+		card = _card(Vector2(270, 150))
+		var lines := _card_lines(card)
+		var name_label := _label(19, GOLD if gift.kind == "gems" else Helper.color_by_type(gift.element))
+		name_label.text = gift_name(gift)
+		lines.add_child(name_label)
+		var desc := _label(14, Color.WHITE)
+		desc.text = _gems_text(gift.gems) if gift.kind == "gems" else tr("LAST_WILL_ELEMENT_DESC")
+		lines.add_child(desc)
+		if not possible:
+			var note := _label(13, GOLD)
+			note.text = tr("LAST_WILL_ALL_HAVE_ELEMENT")
+			lines.add_child(note)
+	if not possible:
+		_disable(card)
+	return card
+
+func _gems_text(gems: Dictionary) -> String:
+	var parts = []
+	for stat in gems:
+		parts.append("+%d %s" % [gems[stat], tr(GemField.STATS[stat].stat).trim_suffix(":")])
+	return ", ".join(PackedStringArray(parts))
+
+func _heir_note(heir: Monster, gift: Dictionary) -> String:
+	var lines = []
+	match gift.kind:
+		"element":
+			if _accepts(heir, gift):
+				lines.append("%s %s" % [tr("SHOP_CHANGES_TO"), tr(ColorMap.get_combo(ColorMap.add_element(heir._type, gift.element)).label)])
+			else:
+				lines.append(tr("LAST_WILL_HAS_ELEMENT"))
+		"skill":
+			lines.append(_learn_note(heir, gift.skill))
+	if not State.mons.has(heir):
+		lines.append(tr("LAST_WILL_HEIR_CATCH"))
+	return "\n".join(PackedStringArray(lines))
+
 func confirm(title: String, text: String, confirm_label: String) -> bool:
 	_reset(text)
 	_title.text = title
@@ -134,6 +285,8 @@ func _reset(warning: String) -> void:
 	_warning.text = warning
 	_warning.visible = warning != ""
 	_confirm.visible = false
+	_cancel.text = "COMMON_CANCEL"
+	_panel.custom_minimum_size.x = PANEL_WIDTH
 
 func _skill_name(skill: Dictionary) -> String:
 	return tr(skill.name) if skill.scouted else tr("BATTLE_UNKNOWN_SKILL").format(skill)
@@ -162,8 +315,12 @@ func _skill_card(skill: Dictionary, note: String) -> Button:
 		lines.add_child(note_label)
 	return card
 
-# Ziel-Monster mit Bild; gesperrt, wenn es die Attacke schon kennt, fehlende Elemente stehen als Hinweis dabei
-func _mon_card(mon: Monster, skill: Dictionary) -> Button:
+# Schon bekannt oder fehlende Elemente, sonst ""
+func _learn_note(mon: Monster, skill: Dictionary) -> String:
+	return tr("JUDGEMENT_LEARN_KNOWN") if Skills.knows_skill(mon, skill.name) else Skills.missing_elements_text(mon, skill)
+
+# Ziel-Monster mit Bild und Hinweis; blocked sperrt die Auswahl
+func _mon_card(mon: Monster, note_text: String, blocked: bool) -> Button:
 	var card := _card(Vector2(270, 150))
 	var row := HBoxContainer.new()
 	row.mouse_filter = MOUSE_FILTER_IGNORE
@@ -187,11 +344,9 @@ func _mon_card(mon: Monster, skill: Dictionary) -> Button:
 	count.text = tr("JUDGEMENT_TEACH_SKILL_COUNT").format({"count": mon._skills.size(), "max": Skills.MAX_SKILLS})
 	lines.add_child(count)
 	var note := _label(13, GOLD)
-	if Skills.knows_skill(mon, skill.name):
-		note.text = tr("JUDGEMENT_LEARN_KNOWN")
+	note.text = note_text
+	if blocked:
 		_disable(card)
-	else:
-		note.text = Skills.missing_elements_text(mon, skill)
 	lines.add_child(note)
 	return card
 

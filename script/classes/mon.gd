@@ -44,6 +44,10 @@ var _computed_moves: int = BASE_MOVES:
 
 # Edelstein-Boni für diesen Run: Stat-Key aus STATS in gems.gd -> feste Punkte obendrauf (vor Buffs)
 var _gems: Dictionary = {}
+# Elemente, die der Spieler im Run vergeben hat (Trank, Erbe), als Maske. Nur die lassen sich vererben, Art- und Biom-Elemente nicht.
+var _gained_elements: int = 0
+# Jedes Monster kann pro Run nur einmal wiederbelebt werden (judgement.gd)
+var _revived: bool = false
 
 # Kampf-Zustand, wird zu Beginn jedes Kampfes zurückgesetzt (reset_battle_state)
 # Schilde fangen Schaden ab, bis sie aufgebraucht sind oder der nächste eigene Zug beginnt (start_turn): physisch gegen physischen, magisch gegen magischen Schaden
@@ -191,3 +195,14 @@ func gem_bonus(stat: String) -> int:
 
 func add_gem(stat: String, bonus: int) -> void:
 	_gems[stat] = _gems.get(stat, 0) + bonus
+
+func gain_element(element: int) -> void:
+	_type = ColorMap.add_element(_type, element)
+	_gained_elements |= element
+
+# Außerhalb des Kampfes aufrufen, das Monster muss schon wieder im Team stehen (passive KP-Boni zählen mit).
+func revive(hp_share: float) -> void:
+	_revived = true
+	_lost_hp = hp() * (1.0 - hp_share)
+	# Der Setter wartet auf dieses Signal, ohne Kampf käme es erst beim ersten Treffer des nächsten Kampfes (wie camp_monster.gd)
+	Events.damage_animation_done.emit.call_deferred(self)

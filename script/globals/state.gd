@@ -15,6 +15,7 @@ var starter_name := ""
 var starter: Monster
 var enemy_mons: Array[Monster] = []
 var catched_mons: Array[Monster] = []
+# Im letzten gewonnenen Kampf gefallene eigene Monster, warten auf Wiederbelebung oder Letzten Willen (judgement.gd)
 var fainted_own_mons: Array[Monster] = []
 var fainted_enemy_mons: Array[Monster] = []
 # IDs der gesammelten Relics (siehe Relics.RELICS)
