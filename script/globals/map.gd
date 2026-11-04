@@ -35,6 +35,23 @@ class path:
 	func get_name() -> String:
 		return _name_map[_type]
 
+# Icon pro Feldtyp, auf der Karte und in der Legende (world_map.gd, map_legend.gd)
+const ICONS := {
+	PATH_TYPE.COMBAT: preload("res://assets/ui/map/node_combat.svg"),
+	PATH_TYPE.BOSS: preload("res://assets/ui/map/node_boss.svg"),
+	PATH_TYPE.CAMP: preload("res://assets/ui/map/node_camp.svg"),
+	PATH_TYPE.SHOP: preload("res://assets/ui/map/node_shop.svg"),
+	PATH_TYPE.TRAINER: preload("res://assets/ui/map/node_trainer.svg"),
+	PATH_TYPE.JAILER: preload("res://assets/ui/map/node_jailer.svg"),
+	PATH_TYPE.EVENT: preload("res://assets/ui/map/node_event.svg"),
+	PATH_TYPE.TREASURE: preload("res://assets/ui/map/node_treasure.svg"),
+	PATH_TYPE.GEM: preload("res://assets/ui/map/node_gem.svg"),
+}
+
+# Übersetzungs-Key des Feldnamens (MAP_NODE_COMBAT ...), die Beschreibung hängt "_DESC" an
+func type_label(type: PATH_TYPE) -> String:
+	return "MAP_NODE_" + PATH_TYPE.keys()[type]
+
 var max_rows = 8
 var max_cols = 3
 #var path = 

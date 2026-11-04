@@ -17,6 +17,7 @@ extends Control
 @export var boss_shard_label: Label
 @export var money_label: Label
 @export var depth_level: Label
+@export var team_bar: HBoxContainer
 
 @export var heal_camp_scene: PackedScene
 @export var shop_scene: PackedScene
@@ -33,15 +34,19 @@ const WHEEL_EVENT := preload("res://script/scenes/wheel_event/wheel_event.gd")
 
 var tweens = []
 
+# Felder unter der aktuellen Position sind abgehakt und werden blass
+const PASSED_MODULATE := Color(0.45, 0.45, 0.45, 0.8)
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	State.ep_changed.connect(change_ep_text)
 	State.boss_shards_changed.connect(monster_shard_changed)
 	State.pos_changed.connect(change_position)
 
-	depth_level.text = str(State.map_level)
-	boss_shard_label.text = str(State.boss_shards)
-	money_label.text = str(State.ep)
+	show_biome()
+	monster_shard_changed(State.boss_shards)
+	# nach Lager, Shop & Co. haben sich KP oder Elemente des Teams evtl. geändert
+	view_container.child_exiting_tree.connect(func(_child): team_bar.refresh.call_deferred())
 
 	await get_tree().process_frame
 	if State.killed_monsters >= 1:
@@ -69,6 +74,7 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	State.ep_changed.disconnect(change_ep_text)
+	State.boss_shards_changed.disconnect(monster_shard_changed)
 	State.pos_changed.disconnect(change_position)
 
 func set_map():
@@ -94,8 +100,8 @@ func set_map():
 			var g_container = grid_children[y_path_index * State.current_map.size() + x_path_index]
 			var d: Button = node_name.duplicate()
 			if y_path != null:
-				d.text = tr("MAP_NODE_" + y_path.get_name())
-				d.text += "\n" + str(y_path._pos.z)
+				d.icon = Map.ICONS[y_path._type]
+				d.tooltip_text = tr(Map.type_label(y_path._type))
 				d.pressed.connect(func(): call_map_event(y_path))
 				d.visible = true
 				y_path._ui_item = d
@@ -258,18 +264,23 @@ func change_position(pos, initial = false) -> void:
 			tween.tween_property(ub, "scale", Vector2(1.2, 1.2), 3)
 			tween.tween_property(ub, "scale", Vector2(1, 1), 3)
 			tweens.append(tween)
-			ub.add_theme_color_override("font_color", Color.DARK_GREEN)
+			ub.modulate = Color.WHITE
 
-func monster_shard_changed(ep) -> void:
-	boss_shard_label.text = tr("WORLDMAP_BOSS_SHARDS").format({"amount": ep})
+func monster_shard_changed(amount) -> void:
+	boss_shard_label.text = str(amount)
 
 func change_ep_text(ep) -> void:
-	money_label.text = tr("WORLDMAP_MONEY").format({"amount": ep})
-	print("ep", str(ep))
+	money_label.text = str(ep)
+
+# Name des aktuellen Bioms in seiner Farbe, dazu die Tiefe
+func show_biome() -> void:
+	var biome = ColorMap.get_combo(State.current_biome())
+	depth_level.text = tr("MAP_HEADER_BIOME").format({"biome": tr(biome.label), "depth": State.map_level + 1})
+	depth_level.add_theme_color_override("font_color", Color(biome.color).lightened(0.4))
 
 func reset_animation_state(ele) -> void:
 	ele._ui_item.scale = Vector2(1,1)
-	ele._ui_item.add_theme_color_override("font_color", Color.DARK_CYAN)
+	ele._ui_item.modulate = PASSED_MODULATE
 
 # Relic-Auswahl nach einem Boss-Sieg, erst hier, damit Level-Up und Boss-Belohnung vorher durch sind
 func show_relic_reward() -> void:

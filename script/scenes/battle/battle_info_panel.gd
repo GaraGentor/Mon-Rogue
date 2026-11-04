@@ -5,6 +5,7 @@ extends Control
 
 const SKILL_COLUMNS := ["SKILL_HEADER_SKILL", "SKILL_HEADER_COST", "SKILL_HEADER_CD", "SKILL_HEADER_POWER"]
 const EGG_SKILL_COLOR := Color(0.858824, 0.717647, 0.45098, 1)
+const MOVES_CHIP_COLOR := Color(0.25, 0.45, 0.7, 1)
 const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 
 @export var turn_wheel: Control
@@ -12,6 +13,8 @@ const EGG_TEXTURE := preload("res://assets/ui/eggs/common_1.png")
 @export var element_chip: Control
 ## Seltenheit der Art, rechts neben dem Typ
 @export var rarity_chip: Control
+## optional: freigeschaltete Züge (Aktionen pro Zug) der Art, rechts neben der Seltenheit
+@export var moves_chip: Control
 @export var stats_grid: GridContainer
 @export var skill_grid: GridContainer
 @export var skill_info_container: ScrollContainer
@@ -44,6 +47,10 @@ func refresh() -> void:
 	if rarity_chip:
 		var rarity := Monmap.rarity_of(monster._name)
 		rarity_chip._init_with_element({"label": Monmap.RARITY_LABELS[rarity], "color": Monmap.RARITY_COLORS[rarity]})
+	if moves_chip:
+		# Grundzug plus beim Kerkermeister gesprengte Ketten, von maximal möglichen
+		var max_moves: int = Monster.BASE_MOVES + Monmap.mon_metainfos_by_name(monster._name).get("max_upgrades", 0)
+		moves_chip._init_with_element({"label": "%s %d/%d" % [tr("BATTLE_MON_MOVES"), Monster.BASE_MOVES + monster._upgrades, max_moves], "color": MOVES_CHIP_COLOR})
 	if monster_texture:
 		Monmap.show_on(monster_texture, monster._name, Monmap.MEDIUM)
 		_reveal_monster_pixels()

@@ -17,6 +17,11 @@
 [ext_resource type="Shader" path="res://script/scenes/world_map/ui_line_wave.gdshader" id="15_qkwaq"]
 [ext_resource type="Script" path="res://script/scenes/world_map/line_control.gd" id="15_w2ou5"]
 [ext_resource type="Script" path="res://script/ui/relic_bar/relic_bar.gd" id="16_relic"]
+[ext_resource type="Texture2D" uid="uid://cpfweiuuk0lou" path="res://assets/ui/icons/bag.svg" id="17_bag"]
+[ext_resource type="Texture2D" uid="uid://16kgyrjrsykb" path="res://assets/ui/boss_shard/ChatGPT Image 26. Dez. 2025, 16_38_12.png" id="18_gold"]
+[ext_resource type="Texture2D" uid="uid://b0n4cvwqlulqv" path="res://assets/ui/boss_shard/ChatGPT Image 25. Dez. 2025, 21_33_55.png" id="19_shard"]
+[ext_resource type="Script" path="res://script/scenes/world_map/team_bar.gd" id="20_team"]
+[ext_resource type="Script" path="res://script/scenes/world_map/map_legend.gd" id="21_legend"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hmv0x"]
 shader = ExtResource("5_23h7f")
@@ -45,7 +50,7 @@ shader_parameter/glow_color = Color(0.4, 0.9, 1, 1)
 shader_parameter/glow_intensity = 1.594
 shader_parameter/glow_speed = 2.76
 
-[node name="WorldMap" type="Control" node_paths=PackedStringArray("scroll_container", "map_layout", "battle_c", "camp_c", "grid_container", "boss_button", "node_container", "node_name", "line_node", "boss_shard_label", "money_label", "depth_level", "view_container")]
+[node name="WorldMap" type="Control" node_paths=PackedStringArray("scroll_container", "map_layout", "battle_c", "camp_c", "grid_container", "boss_button", "node_container", "node_name", "line_node", "boss_shard_label", "money_label", "depth_level", "team_bar", "view_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -63,9 +68,10 @@ boss_button = NodePath("HBoxContainer/Panel2/ScrollContainer/MarginContainer/VBo
 node_container = NodePath("Items/NodeContainer")
 node_name = NodePath("Items/NodeName")
 line_node = NodePath("Items/UILine")
-boss_shard_label = NodePath("HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer/MarginContainer/HBoxContainer/ShardLabel")
-money_label = NodePath("HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer/MarginContainer/HBoxContainer/MoneyLabel")
-depth_level = NodePath("HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer/MarginContainer/HBoxContainer/DepthLevel")
+boss_shard_label = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow/ShardLabel")
+money_label = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow/MoneyLabel")
+depth_level = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow/DepthLevel")
+team_bar = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TeamBar")
 heal_camp_scene = ExtResource("2_tj45e")
 shop_scene = ExtResource("3_t1igp")
 jailer_scene = ExtResource("4_e13wj")
@@ -126,10 +132,10 @@ grow_vertical = 2
 theme_override_constants/separation = 0
 
 [node name="Panel" type="Panel" parent="HBoxContainer"]
+custom_minimum_size = Vector2(0, 184)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.2
+theme = ExtResource("5_pvajd")
 theme_override_styles/panel = SubResource("StyleBoxFlat_14sbp")
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel"]
@@ -144,56 +150,85 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Panel" type="Panel" parent="HBoxContainer/Panel/MarginContainer"]
+[node name="Header" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer"]
 layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BagPanel" type="PanelContainer" parent="HBoxContainer/Panel/MarginContainer/Header"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+tooltip_text = "REWARD_BAG"
 theme_override_styles/panel = ExtResource("4_m3j2j")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel/MarginContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer"]
+[node name="BagIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/BagPanel"]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
+mouse_filter = 2
+texture = ExtResource("17_bag")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer/MarginContainer"]
+[node name="Panel" type="PanelContainer" parent="HBoxContainer/Panel/MarginContainer/Header"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = ExtResource("4_m3j2j")
 
-[node name="MoneyLabel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel/MarginContainer/Header/Panel"]
 layout_mode = 2
-text = "M: 0"
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 8
 
-[node name="ShardLabel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer"]
 layout_mode = 2
-size_flags_horizontal = 2
-text = "M: 0"
+theme_override_constants/separation = 6
 
-[node name="DepthLevel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="TopRow" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 2
-text = "M: 0"
+theme_override_constants/separation = 8
 
-[node name="MarginContainer2" type="MarginContainer" parent="HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer"]
+[node name="GoldIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+texture = ExtResource("18_gold")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer/MarginContainer2"]
+[node name="MoneyLabel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
 
-[node name="RelicBar" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/Panel/VBoxContainer/MarginContainer2/HBoxContainer"]
+[node name="ShardIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+tooltip_text = "BOSS_REWARD_SHARD_DESC"
+texture = ExtResource("19_shard")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ShardLabel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+
+[node name="DepthLevel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "Biom"
+
+[node name="RelicBar" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_constants/separation = 8
 script = ExtResource("16_relic")
+
+[node name="TeamBar" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+script = ExtResource("20_team")
 
 [node name="Panel2" type="Panel" parent="HBoxContainer"]
 layout_mode = 2
@@ -253,6 +288,16 @@ grow_horizontal = 2
 grow_vertical = 2
 columns = 8
 
+[node name="MapLegend" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("21_legend")
+
 [node name="ViewPanel" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -272,17 +317,21 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -36.0
-offset_top = -19.0
-offset_right = 36.0
-offset_bottom = 19.0
+offset_left = -32.0
+offset_top = -32.0
+offset_right = 32.0
+offset_bottom = 32.0
+pivot_offset = Vector2(32, 32)
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("5_pvajd")
+theme_override_constants/icon_max_width = 64
 theme_override_font_sizes/font_size = 24
 flat = true
+icon_alignment = 1
+expand_icon = true
 
 [node name="NodeContainer" type="Panel" parent="Items"]
 visible = false
