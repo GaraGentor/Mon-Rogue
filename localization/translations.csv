@@ -62,7 +62,6 @@ BOSS_REWARD_CHOOSE_ONE,Choose wisely one of two rewards,Wähle weise eine von zw
 BOSS_REWARD_THANKS,Thanks for playing,Danke fürs Spielen
 BOSS_REWARD_NEW_RUN,Start a new run!,Neuen Lauf starten!
 HEAL_CAMP_DESC,Your team feels refreshed and heals 50% of their health!,Dein Team fühlt sich erfrischt und heilt 50% seiner Lebenspunkte!
-JAILER_DESC,Drag a Boss Shard to the Jailer to buy a prisoner free. Every broken chain gives that monster +1 action per turn for good.,"Zieh einen Boss-Splitter zum Kerkermeister, um einen Gefangenen freizukaufen. Jede gesprengte Kette gibt dem Monster dauerhaft +1 Aktion pro Zug."
 JAILER_REROLL,Other prisoners for ${cost} ({money}),Andere Gefangene für ${cost} ({money})
 JAILER_FINISH,Finish,Fertig
 JAILER_BUY,Buy for Boss Shards,Für Boss-Splitter kaufen
@@ -428,37 +427,32 @@ TRAINER_REPLACES,Has to forget another skill for it,Muss dafür einen anderen Sk
 TRAINER_ALL_KNOW,Your monsters already know this skill.,Deine Monster kennen diesen Skill schon.
 TRAINER_ALREADY_KNOWS,Already knows this skill,Kennt diesen Skill schon
 TRAINER_FINISH_CHOICE,First choose which skill to forget.,"Wähle erst, welcher Skill vergessen wird."
-JAILER_TITLE,Jailer,Kerkermeister
 JAILER_SHARD,Boss Shard,Boss-Splitter
-JAILER_SHARD_DESC,You have: {amount},Du hast: {amount}
-JAILER_LEVEL,Level {level}/{max},Stufe {level}/{max}
-JAILER_COST,Ransom: {cost} Boss Shards,Freikaufen: {cost} Boss-Splitter
 JAILER_NOT_ENOUGH_SHARDS,Not enough Boss Shards!,Nicht genug Boss-Splitter!
-JAILER_ALL_MAXED,All of these prisoners are already free.,Diese Gefangenen sind schon alle frei.
-JAILER_DRAG_HINT,Hand the shard to the Jailer,Gib den Splitter dem Kerkermeister
-JAILER_CHOOSE_CELL,Click the cell the Jailer should unlock,"Klick auf die Zelle, die der Kerkermeister aufschließen soll"
 JAILER_CANCEL,Never mind,Doch nicht
-JAILER_CAUGHT,Caught {place},Gefangen {place}
-JAILER_FREE,FREE!,FREI!
-JAILER_MOVES,Actions per turn: {now} -> {next},Aktionen pro Zug: {now} -> {next}
-JAILER_MOVES_MAX,Actions per turn: {now},Aktionen pro Zug: {now}
-JAILER_CHAIN_BROKEN,A chain of {mon} is broken!,Eine Kette von {mon} ist gesprengt!
-JAILER_FREED,{mon} is free!,{mon} ist frei!
-JAILER_LIST_AND,{rest} and {last},{rest} und {last}
 JAILER_PLACE_0,on the Storm Cliffs,in den Sturmklippen
 JAILER_PLACE_1,by the Frozen Sea,am Eismeer
 JAILER_PLACE_2,in the Misty Woods,im Nebelwald
 JAILER_PLACE_3,in the Ember Desert,in der Glutwüste
 JAILER_PLACE_4,beyond the Northern Wall,hinter dem Nordwall
-JAILER_SAY_OFFER,"Today's offer: {mons}! Caught {places}, auctioned off for {costs} Boss Shards.","Heute im Angebot: {mons}! Gefangen {places}, werden versteigert zum Preis von {costs} Boss-Splittern."
-JAILER_SAY_OFFER_ONE,"Today's offer: {mons}! Caught {places}, auctioned off for {costs} Boss Shards.","Heute im Angebot: {mons}! Gefangen {places}, wird versteigert zum Preis von {costs} Boss-Splittern."
-JAILER_SAY_OFFER_END,"Hand me a shard, and I'll fetch my keys.","Gib mir einen Splitter, dann hol ich meine Schlüssel."
-JAILER_SAY_WHO,"A shard... fine. So, whose chains shall I loosen?","Ein Splitter... na gut. Wessen Ketten soll ich lösen?"
-JAILER_SAY_CHAIN,"Clank! One chain less for {mon}. {moves} actions per turn now, but the door stays shut.","Klirr! Eine Kette weniger für {mon}. Jetzt {moves} Aktionen pro Zug, aber die Tür bleibt zu."
-JAILER_SAY_FREED,The door is open. {mon} is free! Make something of it.,Die Tür ist offen. {mon} ist frei! Mach was draus.
+JAILER_SAY_WHO,Now choose a monster. Maybe then I'll give you the keys to it.,Nun wähle ein Monster. Vielleicht gebe ich dir dann die Schlüssel dazu.
+JAILER_SAY_CHAIN,"Clank! One chain less for {mon}. {moves} actions per turn now, but the cage stays shut.","Klirr! Eine Kette weniger für {mon}. Jetzt {moves} Aktionen pro Zug, aber der Käfig bleibt zu."
+JAILER_SAY_FREED,The cage is open. {mon} is free! Make something of it.,Der Käfig ist offen. {mon} ist frei! Mach was draus.
 JAILER_SAY_CANCEL,Changed your mind? Keep your shard then.,"Doch nicht? Dann behalt deinen Splitter."
 JAILER_SAY_POOR,"No Boss Shards, no keys. That's how it works down here.","Ohne Boss-Splitter keine Schlüssel. So läuft das hier unten."
 JAILER_SAY_EMPTY,All my prisoners are free. Bad for business.,Alle meine Gefangenen sind frei. Schlecht fürs Geschäft.
+JAILER_ORIGIN,Origin: {place},Herkunft: {place}
+JAILER_PRICE,Price: {cost} Boss Shards,Preis: {cost} Boss-Splitter
+JAILER_EFFECT,Effect: actions per turn {now} -> {next},Wirkung: Aktionen pro Zug {now} -> {next}
+JAILER_ORIGIN_0,Storm Cliffs,Sturmklippen
+JAILER_ORIGIN_1,Frozen Sea,Eismeer
+JAILER_ORIGIN_2,Misty Woods,Nebelwald
+JAILER_ORIGIN_3,Ember Desert,Glutwüste
+JAILER_ORIGIN_4,Northern Wall,Nordwall
+JAILER_SAY_INTRO_FIRST,"Have a look: {mon}. Caught {place}, yours for {cost} Boss Shards.","Schau her: {mon}. Gefangen {place}, zu haben für {cost} Boss-Splitter."
+JAILER_SAY_INTRO_NEXT,"Next to it, {mon}, freshly caught {place}. That makes {cost} Boss Shards.","Daneben {mon}, frisch {place} eingefangen. Macht {cost} Boss-Splitter."
+JAILER_SAY_INTRO_LAST,"And finally {mon}. Caught {place}, costs {cost} Boss Shards.","Und zuletzt {mon}. Gefangen {place}, kostet {cost} Boss-Splitter."
+JAILER_SAY_HOWTO,I see Boss Shards in your bag. Drag them to me to strengthen one of your monsters.,"Ich sehe da Boss-Splitter in deiner Tasche. Zieh sie zu mir, um eines deiner Monster zu verstärken."
 RUN_END_KILLED_BY,Killing blow:,Tödlicher Treffer:
 RUN_END_FALLEN,Fallen along the way:,Unterwegs gefallen:
 RUN_END_DEATH_LINE,"{killer} (Lv. {killer_level}) took out {victim} (Lv. {victim_level}) with {skill}: -{damage} HP ({hp_left}/{max_hp} HP left)","{killer} (Lv. {killer_level}) besiegte {victim} (Lv. {victim_level}) mit {skill}: -{damage} KP ({hp_left}/{max_hp} KP übrig)"

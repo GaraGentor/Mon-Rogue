@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dl61eynmu64k7"
-path="res://.godot/imported/cell_rivet.svg-f7f7eb189518c38f7f113c93ee9bd910.ctex"
+uid="uid://dgxnf0dkcovdc"
+path="res://.godot/imported/bubble_tail.svg-f8c4c0dca2b6369e92ece5b8266af0f1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/jailer/cell_rivet.svg"
-dest_files=["res://.godot/imported/cell_rivet.svg-f7f7eb189518c38f7f113c93ee9bd910.ctex"]
+source_file="res://assets/ui/jailer/bubble_tail.svg"
+dest_files=["res://.godot/imported/bubble_tail.svg-f8c4c0dca2b6369e92ece5b8266af0f1.ctex"]
 
 [params]
 

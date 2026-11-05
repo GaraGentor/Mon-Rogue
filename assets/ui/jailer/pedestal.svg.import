@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://04nqdnuuuxou"
-path="res://.godot/imported/mw3jnmuc0jtazv.jpeg-bc8c652aac2cf4e4580772c777a05f0e.ctex"
+uid="uid://b3ap410wu33ki"
+path="res://.godot/imported/pedestal.svg-485d1b4ce220f532f45d33b72a4b7dca.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/npcs/mw3jnmuc0jtazv.jpeg"
-dest_files=["res://.godot/imported/mw3jnmuc0jtazv.jpeg-bc8c652aac2cf4e4580772c777a05f0e.ctex"]
+source_file="res://assets/ui/jailer/pedestal.svg"
+dest_files=["res://.godot/imported/pedestal.svg-485d1b4ce220f532f45d33b72a4b7dca.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

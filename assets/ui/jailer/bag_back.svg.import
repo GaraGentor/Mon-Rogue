@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dvo4lrimfwvfr"
-path="res://.godot/imported/cell_bar.svg-da9f8cc893566198aa6d9dbc7f196d7b.ctex"
+uid="uid://cl1gncqfb0afm"
+path="res://.godot/imported/bag_back.svg-8d3fd74ed7852214e3f4e8a431a7fbba.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/jailer/cell_bar.svg"
-dest_files=["res://.godot/imported/cell_bar.svg-da9f8cc893566198aa6d9dbc7f196d7b.ctex"]
+source_file="res://assets/ui/jailer/bag_back.svg"
+dest_files=["res://.godot/imported/bag_back.svg-8d3fd74ed7852214e3f4e8a431a7fbba.ctex"]
 
 [params]
 

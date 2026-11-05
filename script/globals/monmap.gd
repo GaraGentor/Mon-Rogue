@@ -30,12 +30,14 @@ func texture(name: String, display_size: float, back := false) -> Texture2D:
 
 ## "Lebende Pixel" mit animiertem Dithering für alle Monsterbilder (siehe living_pixels.gdshader)
 const LIVING_MATERIAL := preload("res://script/ui/shader/living_pixels_material.tres")
-## wie LIVING_MATERIAL, zusätzlich mit gelbem Umriss (ausgewähltes Monster im Kampf)
+## Umriss für alles Ausgewählte und Hervorgehobene: gedämpftes Gold
+const SELECTED_OUTLINE_COLOR := Color(0.858824, 0.717647, 0.45098)
+## wie LIVING_MATERIAL, zusätzlich mit goldenem Umriss (ausgewähltes Monster)
 var living_selected_material: ShaderMaterial
 
 func _init() -> void:
 	living_selected_material = LIVING_MATERIAL.duplicate()
-	living_selected_material.set_shader_parameter("outline_color", Color(1, 1, 0, 1))
+	living_selected_material.set_shader_parameter("outline_color", SELECTED_OUTLINE_COLOR)
 
 ## Monsterbild samt Lebende-Pixel-Material auf ein TextureRect setzen
 func show_on(rect: TextureRect, name: String, display_size: float, back := false) -> void:
@@ -72,7 +74,7 @@ func egg_material(rarity: int, selected := false) -> ShaderMaterial:
 		tint.a = 0.0 if rarity == Enums.MON_RARITY.COMMON else 0.45 + 0.1 * rarity
 		mat.set_shader_parameter("tint_color", tint)
 		if selected:
-			mat.set_shader_parameter("outline_color", Color(1, 1, 0, 1))
+			mat.set_shader_parameter("outline_color", SELECTED_OUTLINE_COLOR)
 		_egg_materials[key] = mat
 	return _egg_materials[key]
 

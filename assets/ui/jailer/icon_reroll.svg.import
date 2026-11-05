@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://yy21ixwhecwu"
-path="res://.godot/imported/cell_crossbar.svg-d0d52b2ce489685c749c1dcb47127dc6.ctex"
+uid="uid://bqwge7qe2w233"
+path="res://.godot/imported/icon_reroll.svg-83afec9d6a3ac9f597282532d5e6d3fe.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/jailer/cell_crossbar.svg"
-dest_files=["res://.godot/imported/cell_crossbar.svg-d0d52b2ce489685c749c1dcb47127dc6.ctex"]
+source_file="res://assets/ui/jailer/icon_reroll.svg"
+dest_files=["res://.godot/imported/icon_reroll.svg-83afec9d6a3ac9f597282532d5e6d3fe.ctex"]
 
 [params]
 
