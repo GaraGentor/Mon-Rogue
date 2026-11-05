@@ -68,7 +68,10 @@ func _add_skill_card(skill: Dictionary) -> void:
 	card.drag.skill = skill
 	card.on_click = _show_skill_detail.bind(skill, card)
 	# Titel in der Farbe des Elements
-	card.info.get_child(0).add_theme_color_override("font_color", Helper.color_by_type(skill.nature))
+	card.info.get_child(0).add_theme_color_override("font_color", SkillCardPaper.readable_color(Helper.color_by_type(skill.nature)))
+	SkillCardPaper.attach(card, skill)
+	# Text nicht auf den Papierrahmen setzen
+	card.row.get_parent().add_theme_constant_override("margin_bottom", 14)
 	set_price(card, randi_range(skill.shop_cost.min, skill.shop_cost.max))
 	card.tooltip_text = _fits_text(skill)
 	ignore_mouse_below(card)

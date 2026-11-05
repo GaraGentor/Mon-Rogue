@@ -294,7 +294,7 @@ func _skill_name(skill: Dictionary) -> String:
 func _skill_card(skill: Dictionary, note: String) -> Button:
 	var card := _card(Vector2(270, 150))
 	var lines := _card_lines(card)
-	var name_label := _label(19, Helper.color_by_type(skill.nature))
+	var name_label := _label(19, SkillCardPaper.readable_color(Helper.color_by_type(skill.nature)))
 	name_label.text = _skill_name(skill)
 	lines.add_child(name_label)
 	var stats := _label(14, Color.WHITE)
@@ -313,6 +313,10 @@ func _skill_card(skill: Dictionary, note: String) -> Button:
 		var note_label := _label(13, GOLD)
 		note_label.text = note
 		lines.add_child(note_label)
+	SkillCardPaper.attach(card, skill)
+	# Text nicht auf den Papierrahmen setzen
+	for side in ["left", "right", "top", "bottom"]:
+		lines.get_parent().add_theme_constant_override("margin_" + side, 16)
 	return card
 
 # Schon bekannt oder fehlende Elemente, sonst ""

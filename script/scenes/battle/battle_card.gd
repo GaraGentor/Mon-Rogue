@@ -34,6 +34,7 @@ var playable := true:
 var _press_pos := Vector2.ZERO
 var _pressed := false
 var _swiping := false
+var _paper: SkillCardPaper
 
 func _ready() -> void:
 	_init_card()
@@ -41,8 +42,12 @@ func _ready() -> void:
 func _init_card() -> void:
 	if skill.is_empty():
 		return
+	if _paper == null:
+		_paper = SkillCardPaper.attach(self, skill)
+	else:
+		_paper.set_skill(skill)
 	name_label.text = tr(skill.name)
-	name_label.self_modulate = Helper.color_by_type(skill.nature)
+	name_label.self_modulate = SkillCardPaper.readable_color(Helper.color_by_type(skill.nature))
 	cost_label.text = str(skill.cost)
 	value_label.text = Helper.format_number(skill.get("value", skill.get("damage", "")))
 	type_icon.texture = physical_texture if skill.damage_type == Enums.SKILL_DAMAGE_TYPE.PHYSICAL else magic_texture

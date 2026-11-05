@@ -5,9 +5,8 @@ extends Control
 
 const SKILLS_TO_PICK := 3
 const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
-const BG := Color(0.0627451, 0.0862745, 0.0823529, 1)
 const BG_TOP := Color(0.560784, 0.301961, 0.85098, 1)
-const LOCKED_COLOR := Color(0.5, 0.5, 0.5)
+const LOCKED_COLOR := Color(0.65, 0.65, 0.65)
 const MISSING_COLOR := Color(1, 0.45, 0.45)
 const MAP_BACKGROUND := preload("res://script/scenes/world_map/map_background.gdshader")
 const BATTLE_CARD := preload("res://script/scenes/battle/battle_card.tscn")
@@ -146,18 +145,6 @@ func _create_card(skill: Dictionary, locked: bool, locked_label := "") -> Button
 	card.toggle_mode = not locked
 	card.focus_mode = Control.FOCUS_NONE
 
-	if locked:
-		var style := _card_style(Color(0.4, 0.4, 0.4), Color(BG, 0.6), 2)
-		card.add_theme_stylebox_override("normal", style)
-		card.add_theme_stylebox_override("hover", _card_style(Color(0.6, 0.6, 0.6), Color(BG.lightened(0.08), 0.7), 2))
-		card.add_theme_stylebox_override("pressed", style)
-	else:
-		var pressed := _card_style(GOLD, Color(color.darkened(0.55), 1.0), 4)
-		card.add_theme_stylebox_override("normal", _card_style(color, Color(BG.lightened(0.05), 0.95), 2))
-		card.add_theme_stylebox_override("hover", _card_style(color.lightened(0.2), Color(BG.lightened(0.12), 0.95), 2))
-		card.add_theme_stylebox_override("pressed", pressed)
-		card.add_theme_stylebox_override("hover_pressed", pressed)
-
 	# Inhalt als eigene Controls, damit Schadensart und Stärke als Icons erscheinen
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -177,7 +164,7 @@ func _create_card(skill: Dictionary, locked: bool, locked_label := "") -> Button
 	var name_row := HBoxContainer.new()
 	name_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	lines.add_child(name_row)
-	var name_label := _card_label(tr(skill.name), 18, LOCKED_COLOR if locked else color.lightened(0.3))
+	var name_label := _card_label(tr(skill.name), 18, LOCKED_COLOR if locked else SkillCardPaper.readable_color(color))
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_row.add_child(name_label)
@@ -197,6 +184,7 @@ func _create_card(skill: Dictionary, locked: bool, locked_label := "") -> Button
 		if not Skills.can_use(_mon, skill):
 			# wählbar, aber erst spielbar, wenn das Monster die fehlenden Elemente bekommt (z. B. im Shop)
 			lines.add_child(_card_label(Skills.missing_elements_text(_mon, skill), 14, MISSING_COLOR))
+	SkillCardPaper.attach(card, skill, locked)
 	return card
 
 func _card_label(text: String, font_size: int, color: Color) -> Label:
@@ -214,16 +202,6 @@ func _icon(texture: Texture2D, icon_size: int, color: Color) -> TextureRect:
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	icon.modulate = color
 	return icon
-
-func _card_style(border: Color, bg: Color, border_width: int) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = bg
-	style.border_color = border
-	style.set_border_width_all(border_width)
-	style.set_corner_radius_all(8)
-	style.content_margin_left = 14
-	style.content_margin_right = 14
-	return style
 
 func _label(text: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()

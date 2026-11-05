@@ -1,7 +1,6 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://script/scenes/battle/battle_card.gd" id="1_card"]
-[ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="2_box"]
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="3_theme"]
 [ext_resource type="Texture2D" uid="uid://yg6oxnmiu0pd" path="res://assets/ui/icons/fist.svg" id="4_phys"]
 [ext_resource type="Texture2D" uid="uid://djt3q5aymms0i" path="res://assets/ui/icons/sparkle.svg" id="5_magic"]
@@ -11,7 +10,6 @@ custom_minimum_size = Vector2(150, 0)
 size_flags_vertical = 3
 mouse_filter = 0
 theme = ExtResource("3_theme")
-theme_override_styles/panel = ExtResource("2_box")
 script = ExtResource("1_card")
 name_label = NodePath("MarginContainer/VBoxContainer/NameLabel")
 cost_label = NodePath("MarginContainer/VBoxContainer/TopRow/CostLabel")
@@ -24,10 +22,10 @@ magic_texture = ExtResource("5_magic")
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 11
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 11
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
