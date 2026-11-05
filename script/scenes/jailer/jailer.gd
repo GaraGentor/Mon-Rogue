@@ -363,7 +363,7 @@ func _build_stage() -> void:
 	_exit_button.tooltip_text = tr("JAILER_FINISH")
 	_exit_button.pressed.connect(close)
 
-	_bubble = SpeechBubble.new(BUBBLE_WIDTH, true, true)
+	_bubble = SpeechBubble.new(BUBBLE_WIDTH, true)
 	_stage.add_child(_bubble)
 
 func _icon_button(texture: Texture2D) -> Button:

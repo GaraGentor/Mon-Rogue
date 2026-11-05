@@ -131,7 +131,7 @@ func _build_sides() -> void:
 	trainer_image.reparent(_stage, false)
 	for i in mini(State.mons.size(), PLATE_CENTERS.size()):
 		_plates.append(_add_plate_mon(State.mons[i]))
-	_bubble = SpeechBubble.new(BUBBLE_WIDTH, true, true)
+	_bubble = SpeechBubble.new(BUBBLE_WIDTH, true)
 	_stage.add_child(_bubble)
 
 func _add_plate_mon(mon: Monster) -> PlateMon:
