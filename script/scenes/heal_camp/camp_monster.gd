@@ -1,6 +1,6 @@
 extends VBoxContainer
 
-## Monster im Lager: Name, Stufe und Lebensanzeige über dem Bild, ohne Box und ohne Kampfwerte.
+## Monster im Lager: Name, Stufe und Lebensanzeige auf einer Eisenplatte über dem Bild, ohne Kampfwerte.
 
 @export var name_label: Label
 @export var level_label: Label
@@ -13,7 +13,8 @@ var mon: Monster
 func _ready() -> void:
 	Events.deal_damage_to_monster.connect(_on_hp_changed)
 	name_label.text = Helper.mon_battle_name(mon)
-	name_label.self_modulate = Helper.color_by_mon(mon)
+	# aufgehellt wie in der Team-Leiste, sonst sind dunkle Farben auf der Eisenplatte kaum lesbar
+	name_label.self_modulate = Helper.color_by_mon(mon).lightened(0.4)
 	level_label.text = tr("BATTLE_MON_LEVEL") + " " + str(mon._level)
 	Monmap.show_on(texture_rect, mon._name, Monmap.SMALL)
 	hp_bar.max_value = mon.hp()

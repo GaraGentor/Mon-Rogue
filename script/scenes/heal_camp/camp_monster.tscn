@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://script/scenes/heal_camp/camp_monster.gd" id="1_camp"]
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="2_theme"]
+[ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="3_plate"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
 bg_color = Color(0.75, 0.1, 0.1, 1)
@@ -28,32 +29,50 @@ size_flags_vertical = 4
 theme = ExtResource("2_theme")
 theme_override_constants/separation = 8
 script = ExtResource("1_camp")
-name_label = NodePath("Header/Name")
-level_label = NodePath("Header/Level")
-hp_bar = NodePath("HpBar")
-hp_label = NodePath("HpBar/Label")
+name_label = NodePath("Info/Margin/Content/Header/Name")
+level_label = NodePath("Info/Margin/Content/Header/Level")
+hp_bar = NodePath("Info/Margin/Content/HpBar")
+hp_label = NodePath("Info/Margin/Content/HpBar/Label")
 texture_rect = NodePath("TextureRect")
 
-[node name="Header" type="HBoxContainer" parent="."]
+[node name="Info" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="Plate" type="ColorRect" parent="Info"]
+layout_mode = 2
+script = ExtResource("3_plate")
+
+[node name="Margin" type="MarginContainer" parent="Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Content" type="VBoxContainer" parent="Info/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="Info/Margin/Content"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Name" type="Label" parent="Header"]
+[node name="Name" type="Label" parent="Info/Margin/Content/Header"]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 20
 text = "[NAME]"
 text_overrun_behavior = 3
 
-[node name="Level" type="Label" parent="Header"]
+[node name="Level" type="Label" parent="Info/Margin/Content/Header"]
 layout_mode = 2
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
+theme_override_font_sizes/font_size = 20
 text = "Lv 1"
 
-[node name="HpBar" type="ProgressBar" parent="."]
+[node name="HpBar" type="ProgressBar" parent="Info/Margin/Content"]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
@@ -62,7 +81,7 @@ step = 0.0
 value = 100.0
 show_percentage = false
 
-[node name="Label" type="Label" parent="HpBar"]
+[node name="Label" type="Label" parent="Info/Margin/Content/HpBar"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
