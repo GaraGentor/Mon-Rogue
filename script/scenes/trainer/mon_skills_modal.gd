@@ -30,6 +30,18 @@ const SKILL_CARD_SIZE := Vector2(170, 200)
 const DESCRIPTION_FONT_SIZE := 16
 const SKILL_TITLE_FONT_SIZE := 22
 const OPEN_SECONDS := 0.15
+const PIXEL_FONT = preload("res://script/ui/fonts/pxelfont/PixelifySans-VariableFont_wght.ttf")
+const STAT_FONT_SIZE := 17
+const STAT_COLUMNS := 3
+## Anzeige -> Getter am Monster
+const STATS := {
+	"STAT_HP": "hp",
+	"STAT_ATK": "attack",
+	"STAT_DEF": "defense",
+	"STAT_SPA": "s_attack",
+	"STAT_SPD": "s_defense",
+	"STAT_SPE": "speed",
+}
 
 var _skills: Array
 var _details: RichTextLabel
@@ -111,7 +123,26 @@ func _portrait(mon: Monster) -> Control:
 	chip.custom_minimum_size.y = CHIP_HEIGHT
 	chip._init_color(mon)
 	box.add_child(chip)
+	box.add_child(_stats(mon))
 	return box
+
+## Werte wie im Shop: Pixelschrift auf einer Eisenplatte
+func _stats(mon: Monster) -> Control:
+	var plate := PanelContainer.new()
+	var grid := GridContainer.new()
+	grid.columns = STAT_COLUMNS
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 0)
+	IronPlate.frame(plate, grid, 10, 7)
+	for key: String in STATS:
+		var label := Label.new()
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.add_theme_font_override("font", PIXEL_FONT)
+		label.add_theme_font_size_override("font_size", STAT_FONT_SIZE)
+		label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
+		label.text = "%s %d" % [tr(key), roundi(mon.call(STATS[key]))]
+		grid.add_child(label)
+	return plate
 
 func _cards() -> Control:
 	var scroll := ScrollContainer.new()
