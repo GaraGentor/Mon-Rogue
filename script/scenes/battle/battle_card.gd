@@ -66,6 +66,10 @@ func show_state(mon: Monster) -> void:
 	description_label.text = text
 	description_label.self_modulate = Color(1, 0.45, 0.45)
 
+## Ausgewählte Karte leuchtet am Rahmen (erst möglich, wenn die Karte im Baum ist)
+func set_selected(selected: bool) -> void:
+	_paper.set_glow(SkillCardPaper.SELECTED_GLOW if selected else 0.0)
+
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:

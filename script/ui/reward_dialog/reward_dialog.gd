@@ -62,15 +62,9 @@ class RewardCard extends PanelContainer:
 			return null
 		var reason := dialog._drag_blocked(self)
 		if reason != "":
-			dialog._target_header.text = reason
+			dialog._show_blocked(reason)
 			return null
-		var preview := PanelContainer.new()
-		preview.add_theme_stylebox_override("panel", BOX)
-		var label := Label.new()
-		label.theme = LABEL_THEME
-		label.text = drag.title
-		preview.add_child(label)
-		set_drag_preview(preview)
+		set_drag_preview(dialog._make_drag_preview(self))
 		dialog._show_targets(self)
 		return drag
 
@@ -242,6 +236,20 @@ func _taken(_card: RewardCard) -> void:
 func _drag_blocked(_card: RewardCard) -> String:
 	return ""
 
+## Was beim Ziehen am Mauszeiger hängt: standardmäßig der Titel der Karte
+func _make_drag_preview(card: RewardCard) -> Control:
+	var preview := PanelContainer.new()
+	preview.add_theme_stylebox_override("panel", BOX)
+	var label := Label.new()
+	label.theme = LABEL_THEME
+	label.text = card.drag.title
+	preview.add_child(label)
+	return preview
+
+## Zeigt, warum die Karte nicht gezogen werden darf
+func _show_blocked(reason: String) -> void:
+	_target_header.text = reason
+
 ## Ausgegraut und nicht mehr ziehbar
 func mark_sold(card: RewardCard) -> void:
 	card.sold = true
@@ -321,8 +329,12 @@ func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary
 		description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	ignore_mouse_below(card)
-	_card_grid.add_child(card)
+	_place_card(card)
 	return card
+
+## Karte ins Layout setzen, Unterklassen können sie selbst anordnen (Trainer)
+func _place_card(card: RewardCard) -> void:
+	_card_grid.add_child(card)
 
 func _add_target(target_title: String, icon: Control, mon: Variant, locked := false) -> void:
 	var target := DropTarget.new()
@@ -404,13 +416,21 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_DRAG_END and is_node_ready():
 		_hide_targets()
 
+## Ziele, die beim Ziehen hervorgehoben werden
+func _drop_targets() -> Array:
+	return _target_grid.get_children()
+
+## Bereich, unter dem der Tooltip eines Ziels erscheint
+func _tooltip_anchor(target: DropTarget) -> Rect2:
+	return target.get_global_rect()
+
 func _process(_delta: float) -> void:
 	if _dragged == null:
 		return
 	# Ziel unter dem gezogenen Preis hervorheben und seinen Tooltip zeigen
 	var mouse := get_global_mouse_position()
 	var hovered: DropTarget = null
-	for target: DropTarget in _target_grid.get_children():
+	for target: DropTarget in _drop_targets():
 		var over := target.get_global_rect().has_point(mouse)
 		if target.locked:
 			target.modulate = LOCKED_COLOR
@@ -419,10 +439,11 @@ func _process(_delta: float) -> void:
 		if over:
 			hovered = target
 	var tooltip: Callable = _dragged.drag.get("tooltip", Callable())
-	_tooltip.visible = hovered != null and hovered.mon != null and tooltip.is_valid()
+	var text: String = tooltip.call(hovered.mon) if hovered != null and hovered.mon != null and tooltip.is_valid() else ""
+	_tooltip.visible = text != ""
 	if _tooltip.visible:
-		_tooltip_label.text = tooltip.call(hovered.mon)
+		_tooltip_label.text = text
 		_tooltip.reset_size()
-		var rect := hovered.get_global_rect()
+		var rect := _tooltip_anchor(hovered)
 		var pos := Vector2(rect.get_center().x - _tooltip.size.x / 2, rect.end.y + 8)
 		_tooltip.global_position = pos.clamp(Vector2.ZERO, get_viewport_rect().size - _tooltip.size)

@@ -69,5 +69,9 @@ func _sync_button() -> void:
 			glow = HOVER_GLOW
 		BaseButton.DRAW_PRESSED, BaseButton.DRAW_HOVER_PRESSED:
 			glow = SELECTED_GLOW
+	set_glow(glow)
+
+## Rahmen golden leuchten lassen, 0 = normaler Rahmen
+func set_glow(glow: float) -> void:
 	_shader_material.set_shader_parameter("frame_glow", glow)
 	_shader_material.set_shader_parameter("frame_color", GOLD if glow > 0.0 else INK)

@@ -419,11 +419,14 @@ TRAINER_TITLE,Trainer,Trainer
 TRAINER_HINT,Drag a skill onto a monster to teach it.,"Zieh einen Skill auf ein Monster, um ihn ihm beizubringen."
 TRAINER_CHOOSE_MON,Who should learn it?,Wer soll ihn lernen?
 TRAINER_ELEMENT,Element: {element},Element: {element}
+SKILL_KIND_ACTIVE,Active,Aktiv
+SKILL_INFO_COOLDOWN,Cooldown,Abklingzeit
 TRAINER_FITS,Fits: {mons},Passt zu: {mons}
 TRAINER_FITS_NONE,None of your monsters can use it yet,Noch kann keins deiner Monster ihn einsetzen
 TRAINER_CAN_USE,Can use it right away,Kann ihn sofort einsetzen
 TRAINER_REPLACES,Has to forget another skill for it,Muss dafür einen anderen Skill vergessen
 TRAINER_ALL_KNOW,Your monsters already know this skill.,Deine Monster kennen diesen Skill schon.
+TRAINER_ALREADY_KNOWS,Already knows this skill,Kennt diesen Skill schon
 TRAINER_FINISH_CHOICE,First choose which skill to forget.,"Wähle erst, welcher Skill vergessen wird."
 JAILER_TITLE,Jailer,Kerkermeister
 JAILER_SHARD,Boss Shard,Boss-Splitter

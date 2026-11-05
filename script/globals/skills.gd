@@ -249,9 +249,13 @@ func can_use(mon: Monster, skill: Dictionary) -> bool:
 func can_use_name(mon: Monster, skill_name: String) -> bool:
 	return covers(mon._type, get_skill(skill_name).nature)
 
+# Einzelne Elemente, die dem Monster für diesen Skill noch fehlen.
+func missing_elements(mon: Monster, skill: Dictionary) -> Array:
+	return Enums.MON_TYPES.values().filter(func(element): return skill.nature & element and not mon._type & element)
+
 # "Benötigt: Erde, Luft" für die Elemente, die dem Monster für diesen Skill noch fehlen ("" wenn spielbar).
 func missing_elements_text(mon: Monster, skill: Dictionary) -> String:
-	var missing = Enums.MON_TYPES.values().filter(func(element): return skill.nature & element and not mon._type & element)
+	var missing = missing_elements(mon, skill)
 	if missing.is_empty():
 		return ""
 	var labels = missing.map(func(element): return tr(ColorMap.get_combo(element).label))
