@@ -30,6 +30,12 @@ const BAG_ICON = preload("res://assets/ui/icons/bag.svg")
 const HOVER_COLOR := Color(1.3, 1.3, 1.0)
 const LOCKED_COLOR := Color(0.45, 0.45, 0.45)
 const SOLD_ALPHA := 0.35
+const BUTTON_THEME = preload("res://script/scenes/battle/flat_button_theme.tres")
+## Icon-Buttons auf Eisenplatte (Kerkermeister, Trainer), Pixel-Look passend zum Hintergrund
+const ICON_BUTTON_MATERIAL = preload("res://script/scenes/jailer/jailer_props_material.tres")
+const ICON_BUTTON_SIZE := Vector2(72, 72)
+const BUTTON_HOVER_COLOR := Color(1.35, 1.35, 1.2)
+const BUTTON_DISABLED_COLOR := Color(0.5, 0.5, 0.5)
 
 ## Preis auf der linken Seite, lässt sich auf die Ziele ziehen
 class RewardCard extends PanelContainer:
@@ -263,6 +269,26 @@ static func texture_icon(texture: Texture2D, color: Color = Color.WHITE) -> Cont
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	return icon
+
+## Die Platte ist Teil des Icons bzw. eine IronPlate, der Button selbst zeichnet keine Fläche
+static func clear_button_styles(button: Button, style: StyleBox) -> void:
+	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+		button.add_theme_stylebox_override(state, style)
+
+static func icon_button(texture: Texture2D) -> Button:
+	var button := Button.new()
+	button.theme = BUTTON_THEME
+	button.icon = texture
+	button.expand_icon = true
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.material = ICON_BUTTON_MATERIAL
+	clear_button_styles(button, StyleBoxEmpty.new())
+	button.add_theme_color_override("icon_hover_color", BUTTON_HOVER_COLOR)
+	button.add_theme_color_override("icon_hover_pressed_color", BUTTON_HOVER_COLOR)
+	button.add_theme_color_override("icon_disabled_color", BUTTON_DISABLED_COLOR)
+	button.custom_minimum_size = ICON_BUTTON_SIZE
+	button.size = ICON_BUTTON_SIZE
+	return button
 
 ## Art eines Ziels: eigene Monster oder Arten als String
 static func mon_name(mon: Variant) -> String:

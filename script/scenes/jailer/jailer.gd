@@ -6,7 +6,6 @@ extends RewardDialog
 ## zu ihm und wählt den Käfig. Ist die letzte Kette weg, verschwindet der Käfig samt Platz; die anderen
 ## rücken nicht nach, die Lücke bleibt bis zum Neuwürfeln (oben rechts, kostet EP).
 
-const BUTTON_THEME = preload("res://script/scenes/battle/flat_button_theme.tres")
 const CHAIN_TEXTURE = preload("res://assets/ui/jailer/chain.svg")
 const CHAIN_BROKEN_TEXTURE = preload("res://assets/ui/jailer/chain_broken.svg")
 const CAGE_BACK_TEXTURE = preload("res://assets/ui/jailer/birdcage_back.svg")
@@ -28,8 +27,6 @@ const PLACE_COUNT := 5
 const BASE_MOVES := Monster.BASE_MOVES
 const GOLD := Color(0.858824, 0.717647, 0.45098)
 const TOO_EXPENSIVE_COLOR := Color(0.95, 0.38, 0.3)
-const BUTTON_HOVER_COLOR := Color(1.35, 1.35, 1.2)
-const BUTTON_DISABLED_COLOR := Color(0.5, 0.5, 0.5)
 
 ## Bildausschnitt des Kerkermeisters, Anteile der Bildgröße: links und rechts der Figur, linker Rand des Gesichts
 const FIGURE_LEFT := 0.14
@@ -43,7 +40,6 @@ const CAGES_GAP := 12.0
 const BUBBLE_WIDTH := 470.0
 const BUBBLE_TOP := 40.0
 const BUBBLE_TAIL := 18.0
-const ICON_BUTTON_SIZE := Vector2(72, 72)
 const SHARD_DRAG_SIZE := Vector2(64, 96)
 ## Vorstellung: Anzeigedauer pro Satz
 const INTRO_BASE_SECONDS := 2.2
@@ -339,7 +335,7 @@ func _build_stage() -> void:
 	margins.content_margin_right = 16
 	margins.content_margin_top = 10
 	margins.content_margin_bottom = 10
-	_clear_button_styles(_cancel_button, margins)
+	clear_button_styles(_cancel_button, margins)
 	_cancel_button.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	_cancel_button.add_theme_color_override("font_hover_color", GOLD)
 	_cancel_button.add_theme_color_override("font_pressed_color", GOLD)
@@ -370,23 +366,8 @@ func _build_stage() -> void:
 	_bubble = SpeechBubble.new(BUBBLE_WIDTH, true, true)
 	_stage.add_child(_bubble)
 
-## Die Platte ist Teil des Icons bzw. eine IronPlate, der Button selbst zeichnet keine Fläche
-func _clear_button_styles(button: Button, style: StyleBox) -> void:
-	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
-		button.add_theme_stylebox_override(state, style)
-
 func _icon_button(texture: Texture2D) -> Button:
-	var button := Button.new()
-	button.theme = BUTTON_THEME
-	button.icon = texture
-	button.expand_icon = true
-	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	button.material = PROPS_MATERIAL
-	_clear_button_styles(button, StyleBoxEmpty.new())
-	button.add_theme_color_override("icon_hover_color", BUTTON_HOVER_COLOR)
-	button.add_theme_color_override("icon_hover_pressed_color", BUTTON_HOVER_COLOR)
-	button.add_theme_color_override("icon_disabled_color", BUTTON_DISABLED_COLOR)
-	button.size = ICON_BUTTON_SIZE
+	var button := icon_button(texture)
 	_stage.add_child(button)
 	return button
 

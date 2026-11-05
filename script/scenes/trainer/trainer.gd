@@ -75,7 +75,9 @@ const PLATE_WIDTH := 0.40
 const FACE_LEFT := 0.37
 ## Monster auf der Platte, bezogen auf die Plattenbreite
 const MON_SIZE_ON_PLATE := 1.1
-const BUBBLE_TOP := 10.0
+const BUBBLE_WIDTH := 320.0
+## ragt nach oben aus der Bühne, damit die Blase nicht auf den Karten liegt
+const BUBBLE_TOP := -30.0
 const BUBBLE_TAIL := 18.0
 
 ## Wellen-Hintergrund aus der Szene
@@ -104,7 +106,7 @@ func _ready() -> void:
 	set_card_layout(CARD_COLUMNS, TRAINER_CARD_SIZE, true)
 	for skill in _pick_offers():
 		_add_skill_card(skill)
-	add_money_footer("SHOP_FINISH")
+	add_money_bar("SHOP_FINISH")
 	_first_layout()
 
 ## Ersetzt die beiden Standard-Spalten: links Kartentisch, rechts der Trainer, je die halbe Breite
@@ -129,7 +131,7 @@ func _build_sides() -> void:
 	trainer_image.reparent(_stage, false)
 	for i in mini(State.mons.size(), PLATE_CENTERS.size()):
 		_plates.append(_add_plate_mon(State.mons[i]))
-	_bubble = SpeechBubble.new()
+	_bubble = SpeechBubble.new(BUBBLE_WIDTH, true, true)
 	_stage.add_child(_bubble)
 
 func _add_plate_mon(mon: Monster) -> PlateMon:
@@ -175,7 +177,7 @@ func _layout_stage() -> void:
 		plate.position = origin + PLATE_CENTERS[i] * image_size - plate.pivot_offset
 		plate.chips.size = Vector2(mon_size, CHIPS_HEIGHT)
 		plate.chips.position = plate.position + Vector2(0, mon_size + CHIPS_GAP)
-	_bubble.position = origin + Vector2(FACE_LEFT * image_size.x - SpeechBubble.WIDTH - BUBBLE_TAIL, BUBBLE_TOP)
+	_bubble.position = origin + Vector2(FACE_LEFT * image_size.x - BUBBLE_WIDTH - BUBBLE_TAIL, BUBBLE_TOP)
 
 func _place_card(card: RewardCard) -> void:
 	_card_layer.add_child(card)
