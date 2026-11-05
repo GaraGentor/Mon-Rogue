@@ -149,8 +149,13 @@ const EGG_SKILL_CHANCE := 0.35
 
 # Wilde Monster tragen mit etwas Glück genau eine noch nicht freigeschaltete Ei-Attacke ihrer Art.
 func roll_egg_skill(mon: Monster) -> void:
+	if randf() <= EGG_SKILL_CHANCE:
+		add_egg_skill(mon)
+
+# Gibt dem Monster eine noch nicht freigeschaltete Ei-Attacke seiner Art, falls es noch eine gibt.
+func add_egg_skill(mon: Monster) -> void:
 	var locked = Skills.get_locked_egg_skills(mon._name)
-	if locked.is_empty() or randf() > EGG_SKILL_CHANCE:
+	if locked.is_empty():
 		return
 	# bevorzugt Ei-Attacken, die das Monster selbst einsetzen kann
 	var usable_locked = locked.filter(func(skill_name): return Skills.can_use_name(mon, skill_name))

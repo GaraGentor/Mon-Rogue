@@ -235,6 +235,22 @@ func add_footer(control: Control) -> void:
 func close() -> void:
 	queue_free()
 
+## Debug-Menü: vergibt alle Preise auf einmal (Monster-Preise an das erste passende Monster),
+## schließt den Dialog und liefert die Titel der vergebenen Preise
+func take_all() -> PackedStringArray:
+	var titles := PackedStringArray()
+	for card: RewardCard in _card_grid.get_children():
+		if card.drag.get("bag", false):
+			card.drag.on_drop.call()
+		else:
+			var mons: Array = card.drag.mons.call() if card.drag.mons is Callable else card.drag.mons
+			if mons.is_empty():
+				continue
+			card.drag.on_drop.call(mons[0])
+		titles.append(card.drag.title)
+	close()
+	return titles
+
 ## Nach einer Wahl: standardmäßig ist der Dialog damit fertig
 func _taken(_card: RewardCard) -> void:
 	close()

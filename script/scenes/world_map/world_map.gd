@@ -31,6 +31,7 @@ const RELIC_REWARD_SCENE := preload("res://script/scenes/relic_reward/relic_rewa
 const GEM_SCENE := preload("res://script/scenes/gems/gems.tscn")
 const WHEEL_EVENT := preload("res://script/scenes/wheel_event/wheel_event.gd")
 const HUB_CAMP := preload("res://script/scenes/hub_camp/hub_camp.gd")
+const DEBUG_MENU := preload("res://script/scenes/world_map/map_debug_menu.gd")
 
 @export var view_container: Panel
 
@@ -110,7 +111,24 @@ func _ready() -> void:
 	else:
 		change_position(State.current_map_position)
 	change_ep_text(State.ep)
+	if OS.is_debug_build():
+		add_debug_button()
 	show_relic_reward()
+
+# Nur in Debug-Builds: links neben dem Legenden-Button im Header
+func add_debug_button() -> void:
+	var button := RewardDialog.plate_button("DEBUG")
+	button.add_theme_font_size_override("font_size", 16)
+	button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	button.offset_left = -172.0
+	button.offset_top = -60.0
+	button.offset_right = -80.0
+	button.offset_bottom = -16.0
+	button.pressed.connect(func():
+		var menu = DEBUG_MENU.new()
+		menu.map = self
+		view_container.add_child(menu))
+	$HBoxContainer/Panel.add_child(button)
 
 #func _enter_tree() -> void:
 #	Events.map_event_pressed.disconnect(_call_map_event)
@@ -276,7 +294,10 @@ func call_random_event() -> void:
 		Map.EVENT_TYPE.CAMP:
 			open_heal_camp()
 		Map.EVENT_TYPE.WHEEL:
-			view_container.add_child(WHEEL_EVENT.new())
+			open_wheel_event()
+
+func open_wheel_event() -> void:
+	view_container.add_child(WHEEL_EVENT.new())
 
 func open_heal_camp() -> void:
 	var hcs = heal_camp_scene.instantiate()
@@ -287,11 +308,14 @@ func open_heal_camp() -> void:
 func _on_boss_button_pressed() -> void:
 	if State.current_map.size() > 0:
 		if State.current_map_position.y + 1 == State.current_map[0].size():
-			State.is_boss_fight = true
-			if State.map_level == Map.map_settings.size() - 1:
-				State.is_final_boss = true
-			get_tree().change_scene_to_file("res://script/scenes/battle/battle.tscn")
-			State.current_map_position = State.NO_MAP_POSITION
+			start_biome_boss()
+
+func start_biome_boss() -> void:
+	State.is_boss_fight = true
+	if State.map_level == Map.map_settings.size() - 1:
+		State.is_final_boss = true
+	get_tree().change_scene_to_file("res://script/scenes/battle/battle.tscn")
+	State.current_map_position = State.NO_MAP_POSITION
 
 func change_position(pos, initial = false) -> void:
 	for tween: Tween in tweens:

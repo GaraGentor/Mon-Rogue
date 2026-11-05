@@ -82,6 +82,10 @@ func unlock_egg_skill(monster_name: String, skill_name: String):
 		save_data["egg_skills"][monster_name].append(skill_name)
 	save_game()
 
+func lock_egg_skill(monster_name: String, skill_name: String):
+	save_data["egg_skills"].get(monster_name, []).erase(skill_name)
+	save_game()
+
 func is_egg_skill_unlocked(monster_name: String, skill_name: String) -> bool:
 	return save_data["egg_skills"].get(monster_name, []).has(skill_name)
 
@@ -100,6 +104,10 @@ func add_reroll_charge():
 
 func has_full_reroll_charges() -> bool:
 	return int(save_data["reroll_charges"]) >= REROLL_CHARGES_NEEDED
+
+func set_reroll_charges(amount: int):
+	save_data["reroll_charges"] = amount
+	save_game()
 
 func spend_reroll_charges():
 	save_data["reroll_charges"] = 0
