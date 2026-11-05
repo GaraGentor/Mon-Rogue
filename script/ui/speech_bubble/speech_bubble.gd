@@ -2,7 +2,7 @@ class_name SpeechBubble
 extends PanelContainer
 
 ## Sprechblase eines NPCs: eine Eisenplatte im Pixel-Look, say() blendet den Text ein.
-## Der Zipfel zeigt nach rechts zum NPC, der Host legt die Blase links neben dessen Kopf.
+## Der Zipfel zeigt zum NPC, standardmäßig nach rechts: der Host legt die Blase dann links neben dessen Kopf.
 
 const FONT_SIZE := 22
 const MARGIN := 16
@@ -22,10 +22,13 @@ var _tween: Tween
 var _width: float
 ## bleibt stehen, bis der nächste Text kommt
 var _stays: bool
+## NPC steht links der Blase, sie wächst beim Einblenden von dort aus
+var _tail_left: bool
 
-func _init(width: float, stays := false) -> void:
+func _init(width: float, stays := false, tail_left := false) -> void:
 	_width = width
 	_stays = stays
+	_tail_left = tail_left
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_label = Label.new()
@@ -37,10 +40,11 @@ func _init(width: float, stays := false) -> void:
 	_label.add_theme_font_size_override("font_size", FONT_SIZE)
 	# Node2D, damit der Container den Zipfel nicht in die Fläche zieht
 	var holder := Node2D.new()
-	holder.position = Vector2(_width, 0) + TAIL_POSITION
+	holder.position = Vector2(-TAIL_POSITION.x - TAIL_SIZE.x, TAIL_POSITION.y) if _tail_left else Vector2(_width, 0) + TAIL_POSITION
 	add_child(holder)
 	var tail := TextureRect.new()
 	tail.texture = TAIL_TEXTURE
+	tail.flip_h = _tail_left
 	tail.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	tail.size = TAIL_SIZE
 	tail.material = TAIL_MATERIAL
@@ -51,7 +55,7 @@ func say(text: String) -> void:
 	_label.text = text
 	reset_size()
 	visible = true
-	pivot_offset = Vector2(_width, 0)
+	pivot_offset = Vector2.ZERO if _tail_left else Vector2(_width, 0)
 	if _tween:
 		_tween.kill()
 	modulate.a = 0.0

@@ -326,23 +326,7 @@ func _build_stage() -> void:
 	_bag.drag = {"title": tr("JAILER_SHARD"), "header": "", "bag": true, "on_drop": _bribe}
 	_stage.add_child(_bag)
 
-	_cancel_button = Button.new()
-	_cancel_button.theme = BUTTON_THEME
-	_cancel_button.add_theme_font_size_override("font_size", 22)
-	_cancel_button.text = tr("JAILER_CANCEL")
-	var margins := StyleBoxEmpty.new()
-	margins.content_margin_left = 16
-	margins.content_margin_right = 16
-	margins.content_margin_top = 10
-	margins.content_margin_bottom = 10
-	clear_button_styles(_cancel_button, margins)
-	_cancel_button.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
-	_cancel_button.add_theme_color_override("font_hover_color", GOLD)
-	_cancel_button.add_theme_color_override("font_pressed_color", GOLD)
-	var cancel_plate := IronPlate.new()
-	cancel_plate.show_behind_parent = true
-	cancel_plate.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	_cancel_button.add_child(cancel_plate)
+	_cancel_button = plate_button(tr("JAILER_CANCEL"))
 	_cancel_button.position = Vector2(ShardBag.BAG_SIZE.x + 12, 20)
 	_cancel_button.visible = false
 	_cancel_button.pressed.connect(_cancel_choice)

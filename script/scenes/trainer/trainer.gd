@@ -36,15 +36,13 @@ class PlateMon extends RewardDialog.DropTarget:
 		_tween = create_tween()
 		_tween.tween_property(self, "scale", SELECTED_SCALE if selected else Vector2.ONE, SELECT_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
-const ELEMENT_CHIP := preload("res://script/ui/element_chip/element_chip.tscn")
 const TRAINER_CARD_SIZE := Vector2(210, 0)
 ## Karte am Mauszeiger: kleiner als auf dem Tisch und leicht durchscheinend
 const DRAG_PREVIEW_SCALE := 0.8
 const DRAG_PREVIEW_ALPHA := 0.8
-## Chips unter den Monstern: Abstand zum Monster, Zeilenhöhe, Platz um den Text
+## Chips unter den Monstern: Abstand zum Monster, Zeilenhöhe
 const CHIPS_GAP := 8.0
 const CHIPS_HEIGHT := 36.0
-const CHIP_PADDING := Vector2(16, 8)
 const CARD_COLUMNS := 4
 const MIN_TIER := 2
 const SINGLE_ELEMENT_OFFERS := 2
@@ -277,18 +275,7 @@ func _show_missing_elements(card: RewardCard) -> void:
 		if card == null or Skills.knows_skill(plate.mon, card.drag.skill.name):
 			continue
 		for element: int in Skills.missing_elements(plate.mon, card.drag.skill):
-			_add_element_chip(plate.chips, element)
-
-func _add_element_chip(row: Control, element: int) -> void:
-	var chip := ELEMENT_CHIP.instantiate()
-	chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	chip.size_flags_vertical = Control.SIZE_FILL
-	chip._init_with_element({"label": ColorMap.get_combo(element).label, "color": Helper.color_by_type(element)})
-	row.add_child(chip)
-	# der Chip selbst hat keine Mindestgröße, sein Text ist mittig darin verankert
-	chip.custom_minimum_size = chip.label.get_minimum_size() + CHIP_PADDING
-	ignore_mouse_below(chip)
-	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			add_element_chip(plate.chips, element)
 
 func _tooltip_anchor(target: DropTarget) -> Rect2:
 	return target.get_global_rect().merge((target as PlateMon).chips.get_global_rect())

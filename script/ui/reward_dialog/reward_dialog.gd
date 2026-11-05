@@ -36,6 +36,9 @@ const ICON_BUTTON_MATERIAL = preload("res://script/scenes/jailer/jailer_props_ma
 const ICON_BUTTON_SIZE := Vector2(72, 72)
 const BUTTON_HOVER_COLOR := Color(1.35, 1.35, 1.2)
 const BUTTON_DISABLED_COLOR := Color(0.5, 0.5, 0.5)
+const ELEMENT_CHIP := preload("res://script/ui/element_chip/element_chip.tscn")
+## Platz um den Text eines Element-Chips
+const CHIP_PADDING := Vector2(16, 8)
 
 ## Preis auf der linken Seite, lässt sich auf die Ziele ziehen
 class RewardCard extends PanelContainer:
@@ -289,6 +292,39 @@ static func icon_button(texture: Texture2D) -> Button:
 	button.custom_minimum_size = ICON_BUTTON_SIZE
 	button.size = ICON_BUTTON_SIZE
 	return button
+
+## Text-Button auf Eisenplatte (Kerkermeister, Shop)
+static func plate_button(text: String) -> Button:
+	var button := Button.new()
+	button.theme = BUTTON_THEME
+	button.add_theme_font_size_override("font_size", 22)
+	button.text = text
+	var margins := StyleBoxEmpty.new()
+	margins.content_margin_left = 16
+	margins.content_margin_right = 16
+	margins.content_margin_top = 10
+	margins.content_margin_bottom = 10
+	clear_button_styles(button, margins)
+	button.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
+	button.add_theme_color_override("font_hover_color", SkillDetailPopup.GOLD)
+	button.add_theme_color_override("font_pressed_color", SkillDetailPopup.GOLD)
+	var plate := IronPlate.new()
+	plate.show_behind_parent = true
+	plate.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	button.add_child(plate)
+	return button
+
+## Chip mit dem Namen und der Farbe eines Elements bzw. einer Kombination, in eine Zeile eingereiht
+static func add_element_chip(row: Control, element: int) -> void:
+	var chip := ELEMENT_CHIP.instantiate()
+	chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	chip.size_flags_vertical = Control.SIZE_FILL
+	chip._init_with_element({"label": ColorMap.get_combo(element).label, "color": Helper.color_by_type(element)})
+	row.add_child(chip)
+	# der Chip selbst hat keine Mindestgröße, sein Text ist mittig darin verankert
+	chip.custom_minimum_size = chip.label.get_minimum_size() + CHIP_PADDING
+	ignore_mouse_below(chip)
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 ## Art eines Ziels: eigene Monster oder Arten als String
 static func mon_name(mon: Variant) -> String:

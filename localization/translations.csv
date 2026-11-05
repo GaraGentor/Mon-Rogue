@@ -397,8 +397,16 @@ GEM_S_ATK,Amethyst of Power,Amethyst der Macht
 GEM_S_DEF,Sapphire of Warding,Saphir des Schutzes
 GEM_SPEED,Emerald of Swiftness,Smaragd der Schnelligkeit
 SHOP_BOUGHT,{item} bought!,{item} gekauft!
-SHOP_TITLE,Shop,Laden
-SHOP_HINT,Drag an item over here to buy it.,"Zieh eine Ware hier herüber, um sie zu kaufen."
+SHOP_SAY_WELCOME,Welcome to self-checkout! There are no staff here. You serve yourself.,Willkommen an der Selbstzahler-Kasse! Personal gibt es hier nicht. Sie bedienen sich selbst.
+SHOP_SAY_POTIONS,"Potions are on the top shelves. Drag one onto a monster: it gains the element and can use more skills.","Tränke stehen oben im Regal. Auf ein Monster gezogen, bekommt es das Element dazu und kann mehr Skills einsetzen."
+SHOP_SAY_GEMS,Gems are on the lower left. Drag one onto a monster to raise a stat for the rest of the run.,"Edelsteine liegen links unten. Auf ein Monster gezogen, erhöhen sie einen Wert für den restlichen Lauf."
+SHOP_SAY_RELICS,Relics are on the lower right. Please place them in the bag below.,Relikte finden Sie rechts unten. Legen Sie diese bitte in die Tasche unter mir.
+SHOP_SAY_CLICK,Click an item for details. Payment is automatic once you put it down.,"Klicken Sie eine Ware für Details an. Bezahlt wird automatisch, sobald Sie sie ablegen."
+SHOP_SAY_THANKS_0,Thank you for your purchase! Enjoy your {item}.,Vielen Dank für Ihren Einkauf! Viel Freude mit: {item}.
+SHOP_SAY_THANKS_1,Beep! {item} scanned successfully. Thank you!,Piep! {item} erfolgreich gescannt. Danke!
+SHOP_SAY_THANKS_2,"Thanks! {item} is yours. Unexpected item in bagging area? Not my problem.","Danke! {item} gehört jetzt Ihnen. Unerwarteter Artikel im Einpackbereich? Nicht mein Problem."
+SHOP_DETAIL_MON,Drag it onto a monster to buy it.,"Zum Kaufen auf ein Monster ziehen."
+SHOP_DETAIL_BAG,Drag it into the bag to buy it.,Zum Kaufen in die Tasche ziehen.
 REWARD_NO_TARGET,None of your monsters can use this.,Keins deiner Monster kann das gebrauchen.
 BATTLE_SUPER_EFFECTIVE,Super effective!,Sehr effektiv!
 BATTLE_NOT_EFFECTIVE,Not very effective...,Nicht sehr effektiv...

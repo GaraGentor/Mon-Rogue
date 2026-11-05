@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="112" viewBox="0 0 96 112">
+  <!-- Edelstein in Graustufen, die Farbe des Werts kommt per tint_color aus dem Shader -->
+  <path d="M26 6 H70 L90 38 L48 108 L6 38 Z" fill="#6a6a6a"/>
+  <path d="M26 6 H70 L60 38 H36 Z" fill="#e8e8e8"/>
+  <path d="M26 6 L36 38 H6 Z" fill="#b5b5b5"/>
+  <path d="M70 6 L90 38 H60 Z" fill="#8c8c8c"/>
+  <path d="M6 38 H36 L48 108 Z" fill="#9c9c9c"/>
+  <path d="M36 38 H60 L48 108 Z" fill="#cfcfcf"/>
+  <path d="M60 38 H90 L48 108 Z" fill="#5c5c5c"/>
+  <path d="M34 14 L42 14 L36 30 L30 30 Z" fill="#ffffff"/>
+  <path d="M26 6 H70 L90 38 L48 108 L6 38 Z M6 38 H90 M26 6 L36 38 L48 108 L60 38 L70 6" fill="none" stroke="#06080c" stroke-width="4" stroke-linejoin="bevel"/>
+</svg>
