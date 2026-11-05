@@ -77,11 +77,11 @@ biome_path = NodePath("MarginContainer/VBoxContainer/BiomePath")
 stats_grid = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/StatsGrid")
 team_label = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/TeamLabel")
 unlock_label = NodePath("MarginContainer/VBoxContainer/UnlockLabel")
-killer_label = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/KillerLabel")
-fallen_label = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/FallenLabel")
+killer_label = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/DeathScroll/DeathLog/KillerLabel")
+fallen_label = NodePath("MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/DeathScroll/DeathLog/FallenLabel")
 search_edit = NodePath("MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/SearchEdit")
 mon_list = NodePath("MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer/MonList")
-detail_box = NodePath("MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer/Detail")
+detail_box = NodePath("MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer/DetailScroll/Detail")
 biome_tabs = NodePath("MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/BiomeTabs")
 
 [node name="Background" type="TextureRect" parent="."]
@@ -130,6 +130,7 @@ font = ExtResource("7_font")
 
 [node name="Panels" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 20
 alignment = 1
 
@@ -167,17 +168,25 @@ theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
 theme_override_font_sizes/font_size = 18
 autowrap_mode = 2
 
-[node name="KillerLabel" type="Label" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer"]
+[node name="DeathScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="DeathLog" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/DeathScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="KillerLabel" type="Label" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/DeathScroll/DeathLog"]
 visible = false
-custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.55, 0.5, 1)
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 2
 
-[node name="FallenLabel" type="Label" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer"]
+[node name="FallenLabel" type="Label" parent="MarginContainer/VBoxContainer/Panels/StatsPanel/MarginContainer/VBoxContainer/DeathScroll/DeathLog"]
 visible = false
-custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
 theme_override_font_sizes/font_size = 14
@@ -225,6 +234,7 @@ theme_override_constants/separation = 4
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 12
 
 [node name="MonList" type="ItemList" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer"]
@@ -245,7 +255,12 @@ theme_override_styles/cursor = SubResource("StyleBoxEmpty_none")
 theme_override_styles/cursor_unfocused = SubResource("StyleBoxEmpty_none")
 fixed_icon_size = Vector2i(28, 28)
 
-[node name="Detail" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="DetailScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+
+[node name="Detail" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Panels/SearchPanel/MarginContainer/VBoxContainer/HBoxContainer/DetailScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6

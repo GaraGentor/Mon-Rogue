@@ -214,6 +214,7 @@ func _last_sighting(mon_name: String) -> Dictionary:
 func _clear_detail() -> void:
 	for child in detail_box.get_children():
 		child.queue_free()
+	detail_box.get_parent().scroll_vertical = 0
 
 func _show_locked() -> void:
 	_clear_detail()
