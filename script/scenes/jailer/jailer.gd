@@ -2,9 +2,9 @@ extends RewardDialog
 
 ## Kerkermeister: rechts steht er selbst, davor bis zu drei Monster-Arten in Vogelkäfigen, angekettet.
 ## Jede Kette ist eine fehlende Verbesserung (+1 Aktion pro Zug). Erst stellt er die Gefangenen vor
-## (Klick springt zum nächsten Satz). Danach zieht man einen Boss-Splitter aus der Tasche oben links
+## (Klick springt zum nächsten Satz). Danach zieht man eine Boss Träne aus der Tasche oben links
 ## zu ihm und wählt den Käfig. Ist die letzte Kette weg, verschwindet der Käfig samt Platz; die anderen
-## rücken nicht nach, die Lücke bleibt bis zum Neuwürfeln (oben rechts, kostet EP).
+## rücken nicht nach, die Lücke bleibt bis zum Neuwürfeln (oben rechts, kostet ME).
 
 const CHAIN_TEXTURE = preload("res://assets/ui/jailer/chain.svg")
 const CHAIN_BROKEN_TEXTURE = preload("res://assets/ui/jailer/chain_broken.svg")
@@ -13,7 +13,7 @@ const CAGE_FRONT_TEXTURE = preload("res://assets/ui/jailer/birdcage_front.svg")
 const PEDESTAL_TEXTURE = preload("res://assets/ui/jailer/pedestal.svg")
 const BAG_BACK_TEXTURE = preload("res://assets/ui/jailer/bag_back.svg")
 const BAG_FRONT_TEXTURE = preload("res://assets/ui/jailer/bag_front.svg")
-const SHARD_TEXTURE = preload("res://assets/ui/jailer/boss_shard.svg")
+const SHARD_TEXTURE = preload("res://assets/ui/jailer/boss_tear.svg")
 const REROLL_TEXTURE = preload("res://assets/ui/jailer/icon_reroll.svg")
 const EXIT_TEXTURE = preload("res://assets/ui/jailer/icon_exit.svg")
 ## Pixel-Look für Käfig, Beutel, Kristalle, Podest und Buttons, passend zum Hintergrund
@@ -45,12 +45,12 @@ const SHARD_DRAG_SIZE := Vector2(64, 96)
 const INTRO_BASE_SECONDS := 2.2
 const INTRO_SECONDS_PER_CHAR := 0.035
 
-## Offene Tasche: Rückwand, Splitter, Vorderseite mit der Anzahl. Aus ihr zieht man den Splitter.
+## Offene Tasche: Rückwand, Boss Tränen, Vorderseite mit der Anzahl. Aus ihr zieht man eine Träne.
 class ShardBag extends RewardDialog.RewardCard:
 	const BAG_SIZE := Vector2(150, 142)
-	const SHARD_SIZE := Vector2(46, 69)
-	## sichtbare Splitter: Mitte als Anteil der Taschengröße und Neigung in Grad, hinten zuerst
-	const SPOTS := [[0.5, 0.26, 0.0], [0.3, 0.3, -18.0], [0.7, 0.3, 18.0], [0.4, 0.36, -7.0], [0.62, 0.36, 8.0]]
+	const SHARD_SIZE := Vector2(40, 60)
+	## sichtbare Tränen: Mitte als Anteil der Taschengröße und Neigung in Grad, hinten zuerst
+	const SPOTS := [[0.5, 0.2, 0.0], [0.27, 0.25, -18.0], [0.73, 0.25, 18.0], [0.38, 0.32, -7.0], [0.63, 0.32, 8.0]]
 	const PLAQUE_CENTER := Vector2(0.5, 0.73)
 
 	var _shards: Control
@@ -124,6 +124,7 @@ class CageSlot extends VBoxContainer:
 	const SIGN_TITLE_SIZE := 24
 	const SIGN_MARGIN_X := 11
 	const SIGN_MARGIN_Y := 10
+	const REVEAL_SECONDS := 0.8
 
 	var jailer: Node
 	var mon_name: String
@@ -135,6 +136,7 @@ class CageSlot extends VBoxContainer:
 	var _front: TextureRect
 	var _chains: HBoxContainer
 	var _sign: IronPlate
+	var _sign_plate: Control
 	var _cost_label: Label
 	var _effect_label: Label
 
@@ -164,7 +166,11 @@ class CageSlot extends VBoxContainer:
 		for i in jailer.max_level(mon_name):
 			_chains.add_child(ChainLink.new())
 
-		add_child(_build_sign(origin))
+		_sign_plate = _build_sign(origin)
+		add_child(_sign_plate)
+		# bis zur Vorstellung unsichtbar, aber per Alpha statt visible, damit das Layout schon steht
+		_monster.modulate.a = 0.0
+		_sign_plate.modulate.a = 0.0
 		var pedestal := TextureRect.new()
 		pedestal.texture = PEDESTAL_TEXTURE
 		pedestal.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -223,16 +229,22 @@ class CageSlot extends VBoxContainer:
 		if freed:
 			return
 		var moves: int = BASE_MOVES + level
-		_cost_label.text = tr("JAILER_PRICE").format({"cost": jailer.upgrade_cost(mon_name)})
+		_cost_label.text = tr("JAILER_PRICE").format({"cost": jailer.tear_count_text(jailer.upgrade_cost(mon_name))})
 		_cost_label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR if jailer.affordable(mon_name) else TOO_EXPENSIVE_COLOR)
 		_effect_label.text = tr("JAILER_EFFECT").format({"now": moves, "next": moves + 1})
+
+	## Monster und Schild erscheinen, sobald der Kerkermeister sie vorstellt
+	func reveal() -> void:
+		var fade := create_tween().set_parallel()
+		fade.tween_property(_monster, "modulate:a", 1.0, REVEAL_SECONDS)
+		fade.tween_property(_sign_plate, "modulate:a", 1.0, REVEAL_SECONDS)
 
 	## Hervorhebung beim Vorstellen und Auswählen: Umriss ums Monster, goldener Rand am Schild
 	func set_glow(glowing: bool) -> void:
 		_monster.material = Monmap.living_selected_material if glowing else Monmap.LIVING_MATERIAL
 		_sign.set_rim(GOLD if glowing else IronPlate.RIM)
 
-	## choosable: nach dem Abgeben des Splitters anklickbar; locked: ausgegraut
+	## choosable: nach dem Abgeben der Träne anklickbar; locked: ausgegraut
 	func set_choosable(choosable: bool, locked: bool) -> void:
 		set_glow(choosable)
 		modulate = RewardDialog.LOCKED_COLOR if locked else Color.WHITE
@@ -281,7 +293,7 @@ var _reroll_button: Button
 var _reroll_price: Label
 var _exit_button: Button
 var _cancel_button: Button
-## Splitter liegt beim Kerkermeister, man wählt gerade den Käfig
+## Die Träne liegt beim Kerkermeister, man wählt gerade den Käfig
 var _choosing := false
 ## noch offene Sätze der Vorstellung, je {text, slot}
 var _intro: Array[Dictionary] = []
@@ -337,7 +349,7 @@ func _build_stage() -> void:
 	_reroll_price = Label.new()
 	_reroll_price.theme = LABEL_THEME
 	_reroll_price.add_theme_font_size_override("font_size", 20)
-	_reroll_price.text = "$%d" % REROLL_COST
+	_reroll_price.text = Helper.me_text(REROLL_COST)
 	_reroll_price.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_reroll_price.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_reroll_price.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
@@ -376,6 +388,11 @@ static func upgrade_level(mon_name: String) -> int:
 
 static func max_level(mon_name: String) -> int:
 	return Monmap.mon_metainfos_by_name(mon_name).max_upgrades
+
+## "1 Boss Träne" bzw. "3 Boss Tränen"
+static func tear_count_text(amount: int) -> String:
+	var key := "JAILER_TEAR_COUNT_ONE" if amount == 1 else "JAILER_TEAR_COUNT_MANY"
+	return TranslationServer.translate(key).format({"amount": amount})
 
 static func upgrade_cost(mon_name: String) -> int:
 	return upgrade_level(mon_name) * 2 + 1
@@ -426,7 +443,7 @@ func _roll_offers() -> void:
 ## Erster, mittlerer oder letzter Gefangener in der Vorstellung
 func _intro_text(index: int, count: int, mon_name: String, place: String) -> String:
 	var key := "JAILER_SAY_INTRO_FIRST" if index == 0 else ("JAILER_SAY_INTRO_LAST" if index == count - 1 else "JAILER_SAY_INTRO_NEXT")
-	return tr(key).format({"mon": Helper.mon_display_name(mon_name), "place": place, "cost": upgrade_cost(mon_name)})
+	return tr(key).format({"mon": Helper.mon_display_name(mon_name), "place": place, "cost": tear_count_text(upgrade_cost(mon_name))})
 
 func _update_slots() -> void:
 	for slot in _slots:
@@ -448,9 +465,13 @@ func _next_intro_line() -> void:
 	_highlight_only(null)
 	if _intro.is_empty():
 		_intro_running = false
+		# wurde die Vorstellung übersprungen, sind noch nicht alle zu sehen
+		for slot in _slots:
+			slot.reveal()
 		_bubble.say(_explanation())
 		return
 	var line: Dictionary = _intro.pop_front()
+	line.slot.reveal()
 	_highlight_only(line.slot)
 	_bubble.say(line.text)
 	_intro_tween = create_tween()
@@ -462,7 +483,7 @@ func _highlight_only(highlighted: CageSlot) -> void:
 		if not slot.freed:
 			slot.set_glow(slot == highlighted)
 
-## Vorstellung sofort beenden, z. B. wenn schon ein Splitter gezogen wird
+## Vorstellung sofort beenden, z. B. wenn schon eine Träne gezogen wird
 func _end_intro() -> void:
 	if not _intro_running:
 		return
@@ -482,7 +503,7 @@ func _input(event: InputEvent) -> void:
 	if _intro_running and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_next_intro_line()
 
-## Splitter beim Kerkermeister abgelegt: jetzt den Käfig wählen
+## Träne beim Kerkermeister abgelegt: jetzt den Käfig wählen
 func _bribe() -> void:
 	_set_choosing(true)
 	_bubble.say(tr("JAILER_SAY_WHO"))
@@ -523,11 +544,11 @@ func _set_choosing(choosing: bool) -> void:
 	_update_slots()
 	_refresh_bag()
 
-## Der gezogene oder abgegebene Splitter fehlt in der Tasche
+## Die gezogene oder abgegebene Träne fehlt in der Tasche
 func _refresh_bag() -> void:
 	_bag.show_count(State.boss_shards - (1 if _dragged != null or _choosing else 0))
 
-## Die Tasche bleibt beim Ziehen sichtbar, nur ein Splitter wandert heraus
+## Die Tasche bleibt beim Ziehen sichtbar, nur eine Träne wandert heraus
 func _show_targets(card: RewardCard) -> void:
 	super(card)
 	card.modulate.a = 1.0
@@ -539,7 +560,7 @@ func _hide_targets() -> void:
 	if _bag:
 		_refresh_bag()
 
-## Am Mauszeiger hängt der Splitter selbst
+## Am Mauszeiger hängt die Träne selbst
 func _make_drag_preview(_card: RewardCard) -> Control:
 	var shard := texture_icon(SHARD_TEXTURE)
 	shard.material = PROPS_MATERIAL

@@ -1,18 +1,18 @@
 class_name ShopDialog
 extends RewardDialog
 
-## Grundlage für Shop und Trainer: jede Karte hat einen Preis in EP, dazu Geld und Fertig-Button
+## Grundlage für Shop und Trainer: jede Karte hat einen Preis in ME, dazu Geld und Fertig-Button
 ## als Fußzeile (Shop) oder Leiste oben (Trainer). Ist das Geld zu knapp, wird der Preis rot und die Ware lässt sich nicht ziehen.
 
 const TOO_EXPENSIVE_COLOR := Color(0.9, 0.3, 0.3)
-const GOLD_ICON = preload("res://assets/ui/boss_shard/ChatGPT Image 26. Dez. 2025, 16_38_12.png")
+const ESSENCE_ICON = preload("res://assets/ui/icons/monster_essence.svg")
 const EXIT_ICON = preload("res://assets/ui/jailer/icon_exit.svg")
 const MONEY_BAR_ICON_SIZE := Vector2(44, 44)
 const MONEY_BAR_FONT_SIZE := 30
 
 var _money_label: Label
-## steht vor dem Betrag, entfällt neben dem Gold-Icon
-var _money_prefix := "$ "
+## steht hinter dem Betrag, entfällt neben dem Essenz-Icon
+var _money_suffix := " ME"
 ## Karte -> Preis-Label, wird rot, wenn das Geld nicht reicht
 var _price_labels := {}
 
@@ -22,7 +22,7 @@ func set_price(card: RewardCard, price: int, repeatable := false) -> void:
 	card.drag.repeatable = repeatable
 	var label := Label.new()
 	label.theme = LABEL_THEME
-	label.text = "$ " + str(price)
+	label.text = Helper.me_text(price)
 	label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -48,7 +48,7 @@ func add_money_footer(finish_key: String) -> void:
 func add_money_bar(finish_key: String) -> void:
 	var row := HBoxContainer.new()
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var icon := texture_icon(GOLD_ICON)
+	var icon := texture_icon(ESSENCE_ICON)
 	icon.custom_minimum_size = MONEY_BAR_ICON_SIZE
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(icon)
@@ -68,7 +68,7 @@ func add_money_bar(finish_key: String) -> void:
 	_content.move_child(bar, 0)
 	_title.reparent(bar)
 	bar.add_child(row)
-	_money_prefix = ""
+	_money_suffix = ""
 	_watch_money()
 
 func _watch_money() -> void:
@@ -92,7 +92,7 @@ func _drag_blocked(card: RewardCard) -> String:
 	return ""
 
 func _money_changed(_new_val) -> void:
-	_money_label.text = _money_prefix + str(State.ep)
+	_money_label.text = str(State.ep) + _money_suffix
 	for card: RewardCard in _price_labels:
 		var too_expensive: bool = not card.sold and State.ep < card.drag.price
 		_price_labels[card].modulate = TOO_EXPENSIVE_COLOR if too_expensive else Color.WHITE

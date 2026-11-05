@@ -325,7 +325,7 @@ static func add_element_chip(row: Control, element: int) -> void:
 static func mon_name(mon: Variant) -> String:
 	return mon if mon is String else mon._name
 
-## Bild eines eigenen Monsters bzw. einer Art, als Ziel für Edelsteine, Tränke und Boss-Splitter
+## Bild eines eigenen Monsters bzw. einer Art, als Ziel für Edelsteine, Tränke und Boss Tränen
 static func mon_icon(mon: Variant) -> Control:
 	var icon := texture_icon(Monmap.texture(mon_name(mon), Monmap.SMALL))
 	icon.material = Monmap.LIVING_MATERIAL

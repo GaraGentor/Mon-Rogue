@@ -13,7 +13,6 @@ const RelicReward = preload("res://script/scenes/relic_reward/relic_reward.gd")
 const Treasure = preload("res://script/scenes/treasure/treasure.gd")
 
 const SHELF_TEXTURE = preload("res://assets/ui/shop/shelf.svg")
-const GEM_TEXTURE = preload("res://assets/ui/shop/gem.svg")
 const FLASK_TEXTURE = preload("res://assets/ui/shop/potion_flask.svg")
 const LIQUID_TEXTURE = preload("res://assets/ui/shop/potion_liquid.svg")
 const BAG_BACK_TEXTURE = preload("res://assets/ui/jailer/bag_back.svg")
@@ -388,7 +387,7 @@ class ItemPopup extends PanelContainer:
 		copy.custom_minimum_size = ART_SIZE
 		_art_holder.add_child(copy)
 		_title.text = item.title
-		_price.text = "$ %d" % item.drag.price
+		_price.text = Helper.me_text(item.drag.price)
 		_description.text = item.description
 		_hint.text = tr("SHOP_DETAIL_BAG" if item.drag.get("bag", false) else "SHOP_DETAIL_MON")
 		visible = true
@@ -435,6 +434,8 @@ func _ready() -> void:
 	_build_stage()
 	_fill_shelves()
 	_money_label = _bag.money
+	# aufs Beutelschild passt nur die Zahl, die Preise daneben nennen die Währung
+	_money_suffix = ""
 	_watch_money()
 	_explain()
 
@@ -549,7 +550,7 @@ func _add_gem_offers() -> void:
 		var card: ShelfItem = GemField.add_gem_card(self, stat, bonus)
 		card.drag.stat = stat
 		card.drag.bonus = bonus
-		card.set_art(texture_icon(GEM_TEXTURE))
+		card.set_art(texture_icon(GemField.GEM_ICON))
 		card.set_tint(GemField.STATS[stat].color)
 		set_price(card, GEM_PRICES[_depth()])
 

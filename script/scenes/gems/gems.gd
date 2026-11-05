@@ -19,7 +19,7 @@ const STATS := {
 ## Bonus pro Biom-Tiefe (State.map_level) in festen Punkten auf den Wert
 const BONUS_BY_DEPTH := [15, 20, 25, 30, 35]
 
-const GEM_ICON = preload("res://assets/ui/boss_shard/a_rare_crystal_with_some_spark.jpeg")
+const GEM_ICON = preload("res://assets/ui/shop/gem.svg")
 
 var _bonus: int
 

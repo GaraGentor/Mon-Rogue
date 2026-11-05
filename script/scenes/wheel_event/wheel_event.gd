@@ -67,8 +67,8 @@ func _ready() -> void:
 	_wheel = Wheel.new()
 	_wheel.custom_minimum_size = WHEEL_SIZE
 	_wheel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_wheel.win_text = "+ $ " + str(_amount)
-	_wheel.lose_text = "- $ " + str(_amount)
+	_wheel.win_text = "+ " + Helper.me_text(_amount)
+	_wheel.lose_text = "- " + Helper.me_text(_amount)
 	add_footer(_wheel)
 
 	_result = Label.new()

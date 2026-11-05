@@ -1,6 +1,6 @@
 extends Control
 
-## Boss-Splitter, die man als Belohnung bekommt
+## Boss Tränen, die man als Belohnung bekommt
 const SHARD_REWARD := 1
 
 @export var mon_reward: Control

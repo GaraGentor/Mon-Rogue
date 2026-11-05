@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://clfj4a2tkwr85"
-path="res://.godot/imported/boss_shard.svg-c6e61c9ae09caeb111200cd4dad509ad.ctex"
+path="res://.godot/imported/boss_tear.svg-1a39606240fec93e95f3f2509be20e83.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/jailer/boss_shard.svg"
-dest_files=["res://.godot/imported/boss_shard.svg-c6e61c9ae09caeb111200cd4dad509ad.ctex"]
+source_file="res://assets/ui/jailer/boss_tear.svg"
+dest_files=["res://.godot/imported/boss_tear.svg-1a39606240fec93e95f3f2509be20e83.ctex"]
 
 [params]
 
@@ -38,6 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
+svg/scale=2.0
 editor/scale_with_editor_scale=false
 editor/convert_colors_with_editor_theme=false

@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://script/scenes/boss_reward/boss_reward.gd" id="1_7tagj"]
 [ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_g30ok"]
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="3_sj5wi"]
-[ext_resource type="Texture2D" uid="uid://b0n4cvwqlulqv" path="res://assets/ui/boss_shard/ChatGPT Image 25. Dez. 2025, 21_33_55.png" id="5_powi3"]
+[ext_resource type="Texture2D" uid="uid://clfj4a2tkwr85" path="res://assets/ui/jailer/boss_tear.svg" id="5_powi3"]
 [ext_resource type="Texture2D" uid="uid://cjvfj6dpk3y2n" path="res://assets/ui/eggs/common_1.png" id="6_ahjba"]
 [ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="7_plate"]
 

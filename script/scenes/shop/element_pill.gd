@@ -15,7 +15,7 @@ func _init_pill(type, cost:int = 0) -> void:
 	mat.set_shader_parameter("water_color", Color(d.color))
 	element_label.text = tr(d.label)
 	element_label.self_modulate = d.color
-	money_label.text = "$ " + str(cost)
+	money_label.text = Helper.me_text(cost)
 	drag_data = {"type": type, "cost": cost}
 
 func _can_drop_data(pos, data):

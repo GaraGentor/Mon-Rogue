@@ -18,8 +18,9 @@
 [ext_resource type="Script" path="res://script/scenes/world_map/line_control.gd" id="15_w2ou5"]
 [ext_resource type="Script" path="res://script/ui/relic_bar/relic_bar.gd" id="16_relic"]
 [ext_resource type="Texture2D" uid="uid://cpfweiuuk0lou" path="res://assets/ui/icons/bag.svg" id="17_bag"]
-[ext_resource type="Texture2D" uid="uid://16kgyrjrsykb" path="res://assets/ui/boss_shard/ChatGPT Image 26. Dez. 2025, 16_38_12.png" id="18_gold"]
-[ext_resource type="Texture2D" uid="uid://b0n4cvwqlulqv" path="res://assets/ui/boss_shard/ChatGPT Image 25. Dez. 2025, 21_33_55.png" id="19_shard"]
+[ext_resource type="ShaderMaterial" path="res://script/scenes/jailer/jailer_props_material.tres" id="17_bag_mat"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/monster_essence.svg" id="18_essence"]
+[ext_resource type="Texture2D" uid="uid://clfj4a2tkwr85" path="res://assets/ui/jailer/boss_tear.svg" id="19_shard"]
 [ext_resource type="Script" path="res://script/scenes/world_map/team_bar.gd" id="20_team"]
 [ext_resource type="Script" path="res://script/scenes/world_map/map_legend.gd" id="21_legend"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/parchment.svg" id="22_parch"]
@@ -191,10 +192,10 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="GoldIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+[node name="EssenceIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-texture = ExtResource("18_gold")
+texture = ExtResource("18_essence")
 expand_mode = 1
 stretch_mode = 5
 
@@ -263,6 +264,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="BagIcon" type="TextureRect" parent="HBoxContainer/Panel"]
+material = ExtResource("17_bag_mat")
 layout_mode = 0
 offset_top = 12.0
 offset_right = 140.0

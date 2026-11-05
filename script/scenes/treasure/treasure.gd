@@ -1,6 +1,6 @@
 extends RewardDialog
 
-## Schatz: Gold oder ein Bonus-Preis, einer davon darf genommen werden.
+## Schatz: Monster Essenz oder ein Bonus-Preis, einer davon darf genommen werden.
 ## Der Bonus ist meist ein Edelstein, sonst ein Element-Trank oder selten ein gewöhnliches Relic.
 ## Edelstein und Trank werden danach einem eigenen Monster gegeben.
 ## Die Trank-Karte nutzt auch der Shop.
@@ -10,7 +10,7 @@ const RelicReward = preload("res://script/scenes/relic_reward/relic_reward.gd")
 
 const ACCENT := Color(0.74, 0.75, 0.29)
 
-## Gold: Grundbetrag plus Zuschlag pro Biom-Tiefe (State.map_level)
+## Monster Essenz: Grundbetrag plus Zuschlag pro Biom-Tiefe (State.map_level)
 const GOLD_MIN := 20
 const GOLD_MAX := 50
 const GOLD_PER_DEPTH := 10
@@ -20,7 +20,7 @@ const BONUS_WEIGHTS := {"gem": 60, "potion": 30, "relic": 10}
 
 const ELEMENTS := [Enums.MON_TYPES.EARTH, Enums.MON_TYPES.AIR, Enums.MON_TYPES.WATER, Enums.MON_TYPES.FIRE]
 
-var gold_icon = preload("res://assets/ui/boss_shard/ChatGPT Image 26. Dez. 2025, 16_38_12.png")
+const ESSENCE_ICON = preload("res://assets/ui/icons/monster_essence.svg")
 const ELEMENT_PILL = preload("res://script/scenes/shop/element_pill.tscn")
 
 var _depth: int
@@ -30,7 +30,7 @@ func _ready() -> void:
 	set_title(tr("TREASURE_CHOOSE"))
 	_depth = clampi(State.map_level, 0, GemField.BONUS_BY_DEPTH.size() - 1)
 	var gold := randi_range(GOLD_MIN, GOLD_MAX) + _depth * GOLD_PER_DEPTH
-	add_bag_card(tr("TREASURE_GOLD"), "$ " + str(gold), texture_icon(gold_icon), _on_gold_chosen.bind(gold))
+	add_bag_card(tr("TREASURE_GOLD"), Helper.me_text(gold), texture_icon(ESSENCE_ICON), _on_gold_chosen.bind(gold))
 	_add_bonus_card()
 
 func _on_gold_chosen(gold: int) -> void:

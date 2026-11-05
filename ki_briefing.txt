@@ -59,7 +59,7 @@ Run-Struktur und Kartenwahl wie in Slay the Spire. Das Spiel ist in Entwicklung.
   - Meilensteinen (nur mit dem Start-Monster, das dafür im Team bleiben muss;
 	Bosse besiegen, Spiel gewinnen)
   - Kopfgeldern (seltene Monster, die genau diese Art selbst erledigen muss)
-- Boss-Splitter gibt es für Boss-Siege. Beim Kerkermeister sprengt ein Splitter eine Kette
+- Boss Tränen gibt es für Boss-Siege. Beim Kerkermeister sprengt eine Träne eine Kette
   und gibt der Art dauerhaft +1 Aktion pro Zug. Das ist sehr stark.
 
 # Aktueller Stand und Lücken

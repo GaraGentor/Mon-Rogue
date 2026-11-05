@@ -1,8 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <path d="M30 26 L98 26 L98 100 Q98 106 92 106 L30 106 Z" fill="#e8d3a2" stroke="#5c3a17" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M30 26 Q30 14 40 14 L104 14 Q114 14 114 26 Q114 36 104 36 L98 36" fill="#d9bd82" stroke="#5c3a17" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M30 26 Q30 14 40 14 Q50 14 50 26 Q50 34 42 34" fill="none" stroke="#5c3a17" stroke-width="4" stroke-linecap="round"/>
-  <path d="M30 106 Q14 106 14 96 Q14 86 24 86 L30 86" fill="#d9bd82" stroke="#5c3a17" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M44 50 L84 50 M44 64 L84 64 M44 78 L72 78" fill="none" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/>
-  <circle cx="84" cy="88" r="9" fill="#b03a2e" stroke="#5c3a17" stroke-width="3"/>
+  <!-- Abgegriffene Pergamentrolle: harte Kanten, Licht von oben links, wie die Requisiten im Shop -->
+  <!-- obere Rolle hinten -->
+  <path d="M34 12 H106 L116 20 V32 L106 38 H34 Z" fill="#7d6840" stroke="#06080c" stroke-width="5" stroke-linejoin="bevel"/>
+  <!-- Blatt -->
+  <path d="M30 24 H98 V100 L90 110 H22 V88 L30 84 Z" fill="#c4ad7c" stroke="#06080c" stroke-width="5" stroke-linejoin="bevel"/>
+  <path d="M34 28 H62 L42 80 H34 Z" fill="#dcc896"/>
+  <path d="M84 28 H94 V98 L88 106 H72 Z" fill="#9c8759"/>
+  <!-- Schrift -->
+  <path d="M42 46 H84 M42 60 H84 M42 74 H70" fill="none" stroke="#3a2c18" stroke-width="5"/>
+  <!-- untere Rolle vorne -->
+  <path d="M12 90 L22 84 H34 L40 92 V104 L34 112 H22 L12 106 Z" fill="#8e7a4e" stroke="#06080c" stroke-width="5" stroke-linejoin="bevel"/>
+  <!-- obere Rolle vorne -->
+  <path d="M24 16 L34 10 H44 L50 18 V30 L44 38 H34 L24 32 Z" fill="#a8925f" stroke="#06080c" stroke-width="5" stroke-linejoin="bevel"/>
+  <!-- Siegel -->
+  <path d="M78 80 H90 L97 87 V99 L90 106 H78 L71 99 V87 Z" fill="#8a2a20" stroke="#06080c" stroke-width="4" stroke-linejoin="bevel"/>
+  <path d="M80 86 H87 L91 90 V94 L80 90 Z" fill="#c2503e"/>
 </svg>

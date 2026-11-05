@@ -1,5 +1,9 @@
 extends Node
 
+## Betrag in der Währung, z. B. "45 ME" (Monster Essenz)
+func me_text(amount: int) -> String:
+	return "%d ME" % amount
+
 func generate_fake_uuid() -> String:
 	return "%s-%s" % [str(randi()), str(Time.get_ticks_usec())]
 

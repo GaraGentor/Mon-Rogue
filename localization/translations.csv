@@ -55,16 +55,16 @@ MONSTER_CLOSE_INFO,Close Info,Info schließen
 MONSTER_STATUS_EFFECTS,Status effects.,Statuseffekte.
 BOSS_REWARD_OK,OKE!,OKE!
 BOSS_REWARD_DEFEATED,Boss defeated,Boss besiegt
-BOSS_REWARD_SHARD_DESC,"Boss shard, needed to upgrade your monsters permanently","Boss-Splitter, damit verbesserst du deine Monster dauerhaft"
+BOSS_REWARD_SHARD_DESC,"Boss tear, needed to upgrade your monsters permanently","Boss Träne, damit verbesserst du deine Monster dauerhaft"
 BOSS_REWARD_CLAIM,Claim Reward!,Belohnung abholen!
 BOSS_REWARD_EGG_DESC,Choose one of your current monsters to appear as eggs in a new run,"Wähle eines deiner Monster, das in einem neuen Lauf als Ei erscheint"
 BOSS_REWARD_CHOOSE_ONE,Choose wisely one of two rewards,Wähle weise eine von zwei Belohnungen
 BOSS_REWARD_THANKS,Thanks for playing,Danke fürs Spielen
 BOSS_REWARD_NEW_RUN,Start a new run!,Neuen Lauf starten!
 HEAL_CAMP_DESC,Your team feels refreshed and heals 50% of their health!,Dein Team fühlt sich erfrischt und heilt 50% seiner Lebenspunkte!
-JAILER_REROLL,Other prisoners for ${cost} ({money}),Andere Gefangene für ${cost} ({money})
+JAILER_REROLL,Other prisoners for {cost} ME ({money}),Andere Gefangene für {cost} ME ({money})
 JAILER_FINISH,Finish,Fertig
-JAILER_BUY,Buy for Boss Shards,Für Boss-Splitter kaufen
+JAILER_BUY,Buy for Boss Tears,Für Boss Tränen kaufen
 JAILER_SOLD,SOLD!,VERKAUFT!
 JAILER_MAX_UPGRADE,Max Upgrade,Max. Stufe
 JAILER_MOVES_UPGRADE,Moves 1 -> 2,Attacken 1 -> 2
@@ -145,7 +145,7 @@ your Monster","Zieh einen Element-Trank
 oder Edelstein auf
 dein Monster"
 SHOP_FINISH,Finish Shopping!,Einkauf beenden!
-SHOP_NOT_ENOUGH_MONEY,"Nope, not enough money!","Nö, nicht genug Geld!"
+SHOP_NOT_ENOUGH_MONEY,"Nope, not enough Monster Essence!","Nö, nicht genug Monster Essenz!"
 SKILL_CAN_LEARN,Can learn,Kann lernen
 SKILL_CAN_USE,Can use it,Kann es nutzen
 TRAINER_DECIDE_TITLE,"Gratz!
@@ -158,13 +158,13 @@ TRAINER_RECOMMENDED,<Recommended>,<Empfohlen>
 TRAINER_MONSTER_1,Monster 1,Monster 1
 TRAINER_MONSTER_2,Monster 2,Monster 2
 TREASURE_CHOOSE,Choose one prize.,Wähle einen Preis.
-TREASURE_GOLD,Gold,Gold
+TREASURE_GOLD,Monster Essence,Monster Essenz
 TREASURE_POTION,{element} Potion,{element}-Trank
 TREASURE_POTION_DESC,Adds the element {element} to one of your monsters.,Fügt einem deiner Monster das Element {element} hinzu.
 TREASURE_POTION_CHOOSE_MON,Which monster drinks the potion?,Welches Monster trinkt den Trank?
 WORLDMAP_BOSS,BOSS,BOSS
-WORLDMAP_BOSS_SHARDS,Boss Shards: {amount},Boss-Splitter: {amount}
-WORLDMAP_MONEY,M: {amount},M: {amount}
+WORLDMAP_BOSS_SHARDS,Boss Tears: {amount},Boss Tränen: {amount}
+WORLDMAP_MONEY,ME: {amount},ME: {amount}
 SKILL_HEADER_SKILL,Skill,Fähigkeit
 SKILL_HEADER_COST,Cost,Kosten
 SKILL_HEADER_CD,CD,CD
@@ -373,14 +373,14 @@ RUN_END_DEPTH,Biome reached,Erreichtes Biom
 RUN_END_FIGHTS,Fights won,Gewonnene Kämpfe
 RUN_END_KILLS,Monsters defeated,Besiegte Monster
 RUN_END_CATCHES,Monsters caught,Gefangene Monster
-RUN_END_EP,EP earned,Verdiente EP
+RUN_END_EP,ME earned,Verdiente ME
 RUN_END_TEAM,Team: {team},Team: {team}
 RELIC_EXTRA_MOVE,Battle Drum,Kriegstrommel
 RELIC_EXTRA_MOVE_DESC,Your monsters get +1 move each turn.,Deine Monster haben jeden Zug +1 Aktion.
 RELIC_LUCKY_CHARM,Lucky Charm,Glücksbringer
 RELIC_LUCKY_CHARM_DESC,Catch chance +25%.,Fangchance +25 %.
 RELIC_GOLDEN_IDOL,Golden Idol,Goldener Götze
-RELIC_GOLDEN_IDOL_DESC,+30% EP from won battles.,+30 % EP aus gewonnenen Kämpfen.
+RELIC_GOLDEN_IDOL_DESC,+30% ME from won battles.,+30 % ME aus gewonnenen Kämpfen.
 RELIC_REWARD_CHOOSE,Choose a relic,Wähle ein Relikt
 MAP_NODE_GEM,GEMS,EDELSTEINE
 GEM_CHOOSE,Choose a gem,Wähle einen Edelstein
@@ -435,8 +435,8 @@ TRAINER_REPLACES,Has to forget another skill for it,Muss dafür einen anderen Sk
 TRAINER_ALL_KNOW,Your monsters already know this skill.,Deine Monster kennen diesen Skill schon.
 TRAINER_ALREADY_KNOWS,Already knows this skill,Kennt diesen Skill schon
 TRAINER_FINISH_CHOICE,First choose which skill to forget.,"Wähle erst, welcher Skill vergessen wird."
-JAILER_SHARD,Boss Shard,Boss-Splitter
-JAILER_NOT_ENOUGH_SHARDS,Not enough Boss Shards!,Nicht genug Boss-Splitter!
+JAILER_SHARD,Boss Tear,Boss Träne
+JAILER_NOT_ENOUGH_SHARDS,Not enough Boss Tears!,Nicht genug Boss Tränen!
 JAILER_CANCEL,Never mind,Doch nicht
 JAILER_PLACE_0,on the Storm Cliffs,in den Sturmklippen
 JAILER_PLACE_1,by the Frozen Sea,am Eismeer
@@ -446,21 +446,21 @@ JAILER_PLACE_4,beyond the Northern Wall,hinter dem Nordwall
 JAILER_SAY_WHO,Now choose a monster. Maybe then I'll give you the keys to it.,Nun wähle ein Monster. Vielleicht gebe ich dir dann die Schlüssel dazu.
 JAILER_SAY_CHAIN,"Clank! One chain less for {mon}. {moves} actions per turn now, but the cage stays shut.","Klirr! Eine Kette weniger für {mon}. Jetzt {moves} Aktionen pro Zug, aber der Käfig bleibt zu."
 JAILER_SAY_FREED,The cage is open. {mon} is free! Make something of it.,Der Käfig ist offen. {mon} ist frei! Mach was draus.
-JAILER_SAY_CANCEL,Changed your mind? Keep your shard then.,"Doch nicht? Dann behalt deinen Splitter."
-JAILER_SAY_POOR,"No Boss Shards, no keys. That's how it works down here.","Ohne Boss-Splitter keine Schlüssel. So läuft das hier unten."
+JAILER_SAY_CANCEL,Changed your mind? Keep your tear then.,"Doch nicht? Dann behalt deine Boss Träne."
+JAILER_SAY_POOR,"No Boss Tears, no keys. That's how it works down here.","Ohne Boss Tränen keine Schlüssel. So läuft das hier unten."
 JAILER_SAY_EMPTY,All my prisoners are free. Bad for business.,Alle meine Gefangenen sind frei. Schlecht fürs Geschäft.
 JAILER_ORIGIN,Origin: {place},Herkunft: {place}
-JAILER_PRICE,Price: {cost} Boss Shards,Preis: {cost} Boss-Splitter
+JAILER_PRICE,Price: {cost},Preis: {cost}
 JAILER_EFFECT,Effect: actions per turn {now} -> {next},Wirkung: Aktionen pro Zug {now} -> {next}
 JAILER_ORIGIN_0,Storm Cliffs,Sturmklippen
 JAILER_ORIGIN_1,Frozen Sea,Eismeer
 JAILER_ORIGIN_2,Misty Woods,Nebelwald
 JAILER_ORIGIN_3,Ember Desert,Glutwüste
 JAILER_ORIGIN_4,Northern Wall,Nordwall
-JAILER_SAY_INTRO_FIRST,"Have a look: {mon}. Caught {place}, yours for {cost} Boss Shards.","Schau her: {mon}. Gefangen {place}, zu haben für {cost} Boss-Splitter."
-JAILER_SAY_INTRO_NEXT,"Next to it, {mon}, freshly caught {place}. That makes {cost} Boss Shards.","Daneben {mon}, frisch {place} eingefangen. Macht {cost} Boss-Splitter."
-JAILER_SAY_INTRO_LAST,"And finally {mon}. Caught {place}, costs {cost} Boss Shards.","Und zuletzt {mon}. Gefangen {place}, kostet {cost} Boss-Splitter."
-JAILER_SAY_HOWTO,I see Boss Shards in your bag. Drag them to me to strengthen one of your monsters.,"Ich sehe da Boss-Splitter in deiner Tasche. Zieh sie zu mir, um eines deiner Monster zu verstärken."
+JAILER_SAY_INTRO_FIRST,"Have a look: {mon}. Caught {place}, yours for {cost}.","Schau her: {mon}. Gefangen {place}, zu haben für {cost}."
+JAILER_SAY_INTRO_NEXT,"Next to it, {mon}, freshly caught {place}. That makes {cost}.","Daneben {mon}, frisch {place} eingefangen. Macht {cost}."
+JAILER_SAY_INTRO_LAST,"And finally {mon}. Caught {place}, costs {cost}.","Und zuletzt {mon}. Gefangen {place}, kostet {cost}."
+JAILER_SAY_HOWTO,I see Boss Tears in your bag. Drag them to me to strengthen one of your monsters.,"Ich sehe da Boss Tränen in deiner Tasche. Zieh sie zu mir, um eines deiner Monster zu verstärken."
 RUN_END_KILLED_BY,Killing blow:,Tödlicher Treffer:
 RUN_END_FALLEN,Fallen along the way:,Unterwegs gefallen:
 RUN_END_DEATH_LINE,"{killer} (Lv. {killer_level}) took out {victim} (Lv. {victim_level}) with {skill}: -{damage} HP ({hp_left}/{max_hp} HP left)","{killer} (Lv. {killer_level}) besiegte {victim} (Lv. {victim_level}) mit {skill}: -{damage} KP ({hp_left}/{max_hp} KP übrig)"
@@ -484,10 +484,10 @@ RUN_END_EGG_UNLOCKABLE,Sacrifice:,Opfern:
 RUN_END_EGG_MILESTONE,Milestones:,Meilensteine:
 RUN_END_EGG_BOUNTY,Bounties:,Kopfgelder:
 EVENT_WHEEL_TITLE,Wheel of Fortune,Glücksrad
-EVENT_WHEEL_DESC,"Spin the wheel: win or lose $ {amount}, half of your gold.","Dreh am Rad: gewinne oder verliere $ {amount}, die Hälfte deines Goldes."
+EVENT_WHEEL_DESC,"Spin the wheel: win or lose {amount} ME, half of your Monster Essence.","Dreh am Rad: gewinne oder verliere {amount} ME, die Hälfte deiner Monster Essenz."
 EVENT_WHEEL_SPIN,Spin!,Drehen!
-EVENT_WHEEL_WIN,You win $ {amount}!,Du gewinnst $ {amount}!
-EVENT_WHEEL_LOSE,You lose $ {amount}...,Du verlierst $ {amount}...
+EVENT_WHEEL_WIN,You win {amount} ME!,Du gewinnst {amount} ME!
+EVENT_WHEEL_LOSE,You lose {amount} ME...,Du verlierst {amount} ME...
 MAP_HEADER_BIOME,{biome} · Depth {depth},{biome} · Tiefe {depth}
 MAP_HEADER_TEAM,Team:,Team:
 MAP_HEADER_NO_RELICS,No relics yet,Noch keine Relikte
@@ -495,14 +495,14 @@ MAP_TEAM_ENTRY,{name}  Lv {level},{name}  Lv {level}
 MAP_TEAM_HP,{hp} / {max} HP,{hp} / {max} KP
 MAP_LEGEND,Legend,Legende
 MAP_LEGEND_HINT,Click an entry for details.,Klicke auf einen Eintrag für Details.
-MAP_NODE_COMBAT_DESC,"A fight against wild monsters of the current biome. Wins pay gold and experience, and weakened enemies can be caught. Every fight in a biome makes the next enemies a bit stronger.","Ein Kampf gegen wilde Monster aus dem aktuellen Biom. Siege bringen Gold und Erfahrung, geschwächte Gegner kannst du fangen. Mit jedem Kampf im Biom werden die nächsten Gegner etwas stärker."
+MAP_NODE_COMBAT_DESC,"A fight against wild monsters of the current biome. Wins pay Monster Essence and experience, and weakened enemies can be caught. Every fight in a biome makes the next enemies a bit stronger.","Ein Kampf gegen wilde Monster aus dem aktuellen Biom. Siege bringen Monster Essenz und Erfahrung, geschwächte Gegner kannst du fangen. Mit jedem Kampf im Biom werden die nächsten Gegner etwas stärker."
 MAP_NODE_BOSS_DESC,"A fight with boss strength in the middle of the map: more and tougher enemies than usual. It does not end the biome, that only happens with the boss at the top.","Ein Kampf in Boss-Stärke mitten auf der Karte: mehr und zähere Gegner als sonst. Er beendet das Biom nicht, das passiert erst beim Boss ganz oben."
 MAP_NODE_CAMP_DESC,"A place to rest: heals your monsters by half of their maximum HP.","Ein Rastplatz: heilt deine Monster um die Hälfte ihrer maximalen KP."
-MAP_NODE_SHOP_DESC,"Spend your gold: element potions give a monster an additional element (so it can use more skills), gems raise a stat for the rest of the run, relics give passive bonuses.","Hier gibst du Gold aus: Element-Tränke geben einem Monster ein zusätzliches Element (damit kann es mehr Skills einsetzen), Edelsteine erhöhen einen Wert für den restlichen Run, Relikte geben passive Boni."
+MAP_NODE_SHOP_DESC,"Spend your Monster Essence: element potions give a monster an additional element (so it can use more skills), gems raise a stat for the rest of the run, relics give passive bonuses.","Hier gibst du Monster Essenz aus: Element-Tränke geben einem Monster ein zusätzliches Element (damit kann es mehr Skills einsetzen), Edelsteine erhöhen einen Wert für den restlichen Run, Relikte geben passive Boni."
 MAP_NODE_TRAINER_DESC,"Teaches your monsters rare skills, half of them with several elements. A monster can only use a skill if it has all of its elements, the pictures on each card show who fits. Without a free slot you replace an old skill. You only pay once the skill is learned.","Bringt deinen Monstern seltene Skills bei, die Hälfte davon mit mehreren Elementen. Ein Monster kann einen Skill nur einsetzen, wenn es alle seine Elemente hat, die Bilder auf jeder Karte zeigen, wer passt. Ohne freien Platz ersetzt du einen alten Skill. Bezahlt wird erst, wenn der Skill gelernt ist."
-MAP_NODE_JAILER_DESC,"The jailer keeps up to three monster species in chains. Every chain is a missing upgrade (+1 action per turn). Hand him a boss shard to break a chain, once the last one is gone the species is free and fully upgraded, permanently, also for future runs. Showing other prisoners costs gold.","Der Kerkermeister hält bis zu drei Monster-Arten in Ketten. Jede Kette ist eine fehlende Verbesserung (+1 Aktion pro Zug). Gib ihm einen Boss-Splitter, um eine Kette zu sprengen, ist die letzte weg, ist die Art frei und voll verbessert, dauerhaft, auch für spätere Runs. Andere Gefangene zeigen kostet Gold."
-MAP_NODE_EVENT_DESC,"A random event: either a camp that heals your monsters, or the wheel of fortune where you win or lose half of your gold.","Ein Zufallsereignis: entweder ein Lager, das deine Monster heilt, oder das Glücksrad, bei dem du die Hälfte deines Goldes gewinnst oder verlierst."
-MAP_NODE_TREASURE_DESC,"Choose gold or a bonus prize. The bonus is usually a gem, otherwise an element potion or rarely a relic.","Wähle Gold oder einen Bonus-Preis. Der Bonus ist meist ein Edelstein, sonst ein Element-Trank oder selten ein Relikt."
+MAP_NODE_JAILER_DESC,"The jailer keeps up to three monster species in chains. Every chain is a missing upgrade (+1 action per turn). Hand him a boss tear to break a chain, once the last one is gone the species is free and fully upgraded, permanently, also for future runs. Showing other prisoners costs Monster Essence.","Der Kerkermeister hält bis zu drei Monster-Arten in Ketten. Jede Kette ist eine fehlende Verbesserung (+1 Aktion pro Zug). Gib ihm eine Boss Träne, um eine Kette zu sprengen, ist die letzte weg, ist die Art frei und voll verbessert, dauerhaft, auch für spätere Runs. Andere Gefangene zeigen kostet Monster Essenz."
+MAP_NODE_EVENT_DESC,"A random event: either a camp that heals your monsters, or the wheel of fortune where you win or lose half of your Monster Essence.","Ein Zufallsereignis: entweder ein Lager, das deine Monster heilt, oder das Glücksrad, bei dem du die Hälfte deiner Monster Essenz gewinnst oder verlierst."
+MAP_NODE_TREASURE_DESC,"Choose Monster Essence or a bonus prize. The bonus is usually a gem, otherwise an element potion or rarely a relic.","Wähle Monster Essenz oder einen Bonus-Preis. Der Bonus ist meist ein Edelstein, sonst ein Element-Trank oder selten ein Relikt."
 MAP_NODE_GEM_DESC,"Pick one of three gems. It raises one stat of a monster (e.g. attack or HP) for the rest of the run. The deeper you are, the stronger the gems.","Wähle einen von drei Edelsteinen. Er erhöht einen Wert eines Monsters (z. B. Angriff oder KP) für den restlichen Run. Je tiefer du bist, desto stärker die Steine."
 MAP_NODE_HUB,OUTPOST,RASTLAGER
 MAP_NODE_HUB_DESC,"The last stop of every path, right before the boss. Here you can rest (heals half of the maximum HP), visit the shop and the trainer, each once. Prepare your team for the boss fight!","Das letzte Feld jedes Pfads, direkt vor dem Boss. Hier kannst du dich ausruhen (heilt die Hälfte der maximalen KP), den Laden und den Trainer besuchen, jedes einmal. Mach dein Team bereit für den Bosskampf!"
@@ -521,4 +521,6 @@ EGG_CATEGORY_MAGIC,Magical,Magisch
 EGG_CATEGORY_SHIELD,Shield,Schild
 EGG_CATEGORY_BUFF,Buff,Buff
 EGG_CATEGORY_PASSIVE,Passive,Passiv
-BOSS_REWARD_SHARD_AMOUNT,+{amount} Boss Shard,+{amount} Boss-Splitter
+BOSS_REWARD_SHARD_AMOUNT,+{amount} Boss Tear,+{amount} Boss Träne
+JAILER_TEAR_COUNT_ONE,{amount} Boss Tear,{amount} Boss Träne
+JAILER_TEAR_COUNT_MANY,{amount} Boss Tears,{amount} Boss Tränen
