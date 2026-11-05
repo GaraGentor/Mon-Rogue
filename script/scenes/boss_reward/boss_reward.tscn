@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://dhhxnynud3rse"]
+[gd_scene format=3 uid="uid://dhhxnynud3rse"]
 
 [ext_resource type="Script" path="res://script/scenes/boss_reward/boss_reward.gd" id="1_7tagj"]
 [ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_g30ok"]
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="3_sj5wi"]
 [ext_resource type="Texture2D" uid="uid://b0n4cvwqlulqv" path="res://assets/ui/boss_shard/ChatGPT Image 25. Dez. 2025, 21_33_55.png" id="5_powi3"]
 [ext_resource type="Texture2D" uid="uid://cjvfj6dpk3y2n" path="res://assets/ui/eggs/common_1.png" id="6_ahjba"]
+[ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="7_plate"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_twfxh"]
 shader = ExtResource("2_g30ok")
@@ -14,8 +15,27 @@ shader_parameter/wave_amp = 0.115
 shader_parameter/wave_size = 1.0
 shader_parameter/wave_time_mul = 0.933
 shader_parameter/total_phases = 8
+shader_parameter/living_pixels = true
+shader_parameter/pixel_size = 4.0
+shader_parameter/amplitude = 0.0
+shader_parameter/loop_seconds = 19.365
+shader_parameter/particle_min_size = 1.0
+shader_parameter/particle_max_size = 1.2
+shader_parameter/flicker = 0.15
+shader_parameter/color_levels = 8.0
+shader_parameter/dither_strength = 1.0
+shader_parameter/dither_scale = 2.0
+shader_parameter/dither_fps = 10.0
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_3tkvh"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_plate"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_button"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
 
 [node name="BossReward" type="Control" node_paths=PackedStringArray("mon_reward", "egg_rect", "shard_amount_label", "more_label", "unlock_label")]
 layout_mode = 3
@@ -26,8 +46,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7tagj")
 mon_reward = NodePath("MarginContainer/VBoxContainer/Rewards/EggReward")
-egg_rect = NodePath("MarginContainer/VBoxContainer/Rewards/EggReward/TextureRect")
-shard_amount_label = NodePath("MarginContainer/VBoxContainer/Rewards/ShardReward/Amount")
+egg_rect = NodePath("MarginContainer/VBoxContainer/Rewards/EggReward/Margin/Box/TextureRect")
+shard_amount_label = NodePath("MarginContainer/VBoxContainer/Rewards/ShardReward/Margin/Box/Amount")
 more_label = NodePath("MarginContainer/VBoxContainer/Label2")
 unlock_label = NodePath("MarginContainer/VBoxContainer/UnlockLabel")
 
@@ -59,18 +79,25 @@ theme_override_constants/margin_bottom = 24
 layout_mode = 2
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
 layout_mode = 2
 theme = ExtResource("3_sj5wi")
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
 text = "BOSS_REWARD_DEFEATED"
 horizontal_alignment = 1
 
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer"]
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
 visible = false
 layout_mode = 2
 theme = ExtResource("3_sj5wi")
 horizontal_alignment = 1
 
 [node name="UnlockLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
 visible = false
 layout_mode = 2
 theme = ExtResource("3_sj5wi")
@@ -83,62 +110,138 @@ size_flags_vertical = 3
 theme_override_constants/separation = 60
 alignment = 1
 
-[node name="ShardReward" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Rewards"]
-custom_minimum_size = Vector2(380, 0)
+[node name="ShardReward" type="PanelContainer" parent="MarginContainer/VBoxContainer/Rewards"]
+custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxEmpty_plate")
+
+[node name="Plate" type="ColorRect" parent="MarginContainer/VBoxContainer/Rewards/ShardReward"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("7_plate")
+
+[node name="Margin" type="MarginContainer" parent="MarginContainer/VBoxContainer/Rewards/ShardReward"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="Box" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Rewards/ShardReward/Margin"]
+layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Rewards/ShardReward"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Rewards/ShardReward/Margin/Box"]
 layout_mode = 2
 theme = ExtResource("3_sj5wi")
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
 text = "BOSS_REWARD_SHARD_DESC"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Amount" type="Label" parent="MarginContainer/VBoxContainer/Rewards/ShardReward"]
+[node name="Amount" type="Label" parent="MarginContainer/VBoxContainer/Rewards/ShardReward/Margin/Box"]
 layout_mode = 2
 theme = ExtResource("3_sj5wi")
 theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
 horizontal_alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/Rewards/ShardReward"]
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/Rewards/ShardReward/Margin/Box"]
 custom_minimum_size = Vector2(380, 280)
 layout_mode = 2
 texture = ExtResource("5_powi3")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/Rewards/ShardReward"]
+[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/Rewards/ShardReward/Margin/Box"]
+focus_mode = 0
+mouse_default_cursor_shape = 2
 layout_mode = 2
 theme = ExtResource("3_sj5wi")
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
+theme_override_colors/font_hover_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_colors/font_pressed_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_button")
+theme_override_font_sizes/font_size = 22
 text = "BOSS_REWARD_CLAIM"
 
-[node name="EggReward" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Rewards"]
+[node name="Plate" type="ColorRect" parent="MarginContainer/VBoxContainer/Rewards/ShardReward/Margin/Box/Button"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_plate")
+
+[node name="EggReward" type="PanelContainer" parent="MarginContainer/VBoxContainer/Rewards"]
 visible = false
-custom_minimum_size = Vector2(380, 0)
+custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxEmpty_plate")
+
+[node name="Plate" type="ColorRect" parent="MarginContainer/VBoxContainer/Rewards/EggReward"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("7_plate")
+
+[node name="Margin" type="MarginContainer" parent="MarginContainer/VBoxContainer/Rewards/EggReward"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="Box" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Rewards/EggReward/Margin"]
+layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Rewards/EggReward"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Rewards/EggReward/Margin/Box"]
 layout_mode = 2
 theme = ExtResource("3_sj5wi")
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
 text = "BOSS_REWARD_EGG_DESC"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/Rewards/EggReward"]
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/Rewards/EggReward/Margin/Box"]
 custom_minimum_size = Vector2(380, 280)
 layout_mode = 2
 texture = ExtResource("6_ahjba")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/Rewards/EggReward"]
+[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/Rewards/EggReward/Margin/Box"]
+focus_mode = 0
+mouse_default_cursor_shape = 2
 layout_mode = 2
 theme = ExtResource("3_sj5wi")
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
+theme_override_colors/font_hover_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_colors/font_pressed_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_button")
+theme_override_font_sizes/font_size = 22
 text = "BOSS_REWARD_CLAIM"
 
-[connection signal="pressed" from="MarginContainer/VBoxContainer/Rewards/ShardReward/Button" to="." method="_on_shard_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/Rewards/EggReward/Button" to="." method="_on_egg_button_pressed"]
+[node name="Plate" type="ColorRect" parent="MarginContainer/VBoxContainer/Rewards/EggReward/Margin/Box/Button"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_plate")
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/Rewards/ShardReward/Margin/Box/Button" to="." method="_on_shard_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/Rewards/EggReward/Margin/Box/Button" to="." method="_on_egg_button_pressed"]

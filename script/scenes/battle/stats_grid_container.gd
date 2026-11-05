@@ -2,8 +2,10 @@ extends GridContainer
 
 @export var label: Label
 @export var is_leveling: bool = false
-## Werte nebeneinander: oben eine Zeile mit Namen, darunter die Zahlen
+## Alle Werte in einer Zeile: Name in Gold, direkt dahinter die Zahl
 @export var horizontal: bool = false
+
+const GAIN_COLOR := Color(0.45, 0.85, 0.45)
 
 var plabels: Array[Label] = []
 
@@ -65,8 +67,10 @@ func init_with_mon(monster, hidden: Array = []) -> void:
 		var obj = map[i]
 		var tlabel = label.duplicate()
 		tlabel.text = tr(obj.label)
+		tlabel.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
 		var vlabel = label.duplicate()
 		vlabel.text = _value_text(obj, monster, hidden)
+		vlabel.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 
 		tlabel.visible = true
 		vlabel.visible = true
@@ -77,6 +81,7 @@ func init_with_mon(monster, hidden: Array = []) -> void:
 			var plabel = label.duplicate()
 			plabel.visible = true
 			plabel.text = ""
+			plabel.add_theme_color_override("font_color", GAIN_COLOR)
 			plabels.append(plabel)
 			add_child(plabel)
 
@@ -84,17 +89,19 @@ func _value_text(obj: Dictionary, monster, hidden: Array) -> String:
 	return "?" if hidden.has(obj.key) else str(int(obj.value.call(monster)))
 
 func _init_horizontal(monster, hidden: Array = []) -> void:
-	columns = map.size()
+	columns = map.size() * 2
 	for obj in map:
-		var tlabel = label.duplicate()
-		tlabel.text = tr(obj.label).trim_suffix(":")
-		tlabel.visible = true
+		var tlabel = _horizontal_label(tr(obj.label).trim_suffix(":"), SkillDetailPopup.GOLD)
+		tlabel.size_flags_horizontal = Control.SIZE_FILL
 		add_child(tlabel)
-	for obj in map:
-		var vlabel = label.duplicate()
-		vlabel.text = _value_text(obj, monster, hidden)
-		vlabel.visible = true
-		add_child(vlabel)
+		add_child(_horizontal_label(_value_text(obj, monster, hidden), IronPlate.TEXT_COLOR))
+
+func _horizontal_label(text: String, color: Color) -> Label:
+	var new_label = label.duplicate()
+	new_label.text = text
+	new_label.add_theme_color_override("font_color", color)
+	new_label.visible = true
+	return new_label
 
 func show_p_labels(texts: Array[String] = ["+1","+1","+1","+1","+1","+1","+1"]) -> void:
 	for plabel in plabels:

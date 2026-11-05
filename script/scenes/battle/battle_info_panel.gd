@@ -108,7 +108,7 @@ func _build_egg_skill_overview() -> void:
 			continue
 		var entry: Dictionary = by_category[category.key]
 		entry["hints"] = egg_skills.hints
-		var color := Color.WHITE if entry.available.size() > 0 else EGG_LOCKED_COLOR
+		var color := IronPlate.TEXT_COLOR if entry.available.size() > 0 else EGG_LOCKED_COLOR
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
 		row.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -151,7 +151,7 @@ func _show_egg_category_info(category: Dictionary, entry: Dictionary) -> void:
 		var group_box := VBoxContainer.new()
 		group_box.add_theme_constant_override("separation", 4)
 		_egg_skill_list.add_child(group_box)
-		var group_label := _label(tr(group[0]), Color(0.7, 0.7, 0.7))
+		var group_label := _label(tr(group[0]), EGG_SKILL_COLOR)
 		group_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		group_label.add_theme_font_size_override("font_size", 15)
 		group_box.add_child(group_label)
@@ -204,7 +204,7 @@ func _build_skill_list() -> void:
 	_clear_skill_grid(SKILL_COLUMNS.size() + 1)
 	skill_grid.add_child(Control.new())
 	for header in SKILL_COLUMNS:
-		skill_grid.add_child(_label(tr(header), Color(0.7, 0.7, 0.7)))
+		skill_grid.add_child(_label(tr(header), EGG_SKILL_COLOR))
 	# eigene Skills sind bekannt, gegnerische erst nachdem sie eingesetzt wurden
 	var known_all := reveal_all or State.mons.has(monster)
 	for skill in monster._skills:
@@ -249,7 +249,7 @@ func _build_skill_list() -> void:
 		for value in [skill.cost, skill.cooldown, skill.get("value", skill.get("damage", ""))]:
 			skill_grid.add_child(_label(Helper.format_number(value) if known else "?"))
 
-func _label(text: String, color: Color = Color.WHITE) -> Label:
+func _label(text: String, color: Color = IronPlate.TEXT_COLOR) -> Label:
 	var label := Label.new()
 	label.text = text
 	label.self_modulate = color

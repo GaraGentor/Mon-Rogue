@@ -93,9 +93,6 @@ func _on_pick_egg_button_pressed() -> void:
 	if egg_picked_index < 4:
 		title_label.text = tr("SELECTION_PICK_WARRIOR")
 		drop_egg(egg_picked_index - 1)
-		var cr: Panel = $Selection.get_node("HBoxContainer/ColorRect"+str(egg_picked_index))
-		var transition2 = get_tree().create_tween().tween_method(cr.set_self_modulate,Color(1,1,1,0),Color(1,1,1,1), 0.3)
-		cr.set_self_modulate(Color(1,1,1,1))
 	if egg_picked_index == 3:
 		title_label.text = tr("SELECTION_TIME_TO_GO")
 		reroll_button.visible = SaveManager.has_full_reroll_charges()

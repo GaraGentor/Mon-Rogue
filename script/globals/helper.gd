@@ -172,6 +172,7 @@ func mon_battle_name(mon: Monster) -> String:
 func show_unlock_message(text: String) -> void:
 	var label := Label.new()
 	label.text = text
+	label.theme = preload("res://script/ui/materials/pixel_font_theme.tres")
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 28)
 	label.add_theme_color_override("font_color", Color(0.858824, 0.717647, 0.45098, 1))

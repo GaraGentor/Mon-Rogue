@@ -2,7 +2,9 @@ extends Control
 
 # Endbildschirm eines Runs, für Sieg (boss_reward.gd) und Niederlage (battle.gd). Werte stehen in State.run_*.
 
-const WIN_COLOR := Color(0.858824, 0.717647, 0.45098, 1)
+const GOLD := SkillDetailPopup.GOLD
+const TEXT_COLOR := IronPlate.TEXT_COLOR
+const WIN_COLOR := GOLD
 const LOSE_COLOR := Color(0.75, 0.22, 0.2, 1)
 
 @export var background: TextureRect
@@ -181,7 +183,7 @@ func _refresh_list() -> void:
 		if not owned:
 			mon_list.set_item_selectable(index, false)
 			mon_list.set_item_icon_modulate(index, Color.BLACK)
-			mon_list.set_item_custom_fg_color(index, Color(1, 1, 1, 0.45 if seen else 0.25))
+			mon_list.set_item_custom_fg_color(index, Color(TEXT_COLOR, 0.45 if seen else 0.25))
 			mon_list.set_item_tooltip(index, tr("RUN_END_SEARCH_LOCKED"))
 	for index in mon_list.item_count:
 		if mon_list.is_item_selectable(index):
@@ -217,7 +219,7 @@ func _show_locked() -> void:
 	_clear_detail()
 	var hint = _label(tr("RUN_END_SEARCH_LOCKED"), 14)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.add_theme_color_override("font_color", Color(1, 1, 1, 0.6))
+	hint.add_theme_color_override("font_color", Color(TEXT_COLOR, 0.6))
 	detail_box.add_child(hint)
 
 func _show_mon(mon_name: String) -> void:
@@ -236,7 +238,9 @@ func _show_mon(mon_name: String) -> void:
 	header.add_child(portrait)
 	var info = VBoxContainer.new()
 	info.add_theme_constant_override("separation", 0)
-	info.add_child(_label(Helper.mon_display_name(mon_name), 20))
+	var mon_title = _label(Helper.mon_display_name(mon_name), 20)
+	mon_title.add_theme_color_override("font_color", GOLD)
+	info.add_child(mon_title)
 	# gesehene Monster hatten zusätzlich Elemente des Bioms
 	var type = sighting.get("type", meta_data.initial_type)
 	var element = _label(tr(ColorMap.get_combo(type).label), 14)
@@ -282,12 +286,14 @@ func _show_stats(mon_name: String, sighting: Dictionary) -> void:
 	for text in ["", "", tr("RUN_END_SEARCH_BASE"), "Lv. %d" % sighting.level if not sighting.is_empty() else ""]:
 		var head = _label(text, 12)
 		head.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		head.add_theme_color_override("font_color", Color(1, 1, 1, 0.6))
+		head.add_theme_color_override("font_color", GOLD)
 		grid.add_child(head)
 	for stat in SEARCH_STATS:
 		var share: float = stats.growth[stat[1]]
 		var value = share * stats.best_points
-		grid.add_child(_label(tr(stat[0]), 14))
+		var stat_name = _label(tr(stat[0]), 14)
+		stat_name.add_theme_color_override("font_color", GOLD)
+		grid.add_child(stat_name)
 		grid.add_child(_stat_bar(value))
 		var value_label = _label("%d (%d%%)" % [roundi(value), roundi(share * 100)], 14)
 		value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -311,7 +317,7 @@ func _show_stats(mon_name: String, sighting: Dictionary) -> void:
 		notes.append(tr("RUN_END_SEARCH_KILLS").format({"count": kills.size(), "skill": tr(hardest.skill), "damage": roundi(hardest.damage)}))
 	var note = _label("\n".join(PackedStringArray(notes)), 13)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	note.add_theme_color_override("font_color", Color(1, 0.55, 0.5, 1) if not kills.is_empty() else Color(1, 1, 1, 0.7))
+	note.add_theme_color_override("font_color", Color(1, 0.55, 0.5, 1) if not kills.is_empty() else TEXT_COLOR)
 	detail_box.add_child(note)
 
 # Fähigkeiten der letzten Sichtung und alle Ei-Attacken der Art (gesperrte abgedunkelt)
@@ -347,6 +353,7 @@ func _show_skills(mon_name: String, sighting: Dictionary) -> void:
 	text.fit_content = true
 	text.scroll_active = false
 	text.add_theme_font_size_override("normal_font_size", 13)
+	text.add_theme_color_override("default_color", TEXT_COLOR)
 	text.text = "\n".join(PackedStringArray(lines))
 	detail_box.add_child(text)
 
@@ -359,7 +366,7 @@ func _skill_text(skill: Dictionary) -> String:
 	return "[color=#%s]%s[/color]%s" % [color.to_html(false), tr(skill.name), power]
 
 func _dim(text: String) -> String:
-	return "[color=#ffffff80]%s[/color]" % text
+	return "[color=#%s]%s[/color]" % [Color(TEXT_COLOR, 0.5).to_html(), text]
 
 func _stat_bar(value: float) -> ProgressBar:
 	var bar = ProgressBar.new()
@@ -382,17 +389,19 @@ func _label(text: String, font_size: int) -> Label:
 	var label = Label.new()
 	label.text = text
 	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", TEXT_COLOR)
 	return label
 
 func _add_stat(key: String, value: String) -> void:
 	var name_label = Label.new()
 	name_label.text = tr(key)
-	name_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.7))
+	name_label.add_theme_color_override("font_color", GOLD)
 	name_label.add_theme_font_size_override("font_size", 18)
 	stats_grid.add_child(name_label)
 	var value_label = Label.new()
 	value_label.text = value
 	value_label.add_theme_font_size_override("font_size", 18)
+	value_label.add_theme_color_override("font_color", TEXT_COLOR)
 	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	stats_grid.add_child(value_label)
 
@@ -410,12 +419,19 @@ func _on_new_run_pressed() -> void:
 	State.reset()
 	get_tree().change_scene_to_file("res://script/scenes/selection/selection.tscn")
 
-# Tabs und Umschalter: flacher Button, der aktive bekommt einen hellen Hintergrund
+# Tabs und Umschalter: Text wie auf den Eisenplatten, der aktive bekommt einen goldenen Rahmen
 func _style_toggle(button: Button) -> void:
 	button.theme = FLAT_BUTTON_THEME
+	var idle = StyleBoxEmpty.new()
+	idle.set_content_margin_all(4)
+	RewardDialog.clear_button_styles(button, idle)
 	var active = StyleBoxFlat.new()
-	active.bg_color = Color(1, 1, 1, 0.15)
-	active.set_corner_radius_all(3)
+	active.bg_color = Color(GOLD, 0.15)
+	active.border_color = GOLD
+	active.set_border_width_all(2)
 	active.set_content_margin_all(4)
 	button.add_theme_stylebox_override("pressed", active)
 	button.add_theme_stylebox_override("hover_pressed", active)
+	button.add_theme_color_override("font_color", TEXT_COLOR)
+	for state in ["font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+		button.add_theme_color_override(state, GOLD)

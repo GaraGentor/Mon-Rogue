@@ -48,7 +48,7 @@ func get_labels() -> Array[String]:
 	return [floor_val(hp_diff),floor_val(attack_diff),floor_val(defense_diff),floor_val(s_attack_diff),floor_val(s_defense_diff), floor_val(speed_diff), ""]
 
 func floor_val(_val: float) -> String:
-	return " + " + str(floorf(_val))
+	return " + %d" % floori(_val)
 
 func _play() -> bool:
 	mon._level_progress += 1

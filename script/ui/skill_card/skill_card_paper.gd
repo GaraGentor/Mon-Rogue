@@ -22,6 +22,10 @@ var _button: BaseButton
 static func attach(card: Control, skill: Dictionary, muted := false) -> SkillCardPaper:
 	var paper := SkillCardPaper.new()
 	paper.set_skill(skill)
+	# das Papier ersetzt eine Eisenplatte der Karte
+	for child in card.get_children():
+		if child is IronPlate:
+			child.visible = false
 	paper._shader_material.set_shader_parameter("muted", 1.0 if muted else 0.0)
 	card.add_child(paper)
 	card.move_child(paper, 0)

@@ -22,6 +22,7 @@ func _ready() -> void:
 
 	var description := Label.new()
 	description.text = tr("HUB_DESC")
+	description.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	description.custom_minimum_size.x = 3 * STATION_SIZE.x + 2 * 20
@@ -36,9 +37,7 @@ func _ready() -> void:
 	stations.add_child(_station(Map.type_label(Map.PATH_TYPE.TRAINER), Map.ICONS[Map.PATH_TYPE.TRAINER], TRAINER_SCENE))
 	add_footer(stations)
 
-	var continue_button := Button.new()
-	continue_button.text = tr("HUB_CONTINUE")
-	continue_button.theme = LABEL_THEME
+	var continue_button := plate_button(tr("HUB_CONTINUE"))
 	continue_button.custom_minimum_size = Vector2(220, 50)
 	continue_button.add_theme_font_size_override("font_size", STATION_FONT_SIZE)
 	continue_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -46,8 +45,7 @@ func _ready() -> void:
 	add_footer(continue_button)
 
 func _station(label: String, icon: Texture2D, scene: PackedScene) -> Button:
-	var button := Button.new()
-	button.text = tr(label)
+	var button := plate_button(tr(label))
 	button.icon = icon
 	button.expand_icon = true
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER

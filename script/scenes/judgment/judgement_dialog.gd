@@ -7,9 +7,9 @@ extends Control
 
 signal _choice(result: Dictionary)
 
-const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
-const MUTED := Color(0.75, 0.75, 0.75, 1)
-const BOX = preload("res://script/ui/materials/monster_widget_boxes.tres")
+const GOLD := SkillDetailPopup.GOLD
+const TEXT_COLOR := IronPlate.TEXT_COLOR
+const MUTED := IronPlate.TEXT_COLOR
 const FLAT_THEME = preload("res://script/scenes/battle/flat_button_theme.tres")
 const GemField = preload("res://script/scenes/gems/gems.gd")
 const PANEL_WIDTH := 900.0
@@ -36,11 +36,10 @@ func _ready() -> void:
 	center.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	add_child(center)
 	_panel = PanelContainer.new()
-	_panel.add_theme_stylebox_override("panel", _box(BOX.border_color, 20))
 	center.add_child(_panel)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 14)
-	_panel.add_child(box)
+	IronPlate.frame(_panel, box, 20, 20)
 
 	_title = _label(22, GOLD)
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -234,7 +233,7 @@ func _gift_card(gift: Dictionary, heirs: Array) -> Button:
 		var name_label := _label(19, GOLD if gift.kind == "gems" else Helper.color_by_type(gift.element))
 		name_label.text = gift_name(gift)
 		lines.add_child(name_label)
-		var desc := _label(14, Color.WHITE)
+		var desc := _label(14, TEXT_COLOR)
 		desc.text = _gems_text(gift.gems) if gift.kind == "gems" else tr("LAST_WILL_ELEMENT_DESC")
 		lines.add_child(desc)
 		if not possible:
@@ -297,7 +296,7 @@ func _skill_card(skill: Dictionary, note: String) -> Button:
 	var name_label := _label(19, SkillCardPaper.readable_color(Helper.color_by_type(skill.nature)))
 	name_label.text = _skill_name(skill)
 	lines.add_child(name_label)
-	var stats := _label(14, Color.WHITE)
+	var stats := _label(14, TEXT_COLOR)
 	var desc := _label(13, MUTED)
 	desc.max_lines_visible = 3
 	if skill.scouted:
@@ -341,7 +340,7 @@ func _mon_card(mon: Monster, note_text: String, blocked: bool) -> Button:
 	lines.mouse_filter = MOUSE_FILTER_IGNORE
 	lines.size_flags_horizontal = SIZE_EXPAND_FILL
 	row.add_child(lines)
-	var name_label := _label(19, Color.WHITE)
+	var name_label := _label(19, GOLD)
 	name_label.text = Helper.mon_battle_name(mon)
 	lines.add_child(name_label)
 	var count := _label(14, MUTED)
@@ -358,10 +357,11 @@ func _card(min_size: Vector2) -> Button:
 	var card := Button.new()
 	card.theme = FLAT_THEME
 	card.custom_minimum_size = min_size
-	card.add_theme_stylebox_override("normal", _box(BOX.border_color, 0))
-	card.add_theme_stylebox_override("hover", _box(GOLD, 0))
-	card.add_theme_stylebox_override("pressed", _box(GOLD, 0))
-	card.add_theme_stylebox_override("disabled", _box(BOX.border_color, 0))
+	RewardDialog.clear_button_styles(card, StyleBoxEmpty.new())
+	# Hover zeigt der Rand der Platte; Skill-Karten ersetzen sie durch ihr Papier
+	var plate := IronPlate.back(card)
+	card.mouse_entered.connect(plate.set_rim.bind(GOLD))
+	card.mouse_exited.connect(plate.set_rim.bind(IronPlate.RIM))
 	_content.add_child(card)
 	return card
 
@@ -383,13 +383,9 @@ func _card_lines(card: Button) -> VBoxContainer:
 	return lines
 
 func _action_button(text_key: String, result: Dictionary) -> Button:
-	var button := Button.new()
-	button.theme = FLAT_THEME
-	button.text = text_key
+	var button := RewardDialog.plate_button(text_key)
 	button.custom_minimum_size = Vector2(180, 44)
 	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_stylebox_override("normal", _box(BOX.border_color, 0))
-	button.add_theme_stylebox_override("hover", _box(GOLD, 0))
 	button.pressed.connect(_choice.emit.bind(result))
 	return button
 
@@ -400,10 +396,3 @@ func _label(font_size: int, color: Color) -> Label:
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.mouse_filter = MOUSE_FILTER_IGNORE
 	return label
-
-func _box(border: Color, padding: int) -> StyleBoxFlat:
-	var box := BOX.duplicate() as StyleBoxFlat
-	box.border_color = border
-	if padding > 0:
-		box.set_content_margin_all(padding)
-	return box

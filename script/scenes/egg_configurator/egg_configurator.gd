@@ -4,7 +4,8 @@ extends Control
 ## Zur Wahl stehen die Standard-Ei-Attacken der Art und alle freigeschalteten.
 
 const SKILLS_TO_PICK := 3
-const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
+const GOLD := SkillDetailPopup.GOLD
+const TEXT_COLOR := IronPlate.TEXT_COLOR
 const BG_TOP := Color(0.560784, 0.301961, 0.85098, 1)
 const LOCKED_COLOR := Color(0.65, 0.65, 0.65)
 const MISSING_COLOR := Color(1, 0.45, 0.45)
@@ -12,8 +13,6 @@ const MAP_BACKGROUND := preload("res://script/scenes/world_map/map_background.gd
 const BATTLE_CARD := preload("res://script/scenes/battle/battle_card.tscn")
 const PHYSICAL_TEXTURE := preload("res://assets/ui/icons/fist.svg")
 const MAGIC_TEXTURE := preload("res://assets/ui/icons/sparkle.svg")
-
-@export var font: Font
 
 var _mon: Monster
 var _selected: Array[String] = []
@@ -44,6 +43,18 @@ func _build() -> void:
 	bg_material.set_shader_parameter("wave_size", 1.0)
 	bg_material.set_shader_parameter("wave_time_mul", 0.933)
 	bg_material.set_shader_parameter("total_phases", 8)
+	# Pixel-Look wie im Laden
+	bg_material.set_shader_parameter("living_pixels", true)
+	bg_material.set_shader_parameter("pixel_size", 4.0)
+	bg_material.set_shader_parameter("amplitude", 0.0)
+	bg_material.set_shader_parameter("loop_seconds", 19.365)
+	bg_material.set_shader_parameter("particle_min_size", 1.0)
+	bg_material.set_shader_parameter("particle_max_size", 1.2)
+	bg_material.set_shader_parameter("flicker", 0.15)
+	bg_material.set_shader_parameter("color_levels", 8.0)
+	bg_material.set_shader_parameter("dither_strength", 1.0)
+	bg_material.set_shader_parameter("dither_scale", 2.0)
+	bg_material.set_shader_parameter("dither_fps", 10.0)
 	background.material = bg_material
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -59,7 +70,10 @@ func _build() -> void:
 	root.add_theme_constant_override("separation", 24)
 	margin.add_child(root)
 
-	root.add_child(_label(tr("CONFIGURATOR_TITLE"), 36, Color.WHITE))
+	var title := _label(tr("CONFIGURATOR_TITLE"), 36, GOLD)
+	title.add_theme_color_override("font_outline_color", Color.BLACK)
+	title.add_theme_constant_override("outline_size", 8)
+	root.add_child(title)
 
 	var content := HBoxContainer.new()
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -70,15 +84,22 @@ func _build() -> void:
 	var mon_box := VBoxContainer.new()
 	mon_box.custom_minimum_size = Vector2(300, 0)
 	mon_box.add_theme_constant_override("separation", 4)
-	content.add_child(mon_box)
+	var mon_panel := PanelContainer.new()
+	IronPlate.frame(mon_panel, mon_box, 16, 16)
+	content.add_child(mon_panel)
 	var texture := TextureRect.new()
 	Monmap.show_on(texture, _mon._name, Monmap.MEDIUM)
+	texture.material = Monmap.LIVING_MATERIAL
 	texture.custom_minimum_size = Vector2(120, 120)
 	texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	mon_box.add_child(texture)
-	mon_box.add_child(_label(Helper.mon_display_name(_mon._name), 26, Helper.color_by_mon(_mon)))
-	mon_box.add_child(_label(tr(Helper.type_name_by_mon(_mon)), 16, Color(1, 1, 1, 0.6)))
+	mon_box.add_child(_label(Helper.mon_display_name(_mon._name), 26, SkillCardPaper.readable_color(Helper.color_by_mon(_mon))))
+	var chip_row := HBoxContainer.new()
+	chip_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	chip_row.custom_minimum_size.y = 32
+	RewardDialog.add_element_chip(chip_row, _mon._type)
+	mon_box.add_child(chip_row)
 
 	_detail_card = BATTLE_CARD.instantiate()
 	_detail_card.custom_minimum_size = Vector2(220, 200)
@@ -87,7 +108,7 @@ func _build() -> void:
 	_detail_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_detail_card.visible = false
 	mon_box.add_child(_detail_card)
-	_detail_note = _label(tr("CONFIGURATOR_PICK_HINT"), 14, Color(1, 1, 1, 0.6))
+	_detail_note = _label(tr("CONFIGURATOR_PICK_HINT"), 14, TEXT_COLOR)
 	_detail_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_detail_note.custom_minimum_size = Vector2(300, 0)
 	mon_box.add_child(_detail_note)
@@ -121,14 +142,12 @@ func _build() -> void:
 	footer.alignment = BoxContainer.ALIGNMENT_END
 	footer.add_theme_constant_override("separation", 40)
 	root.add_child(footer)
-	_counter_label = _label("", 24, Color.WHITE)
-	footer.add_child(_counter_label)
-	_go_button = Button.new()
-	_go_button.text = tr("CONFIGURATOR_GO")
-	_go_button.flat = true
-	_go_button.add_theme_font_size_override("font_size", 32)
-	if font:
-		_go_button.add_theme_font_override("font", font)
+	_counter_label = _label("", 22, TEXT_COLOR)
+	var counter_panel := PanelContainer.new()
+	IronPlate.frame(counter_panel, _counter_label, 16, 10)
+	footer.add_child(counter_panel)
+	_go_button = RewardDialog.plate_button(tr("CONFIGURATOR_GO"))
+	_go_button.focus_mode = Control.FOCUS_NONE
 	_go_button.pressed.connect(_on_go_pressed)
 	footer.add_child(_go_button)
 
@@ -160,7 +179,7 @@ func _create_card(skill: Dictionary, locked: bool, locked_label := "") -> Button
 	lines.add_theme_constant_override("separation", 4)
 	margin.add_child(lines)
 
-	var tint := LOCKED_COLOR if locked else Color.WHITE
+	var tint := LOCKED_COLOR if locked else TEXT_COLOR
 	var name_row := HBoxContainer.new()
 	name_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	lines.add_child(name_row)
@@ -180,7 +199,7 @@ func _create_card(skill: Dictionary, locked: bool, locked_label := "") -> Button
 	if locked:
 		lines.add_child(_card_label(tr(locked_label), 15, LOCKED_COLOR))
 	else:
-		lines.add_child(_card_label(tr("CONFIGURATOR_TIER").format({"tier": skill.tier}), 15, Color(1, 1, 1, 0.6)))
+		lines.add_child(_card_label(tr("CONFIGURATOR_TIER").format({"tier": skill.tier}), 15, TEXT_COLOR))
 		if not Skills.can_use(_mon, skill):
 			# wählbar, aber erst spielbar, wenn das Monster die fehlenden Elemente bekommt (z. B. im Shop)
 			lines.add_child(_card_label(Skills.missing_elements_text(_mon, skill), 14, MISSING_COLOR))
@@ -209,8 +228,6 @@ func _label(text: String, font_size: int, color: Color) -> Label:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
-	if font:
-		label.add_theme_font_override("font", font)
 	return label
 
 func _show_detail(skill: Dictionary, note: String, note_color: Color, locked: bool) -> void:

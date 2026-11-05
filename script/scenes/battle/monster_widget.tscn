@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bqa8vtcwoin5c"]
 
 [ext_resource type="Script" uid="uid://c4yvt3ruax2av" path="res://script/scenes/battle/monster_widget.gd" id="1_iuy1o"]
-[ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="2_2w2hn"]
+[ext_resource type="StyleBox" path="res://script/ui/materials/iron_inset_box.tres" id="2_2w2hn"]
 [ext_resource type="Texture2D" uid="uid://bq0pf5g35vxjd" path="res://assets/mons/1/1_frontx256.png" id="3_pwhph"]
 [ext_resource type="PackedScene" uid="uid://m3rvs4wik3f2" path="res://script/scenes/battle/monster_switcher.tscn" id="3_xmagv"]
 [ext_resource type="Script" uid="uid://ci4eknn4ye3v3" path="res://script/scenes/battle/stats_grid_container.gd" id="4_jq4j5"]
@@ -14,19 +14,16 @@
 [ext_resource type="Script" uid="uid://74e2sad2jg6s" path="res://script/scenes/battle/monster_widget_skill_label.gd" id="11_pnkja"]
 [ext_resource type="Script" uid="uid://7pjv8ftyswon" path="res://script/scenes/battle/skill_info_scroll_container.gd" id="13_m6wl3"]
 [ext_resource type="Texture2D" uid="uid://b04ik3o7e4jqy" path="res://assets/ui/icons/machine-learning.svg" id="13_oppc6"]
+[ext_resource type="Theme" path="res://script/ui/materials/pixel_font_theme.tres" id="99_font_theme"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_x8ik0"]
 content_margin_top = 8.0
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6wlmv"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v8ewt"]
-draw_center = false
-border_width_left = 4
-border_color = Color(0.8, 0.8, 0.8, 0.807843)
-
 [sub_resource type="LabelSettings" id="LabelSettings_y7ch6"]
 resource_local_to_scene = true
+font_color = Color(0.86, 0.83, 0.72, 1)
 
 [node name="MonsterWidget" type="Control" unique_id=1280703230 node_paths=PackedStringArray("info_container", "selection_monster_image_panel", "monster_switcher", "monster_texture", "element_chip", "name_label", "grid_container", "initial_skill_label", "play_button", "learn_button", "first_panel", "type_splash", "magic_splash", "skill_info_container", "info_panel", "info_label", "skill_panel")]
 layout_mode = 3
@@ -35,8 +32,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("99_font_theme")
 script = ExtResource("1_iuy1o")
-info_container = NodePath("MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel/MarginContainer/GridContainer")
+info_container = NodePath("MarginContainer/VBoxContainer/StatsPanel/StatsGrid")
 selection_monster_image_panel = NodePath("MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer")
 monster_switcher = NodePath("MarginContainer/VBoxContainer/Panel/HBoxContainer/NewMonsterSwitcher")
 monster_texture = NodePath("MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Panel2/TextureRect")
@@ -61,14 +59,14 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1305960599]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 6
 
 [node name="InfoPanel" type="Panel" parent="MarginContainer/VBoxContainer" unique_id=1440953349]
 visible = false
@@ -104,6 +102,7 @@ size_flags_horizontal = 3
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer" unique_id=1069704515]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
 theme_override_styles/normal = SubResource("StyleBoxEmpty_x8ik0")
 text = "[NAME]"
 horizontal_alignment = 1
@@ -135,34 +134,6 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer" unique_id=1254040576]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.5
-theme_override_styles/panel = SubResource("StyleBoxFlat_v8ewt")
-
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel" unique_id=2112924587]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel/MarginContainer" unique_id=1183065624 node_paths=PackedStringArray("label")]
-layout_mode = 2
-columns = 2
-script = ExtResource("4_jq4j5")
-label = NodePath("Label")
-
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Panel/HBoxContainer/Panel/MarginContainer/GridContainer" unique_id=873801863]
-visible = false
-layout_mode = 2
-theme_override_fonts/font = ExtResource("5_4s83u")
-theme_override_font_sizes/font_size = 24
-text = "ATK"
-
 [node name="FirstPanel" type="Panel" parent="MarginContainer/VBoxContainer/Panel" unique_id=1488300562]
 visible = false
 layout_mode = 1
@@ -172,6 +143,26 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("2_2w2hn")
+
+[node name="StatsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_2w2hn")
+
+[node name="StatsGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/StatsPanel" node_paths=PackedStringArray("label")]
+layout_mode = 2
+theme_override_constants/h_separation = 2
+columns = 14
+script = ExtResource("4_jq4j5")
+label = NodePath("Label")
+horizontal = true
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/StatsPanel/StatsGrid"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("5_4s83u")
+theme_override_font_sizes/font_size = 14
+text = "ATK"
 
 [node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainer" unique_id=61333713]
 layout_mode = 2

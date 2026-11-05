@@ -21,7 +21,6 @@ class SkillSlot extends MarginContainer:
 			on_click.call()
 
 const BATTLE_CARD := preload("res://script/scenes/battle/battle_card.tscn")
-const BOX := preload("res://script/ui/materials/monster_widget_boxes.tres")
 const ELEMENT_CHIP := preload("res://script/ui/element_chip/element_chip.tscn")
 const LABEL_THEME := preload("res://script/ui/materials/battle_labels.tres")
 const CHIP_HEIGHT := 32.0
@@ -50,13 +49,10 @@ var _slots: Array[SkillSlot] = []
 func _init(mon: Monster) -> void:
 	_skills = mon._skills
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var style := BOX.duplicate() as StyleBoxFlat
-	style.set_content_margin_all(16)
-	add_theme_stylebox_override("panel", style)
 
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
-	add_child(box)
+	IronPlate.frame(self, box, 16, 16)
 	var top := HBoxContainer.new()
 	top.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	top.add_theme_constant_override("separation", 16)

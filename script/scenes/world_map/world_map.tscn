@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://ct8ovcic8ewvm"]
+[gd_scene format=3 uid="uid://ct8ovcic8ewvm"]
 
 [ext_resource type="Script" path="res://script/scenes/world_map/world_map.gd" id="1_fque0"]
 [ext_resource type="Script" path="res://script/scenes/world_map/event_handler.gd" id="2_7tuf0"]
@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bcjim8fkv613c" path="res://script/scenes/shop/shop.tscn" id="3_t1igp"]
 [ext_resource type="PackedScene" uid="uid://082mo0k6468p" path="res://script/scenes/jailer/jailer.tscn" id="4_e13wj"]
 [ext_resource type="PackedScene" uid="uid://bc56refqd7yk6" path="res://script/scenes/trainer/trainer.tscn" id="4_k05nh"]
-[ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="4_m3j2j"]
+[ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="4_plate"]
 [ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="5_23h7f"]
 [ext_resource type="PackedScene" uid="uid://c3ubam1ngmpg5" path="res://script/scenes/treasure/treasure.tscn" id="5_pm81x"]
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="5_pvajd"]
@@ -40,6 +40,8 @@ shader_parameter/total_phases = 8
 bg_color = Color(0, 0, 0, 0)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vjn3m"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_header"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t4rwl"]
 bg_color = Color(1, 1, 1, 0)
@@ -167,14 +169,19 @@ mouse_filter = 2
 [node name="Panel" type="PanelContainer" parent="HBoxContainer/Panel/MarginContainer/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("4_m3j2j")
+theme_override_styles/panel = SubResource("StyleBoxEmpty_header")
+
+[node name="Plate" type="ColorRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("4_plate")
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel/MarginContainer/Header/Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 80
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 10
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer"]
 layout_mode = 2
@@ -194,6 +201,7 @@ stretch_mode = 5
 [node name="MoneyLabel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
 theme_override_font_sizes/font_size = 22
 text = "0"
 
@@ -208,6 +216,7 @@ stretch_mode = 5
 [node name="ShardLabel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
 theme_override_font_sizes/font_size = 22
 text = "0"
 
@@ -280,9 +289,23 @@ grow_horizontal = 0
 grow_vertical = 0
 tooltip_text = "MAP_LEGEND"
 theme = ExtResource("6_4ileh")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_header")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_header")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_header")
 icon = ExtResource("22_parch")
 icon_alignment = 1
 expand_icon = true
+
+[node name="Plate" type="ColorRect" parent="HBoxContainer/Panel/LegendButton"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_plate")
 
 [node name="Panel2" type="Panel" parent="HBoxContainer"]
 layout_mode = 2

@@ -6,7 +6,7 @@ extends PanelContainer
 ## Liegt per top_level frei über der Szene, der Host hängt es nur als Kind an.
 
 const BATTLE_CARD := preload("res://script/scenes/battle/battle_card.tscn")
-const BOX := preload("res://script/ui/materials/monster_widget_boxes.tres")
+const FONT_THEME := preload("res://script/ui/materials/pixel_font_theme.tres")
 const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
 const MISSING_COLOR := Color(1, 0.45, 0.45)
 const WIDTH := 300.0
@@ -25,37 +25,31 @@ func _init() -> void:
 	z_index = 10
 	visible = false
 	custom_minimum_size = Vector2(WIDTH, 0)
-	# gleicher Rahmen wie alle anderen Boxen
-	var style := BOX.duplicate() as StyleBoxFlat
-	style.set_content_margin_all(16)
-	add_theme_stylebox_override("panel", style)
+	theme = FONT_THEME
 	# umbrechende Labels kennen ihre Höhe erst nach dem Layout, dann nochmal auf den Inhalt schrumpfen
 	minimum_size_changed.connect(_fit)
 
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
-	add_child(box)
+	IronPlate.frame(self, box, 16, 16)
 	_card = BATTLE_CARD.instantiate()
 	_card.custom_minimum_size = Vector2(220, 200)
 	_card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(_card)
-	_stats = _label(Color.WHITE)
-	_element = _label(Color.WHITE)
+	_stats = _label(IronPlate.TEXT_COLOR)
+	_element = _label(IronPlate.TEXT_COLOR)
 	_missing = _label(MISSING_COLOR)
 	_lock = _label(GOLD)
 	_lock.add_theme_font_size_override("font_size", 15)
 	for label in [_stats, _element, _missing, _lock]:
 		box.add_child(label)
 
-	var close := Button.new()
-	close.text = "MONSTER_CLOSE_INFO"
+	var close := RewardDialog.plate_button(tr("MONSTER_CLOSE_INFO"))
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	close.focus_mode = Control.FOCUS_NONE
 	close.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	for state in ["normal", "hover", "pressed"]:
-		close.add_theme_stylebox_override(state, load("res://script/ui/materials/info_button_%s.tres" % state))
 	close.pressed.connect(hide_popup)
 	box.add_child(close)
 

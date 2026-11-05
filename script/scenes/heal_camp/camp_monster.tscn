@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://script/scenes/heal_camp/camp_monster.gd" id="1_camp"]
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="2_theme"]
 [ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="3_plate"]
+[ext_resource type="Material" path="res://script/ui/shader/living_pixels_material.tres" id="4_living"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
 bg_color = Color(0.75, 0.1, 0.1, 1)
@@ -94,6 +95,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="."]
+material = ExtResource("4_living")
 custom_minimum_size = Vector2(320, 320)
 layout_mode = 2
 expand_mode = 1

@@ -24,7 +24,7 @@ const BAG_FILL_SIZE := Vector2(220, 260)
 const MON_FILL_SIZE := Vector2(220, 225)
 ## so weit darf sich die Maus bei einem Klick auf eine Karte bewegen, sonst ist es ein Ziehen
 const CLICK_MAX_MOVE := 10.0
-const BOX = preload("res://script/ui/materials/monster_widget_boxes.tres")
+const FONT_THEME = preload("res://script/ui/materials/pixel_font_theme.tres")
 const LABEL_THEME = preload("res://script/ui/materials/battle_labels.tres")
 const BAG_ICON = preload("res://assets/ui/icons/bag.svg")
 const HOVER_COLOR := Color(1.3, 1.3, 1.0)
@@ -83,6 +83,8 @@ class DropTarget extends PanelContainer:
 	var mon: Variant
 	## gesperrt (drag.can_drop), z. B. zu teuer: ausgegraut, Ablegen nicht möglich
 	var locked := false
+	## Hintergrund der Standard-Ziele, im Szenen-Layout ausgeblendet
+	var plate: IronPlate
 
 	func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 		return not locked and dialog._dragged != null and is_same(data, dialog._dragged.drag)
@@ -98,6 +100,7 @@ class DropTarget extends PanelContainer:
 var _dim: ColorRect
 var _center: CenterContainer
 var _panel: PanelContainer
+var _panel_plate: IronPlate
 var _title: Label
 var _content: VBoxContainer
 var _columns: BoxContainer
@@ -122,6 +125,7 @@ var _fill_targets := false
 func _init() -> void:
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	mouse_filter = MOUSE_FILTER_STOP
+	theme = FONT_THEME
 	_dim = ColorRect.new()
 	_dim.color = Color(0, 0, 0, 0.7)
 	_dim.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
@@ -131,13 +135,13 @@ func _init() -> void:
 	add_child(_center)
 	_panel = PanelContainer.new()
 	_center.add_child(_panel)
-	set_accent(BOX.border_color)
 
 	_content = VBoxContainer.new()
 	_content.add_theme_constant_override("separation", 20)
-	_panel.add_child(_content)
+	_panel_plate = IronPlate.frame(_panel, _content, 24, 24)
 	_title = Label.new()
 	_title.theme = LABEL_THEME
+	_title.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_content.add_child(_title)
 
@@ -157,6 +161,7 @@ func _init() -> void:
 	_target_header = Label.new()
 	_target_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_target_header.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_target_header.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	_target_side.add_child(_target_header)
 	_target_grid = GridContainer.new()
 	_target_grid.add_theme_constant_override("h_separation", 12)
@@ -166,14 +171,12 @@ func _init() -> void:
 
 	# eigener Tooltip, weil Godot während eines Drags keine Tooltips zeigt
 	_tooltip = PanelContainer.new()
-	var tooltip_style := BOX.duplicate() as StyleBoxFlat
-	tooltip_style.set_content_margin_all(10)
-	_tooltip.add_theme_stylebox_override("panel", tooltip_style)
 	_tooltip.top_level = true
 	_tooltip.mouse_filter = MOUSE_FILTER_IGNORE
 	_tooltip.visible = false
 	_tooltip_label = Label.new()
-	_tooltip.add_child(_tooltip_label)
+	_tooltip_label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
+	IronPlate.frame(_tooltip, _tooltip_label, 12, 10)
 	add_child(_tooltip)
 	_hide_targets()
 
@@ -182,10 +185,7 @@ func set_title(text: String) -> void:
 
 ## Rahmenfarbe des Panels, unterscheidet die Belohnungsarten
 func set_accent(color: Color) -> void:
-	var style := BOX.duplicate() as StyleBoxFlat
-	style.border_color = color
-	style.set_content_margin_all(24)
-	_panel.add_theme_stylebox_override("panel", style)
+	_panel_plate.set_rim(color)
 
 ## Wie viele Preise nebeneinander stehen (der Shop hat mehr Ware, als in eine Spalte passt).
 ## vertical: Bild oben, Text darunter. Gilt für Karten, die danach angelegt werden.
@@ -213,9 +213,7 @@ func use_scene_layout(background: Control) -> void:
 	add_child(_panel)
 	move_child(_panel, 1)
 	_panel.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	var style := StyleBoxEmpty.new()
-	style.set_content_margin_all(24)
-	_panel.add_theme_stylebox_override("panel", style)
+	_panel_plate.visible = false
 	_columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_target_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_fill_targets = true
@@ -248,11 +246,11 @@ func _drag_blocked(_card: RewardCard) -> String:
 ## Was beim Ziehen am Mauszeiger hängt: standardmäßig der Titel der Karte
 func _make_drag_preview(card: RewardCard) -> Control:
 	var preview := PanelContainer.new()
-	preview.add_theme_stylebox_override("panel", BOX)
 	var label := Label.new()
 	label.theme = LABEL_THEME
 	label.text = card.drag.title
-	preview.add_child(label)
+	label.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
+	IronPlate.frame(preview, label, 12, 8)
 	return preview
 
 ## Zeigt, warum die Karte nicht gezogen werden darf
@@ -308,10 +306,7 @@ static func plate_button(text: String) -> Button:
 	button.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	button.add_theme_color_override("font_hover_color", SkillDetailPopup.GOLD)
 	button.add_theme_color_override("font_pressed_color", SkillDetailPopup.GOLD)
-	var plate := IronPlate.new()
-	plate.show_behind_parent = true
-	plate.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	button.add_child(plate)
+	IronPlate.back(button)
 	return button
 
 ## Chip mit dem Namen und der Farbe eines Elements bzw. einer Kombination, in eine Zeile eingereiht
@@ -358,16 +353,10 @@ func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary
 	card.drag = drag
 	card.custom_minimum_size = _card_size
 	card.mouse_default_cursor_shape = Control.CURSOR_DRAG
-	card.add_theme_stylebox_override("panel", BOX)
-
-	var margin := MarginContainer.new()
-	for side in ["left", "top", "right", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 10)
-	card.add_child(margin)
 
 	card.row = VBoxContainer.new() if _vertical_cards else HBoxContainer.new()
 	card.row.add_theme_constant_override("separation", 8 if _vertical_cards else 12)
-	margin.add_child(card.row)
+	IronPlate.frame(card, card.row, 12, 12)
 	icon.custom_minimum_size = VERTICAL_ICON_SIZE if _vertical_cards else ICON_SIZE
 	card.row.add_child(icon)
 
@@ -378,11 +367,13 @@ func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary
 	var label := Label.new()
 	label.theme = LABEL_THEME
 	label.text = card_title
+	label.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
 	# lange Namen nur an Wortgrenzen umbrechen
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	card.info.add_child(label)
 	var description := Label.new()
 	description.text = text
+	description.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	card.info.add_child(description)
 	if _vertical_cards:
@@ -405,14 +396,14 @@ func _add_target(target_title: String, icon: Control, mon: Variant, locked := fa
 	target.locked = locked
 	target.modulate = LOCKED_COLOR if locked else Color.WHITE
 	target.custom_minimum_size = TARGET_SIZE
-	target.add_theme_stylebox_override("panel", BOX)
 
 	var box := VBoxContainer.new()
-	target.add_child(box)
+	target.plate = IronPlate.frame(target, box, 8, 8)
 	icon.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(icon)
 	var label := Label.new()
 	label.text = target_title
+	label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	box.add_child(label)
@@ -456,9 +447,9 @@ func _build_targets(card: RewardCard) -> void:
 		_add_target(target_title, mon_icon(mon), mon, can_drop.is_valid() and not can_drop.call(mon))
 	if _fill_targets:
 		# Monster untereinander in fester Größe und ohne Box, egal ob eins oder zwei da sind
-		for target: Control in _target_grid.get_children():
+		for target: DropTarget in _target_grid.get_children():
 			target.custom_minimum_size = MON_FILL_SIZE
-			target.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+			target.plate.visible = false
 
 func _hide_targets() -> void:
 	_clear_targets()

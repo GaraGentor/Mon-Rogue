@@ -6,6 +6,7 @@ extends VBoxContainer
 signal picked(index: int)
 
 func _init(mon: Monster) -> void:
+	theme = preload("res://script/ui/materials/pixel_font_theme.tres")
 	alignment = BoxContainer.ALIGNMENT_CENTER
 	add_theme_constant_override("separation", 8)
 	var title := Label.new()

@@ -1,10 +1,12 @@
-[gd_scene load_steps=15 format=3 uid="uid://cyw2det7lplq0"]
+[gd_scene format=3 uid="uid://cyw2det7lplq0"]
 
 [ext_resource type="Script" path="res://script/scenes/judgment/judgement.gd" id="1_nuduw"]
 [ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_g5s67"]
 [ext_resource type="PackedScene" uid="uid://bqa8vtcwoin5c" path="res://script/scenes/battle/monster_widget.tscn" id="3_4or1s"]
 [ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="4_atuse"]
-[ext_resource type="StyleBox" uid="uid://bdq0txb6w7gmt" path="res://script/ui/materials/monster_widget_boxes.tres" id="7_5vxq8"]
+[ext_resource type="StyleBox" path="res://script/ui/materials/iron_inset_box.tres" id="7_inset"]
+[ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="7_plate"]
+[ext_resource type="Theme" path="res://script/ui/materials/pixel_font_theme.tres" id="7_font"]
 [ext_resource type="Script" path="res://script/scenes/judgment/judgement_dialog.gd" id="8_dlg01"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cx0eb"]
@@ -15,77 +17,27 @@ shader_parameter/wave_amp = 0.115
 shader_parameter/wave_size = 1.0
 shader_parameter/wave_time_mul = 0.933
 shader_parameter/total_phases = 8
+shader_parameter/living_pixels = true
+shader_parameter/pixel_size = 4.0
+shader_parameter/amplitude = 0.0
+shader_parameter/loop_seconds = 19.365
+shader_parameter/particle_min_size = 1.0
+shader_parameter/particle_max_size = 1.2
+shader_parameter/flicker = 0.15
+shader_parameter/color_levels = 8.0
+shader_parameter/dither_strength = 1.0
+shader_parameter/dither_scale = 2.0
+shader_parameter/dither_fps = 10.0
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_fd6q6"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot0"]
-bg_color = Color(0, 0, 0, 0.25)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.8, 0.8, 0.8, 0.5)
-border_blend = true
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_plate"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_catchframe"]
-bg_color = Color(0, 0, 0, 0.12)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.8, 0.8, 0.8, 0.6)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_teamframe"]
-bg_color = Color(0.2, 0.14, 0.05, 0.6)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.858824, 0.717647, 0.45098, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_catchlegend"]
-content_margin_left = 14.0
-content_margin_top = 2.0
-content_margin_right = 14.0
-content_margin_bottom = 2.0
-bg_color = Color(0.0933971, 0.0873049, 0.0836773, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.8, 0.8, 0.8, 0.6)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_teamlegend"]
-content_margin_left = 14.0
-content_margin_top = 2.0
-content_margin_right = 14.0
-content_margin_bottom = 2.0
-bg_color = Color(0.0933971, 0.0873049, 0.0836773, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.858824, 0.717647, 0.45098, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_button"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
 
 [node name="Judgement" type="Control" node_paths=PackedStringArray("mw1", "mw2", "mw3", "catch_header", "catch_badges", "catch_area", "catch_empty", "prev_button", "next_button", "dots", "slot_area_1", "slot_area_2", "slot_badges_1", "slot_badges_2", "slot_empty_1", "slot_empty_2", "hint_label", "zone_row", "confirm_button", "confirm_info", "dialog")]
 layout_mode = 3
@@ -94,11 +46,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("7_font")
 script = ExtResource("1_nuduw")
 mw1 = NodePath("Margin/VBox/Top/CatchFrame/Content/CatchArea/MonsterWidget")
 mw2 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot1/Area1/MonsterWidget2")
 mw3 = NodePath("Margin/VBox/Top/TeamFrame/Content/TeamRow/Slot2/Area2/MonsterWidget3")
-catch_header = NodePath("Margin/VBox/Top/CatchFrame/Legend/Label")
+catch_header = NodePath("Margin/VBox/Top/CatchFrame/Legend/Margin/Label")
 catch_badges = NodePath("Margin/VBox/Top/CatchFrame/Content/Badges")
 catch_area = NodePath("Margin/VBox/Top/CatchFrame/Content/CatchArea")
 catch_empty = NodePath("Margin/VBox/Top/CatchFrame/Content/CatchArea/Empty")
@@ -152,7 +105,7 @@ theme_override_constants/separation = 16
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Border" type="Panel" parent="Margin/VBox/Top/CatchFrame"]
+[node name="Border" type="ColorRect" parent="Margin/VBox/Top/CatchFrame"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -161,7 +114,7 @@ offset_top = 14.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_catchframe")
+script = ExtResource("7_plate")
 
 [node name="Content" type="VBoxContainer" parent="Margin/VBox/Top/CatchFrame"]
 layout_mode = 1
@@ -202,8 +155,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBoxFlat_slot0")
+theme_override_styles/normal = ExtResource("7_inset")
 text = "JUDGEMENT_NO_CATCHES_LEFT"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -217,9 +171,26 @@ layout_mode = 2
 custom_minimum_size = Vector2(56, 0)
 layout_mode = 2
 theme = ExtResource("4_atuse")
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
+theme_override_colors/font_hover_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_colors/font_pressed_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_button")
 theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = ExtResource("7_5vxq8")
 text = "<"
+
+[node name="Plate" type="ColorRect" parent="Margin/VBox/Top/CatchFrame/Content/Nav/Prev"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_plate")
 
 [node name="Dots" type="HBoxContainer" parent="Margin/VBox/Top/CatchFrame/Content/Nav"]
 layout_mode = 2
@@ -231,19 +202,50 @@ alignment = 1
 custom_minimum_size = Vector2(56, 0)
 layout_mode = 2
 theme = ExtResource("4_atuse")
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
+theme_override_colors/font_hover_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_colors/font_pressed_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_button")
 theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = ExtResource("7_5vxq8")
 text = ">"
+
+[node name="Plate" type="ColorRect" parent="Margin/VBox/Top/CatchFrame/Content/Nav/Next"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_plate")
 
 [node name="Legend" type="PanelContainer" parent="Margin/VBox/Top/CatchFrame"]
 layout_mode = 0
 offset_left = 18.0
 offset_right = 18.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_catchlegend")
+theme_override_styles/panel = SubResource("StyleBoxEmpty_plate")
 
-[node name="Label" type="Label" parent="Margin/VBox/Top/CatchFrame/Legend"]
+[node name="Plate" type="ColorRect" parent="Margin/VBox/Top/CatchFrame/Legend"]
 layout_mode = 2
+mouse_filter = 2
+script = ExtResource("7_plate")
+
+[node name="Margin" type="MarginContainer" parent="Margin/VBox/Top/CatchFrame/Legend"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 5
+
+[node name="Label" type="Label" parent="Margin/VBox/Top/CatchFrame/Legend/Margin"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
 theme_override_font_sizes/font_size = 18
 
 [node name="TeamFrame" type="Control" parent="Margin/VBox/Top"]
@@ -251,7 +253,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 
-[node name="Border" type="Panel" parent="Margin/VBox/Top/TeamFrame"]
+[node name="Border" type="ColorRect" parent="Margin/VBox/Top/TeamFrame"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -260,7 +262,7 @@ offset_top = 14.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_teamframe")
+script = ExtResource("7_plate")
 
 [node name="Content" type="VBoxContainer" parent="Margin/VBox/Top/TeamFrame"]
 layout_mode = 1
@@ -311,8 +313,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBoxFlat_slot0")
+theme_override_styles/normal = ExtResource("7_inset")
 text = "JUDGEMENT_FREE_SLOT"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -349,8 +352,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBoxFlat_slot0")
+theme_override_styles/normal = ExtResource("7_inset")
 text = "JUDGEMENT_FREE_SLOT"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -369,9 +373,22 @@ layout_mode = 0
 offset_left = 18.0
 offset_right = 18.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_teamlegend")
+theme_override_styles/panel = SubResource("StyleBoxEmpty_plate")
 
-[node name="Label" type="Label" parent="Margin/VBox/Top/TeamFrame/Legend"]
+[node name="Plate" type="ColorRect" parent="Margin/VBox/Top/TeamFrame/Legend"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("7_plate")
+
+[node name="Margin" type="MarginContainer" parent="Margin/VBox/Top/TeamFrame/Legend"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 5
+
+[node name="Label" type="Label" parent="Margin/VBox/Top/TeamFrame/Legend/Margin"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
 theme_override_font_sizes/font_size = 18
@@ -398,13 +415,30 @@ custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme = ExtResource("4_atuse")
 theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_colors/font_hover_color = Color(1, 0.9, 0.65, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.9, 0.65, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = ExtResource("7_5vxq8")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_button")
 autowrap_mode = 3
+
+[node name="Plate" type="ColorRect" parent="Margin/VBox/Bottom/Confirm/ConfirmButton"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_plate")
 
 [node name="Info" type="Label" parent="Margin/VBox/Bottom/Confirm"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
 theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 autowrap_mode = 3

@@ -60,6 +60,7 @@ func _ready() -> void:
 
 	var description := Label.new()
 	description.text = tr("EVENT_WHEEL_DESC").format({"amount": _amount})
+	description.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_footer(description)
 
@@ -75,14 +76,12 @@ func _ready() -> void:
 	_result.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_footer(_result)
 
-	_spin_button = Button.new()
-	_spin_button.text = tr("EVENT_WHEEL_SPIN")
+	_spin_button = plate_button(tr("EVENT_WHEEL_SPIN"))
 	_spin_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_spin_button.pressed.connect(_spin)
 	add_footer(_spin_button)
 
-	_ok_button = Button.new()
-	_ok_button.text = tr("COMMON_OK")
+	_ok_button = plate_button(tr("COMMON_OK"))
 	_ok_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_ok_button.visible = false
 	_ok_button.pressed.connect(close)

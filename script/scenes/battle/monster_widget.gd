@@ -94,7 +94,7 @@ func init_skills(mon: Monster) -> void:
 			var dupe = (DuplicateFlags.DUPLICATE_USE_INSTANTIATION | DuplicateFlags.DUPLICATE_SCRIPTS | DuplicateFlags.DUPLICATE_SIGNALS) if st == "name" else DuplicateFlags.DUPLICATE_USE_INSTANTIATION
 			var name_label: Label = initial_skill_label.duplicate(dupe)
 			name_label.visible = true
-			name_label.text = display_skill_or_questionmark(skill, tr(skill[st]) if st == "name" else str(skill[st]))
+			name_label.text = display_skill_or_questionmark(skill, tr(skill[st]) if st == "name" else Helper.format_number(skill[st]))
 			if st == "name":
 				print(skill.nature)
 				var new_ls = name_label.label_settings.duplicate(DuplicateFlags.DUPLICATE_USE_INSTANTIATION)
@@ -134,10 +134,13 @@ func init_new_grid() -> void:
 	for c in grid_container.get_children():
 		c.queue_free()
 	var map = ["", "SKILL_HEADER_SKILL", "SKILL_HEADER_COST", "SKILL_HEADER_CD", "SKILL_HEADER_POWER", ""]
+	var header_settings: LabelSettings = initial_skill_label.label_settings.duplicate()
+	header_settings.font_color = SkillDetailPopup.GOLD
 	for st in map:
 		var name_label: Label = initial_skill_label.duplicate()
 		name_label.visible = true
 		name_label.text = tr(st)
+		name_label.label_settings = header_settings
 		grid_container.add_child(name_label)
 
 func remove_panel() -> void:

@@ -23,6 +23,7 @@ func set_price(card: RewardCard, price: int, repeatable := false) -> void:
 	var label := Label.new()
 	label.theme = LABEL_THEME
 	label.text = "$ " + str(price)
+	label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.insert_detail(label)
@@ -33,12 +34,10 @@ func add_money_footer(finish_key: String) -> void:
 	var footer := HBoxContainer.new()
 	_money_label = Label.new()
 	_money_label.theme = LABEL_THEME
+	_money_label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	_money_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(_money_label)
-	var finish := Button.new()
-	finish.theme = BUTTON_THEME
-	finish.add_theme_font_size_override("font_size", 24)
-	finish.text = tr(finish_key)
+	var finish := plate_button(tr(finish_key))
 	finish.pressed.connect(close)
 	footer.add_child(finish)
 	add_footer(footer)
@@ -56,6 +55,7 @@ func add_money_bar(finish_key: String) -> void:
 	_money_label = Label.new()
 	_money_label.theme = LABEL_THEME
 	_money_label.add_theme_font_size_override("font_size", MONEY_BAR_FONT_SIZE)
+	_money_label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	_money_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(_money_label)
 	var exit_button := icon_button(EXIT_ICON)

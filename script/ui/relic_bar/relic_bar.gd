@@ -3,13 +3,26 @@ extends HBoxContainer
 ## Zeigt die gesammelten Relics als Icons, ein Klick öffnet ein Popup mit Name und Beschreibung.
 
 const ICON_SIZE := Vector2(40, 40)
+const INSET_BOX := preload("res://script/ui/materials/iron_inset_box.tres")
+const FONT_THEME := preload("res://script/ui/materials/pixel_font_theme.tres")
 
 var _popup: PopupPanel
 var _popup_label: RichTextLabel
+var _button_style: StyleBoxFlat
+var _button_hover_style: StyleBoxFlat
 
 func _ready() -> void:
+	_button_style = INSET_BOX.duplicate()
+	_button_style.set_content_margin_all(4)
+	_button_hover_style = _button_style.duplicate()
+	_button_hover_style.border_color = SkillDetailPopup.GOLD
 	_popup = PopupPanel.new()
+	_popup.theme = FONT_THEME
+	var popup_style: StyleBoxFlat = INSET_BOX.duplicate()
+	popup_style.set_content_margin_all(12)
+	_popup.add_theme_stylebox_override("panel", popup_style)
 	_popup_label = RichTextLabel.new()
+	_popup_label.add_theme_color_override("default_color", IronPlate.TEXT_COLOR)
 	_popup_label.bbcode_enabled = true
 	_popup_label.fit_content = true
 	_popup_label.custom_minimum_size = Vector2(260, 0)
@@ -33,10 +46,12 @@ func refresh() -> void:
 		button.custom_minimum_size = ICON_SIZE
 		button.icon = load(relic.icon)
 		button.expand_icon = true
+		RewardDialog.clear_button_styles(button, _button_style)
+		button.add_theme_stylebox_override("hover", _button_hover_style)
 		button.pressed.connect(_show_info.bind(button, relic))
 		add_child(button)
 
 func _show_info(button: Button, relic: Dictionary) -> void:
-	_popup_label.text = "[b]%s[/b]\n%s" % [tr(relic.name), tr(relic.description)]
+	_popup_label.text = "[color=#%s]%s[/color]\n%s" % [SkillDetailPopup.GOLD.to_html(false), tr(relic.name), tr(relic.description)]
 	var pos := Vector2i(button.get_screen_position() + Vector2(0, button.size.y + 4))
 	_popup.popup(Rect2i(pos, Vector2i.ZERO))

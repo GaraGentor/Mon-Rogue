@@ -7,10 +7,9 @@ extends Control
 ## Ist im Kampf ein eigenes Monster gefallen, kann es zuerst einmalig durch einen neuen Fang wiederbelebt werden.
 ## Wird das übersprungen oder ist es nicht möglich, vererbt es eine Sache (Letzter Wille). Ohne übrige Fänge geht es danach direkt zur Karte.
 
-const GOLD := Color(0.858824, 0.717647, 0.45098, 1)
-const MUTED := Color(0.75, 0.75, 0.75, 1)
+const GOLD := SkillDetailPopup.GOLD
+const MUTED := IronPlate.TEXT_COLOR
 const EGG_ICON = preload("res://assets/ui/eggs/common_1.png")
-const BOX = preload("res://script/ui/materials/monster_widget_boxes.tres")
 const SKILL_LABEL_SCRIPT = preload("res://script/scenes/battle/monster_widget_skill_label.gd")
 const MAX_TEAM := 2
 const DRAG_THRESHOLD := 10.0
@@ -64,6 +63,8 @@ var _dragging := false
 var _press := {}
 var _zones := {}
 var _zone_desc := {}
+# Ablage -> ihre Eisenplatte (die Ablagen über den Team-Karten haben keine)
+var _zone_plates := {}
 # Kartenbereich -> goldener Auswahlrahmen
 var _frames := {}
 
@@ -77,6 +78,9 @@ func _ready() -> void:
 	# Die Karten sind hier flacher als im Kampf: dem Werte-Bereich mehr Höhe geben, die Attacken-Liste scrollt
 	for widget in [mw1, mw2, mw3]:
 		widget.get_node("MarginContainer/VBoxContainer/Panel").size_flags_stretch_ratio = 1.5
+	# das aktuelle Team ist golden umrandet
+	for plate: IronPlate in [$Margin/VBox/Top/TeamFrame/Border, $Margin/VBox/Top/TeamFrame/Legend/Plate]:
+		plate.set_rim(GOLD)
 	for zone in ZONE_TITLES:
 		_zones[zone] = _make_zone(zone)
 	for slot in MAX_TEAM:
@@ -96,14 +100,19 @@ func _process(_delta: float) -> void:
 	if not _dragging:
 		return
 	for zone in _zones:
-		_zones[zone].self_modulate = Color(1.4, 1.4, 1.4) if _zones[zone].is_drag_hovered() else Color.WHITE
+		_set_zone_glow(zone, Color(1.4, 1.4, 1.4) if _zones[zone].is_drag_hovered() else Color.WHITE)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_DRAG_END and _dragging:
 		_dragging = false
 		for zone in _zones:
-			_zones[zone].self_modulate = Color.WHITE
+			_set_zone_glow(zone, Color.WHITE)
 		_set_held(null)
+
+func _set_zone_glow(zone: int, color: Color) -> void:
+	_zones[zone].self_modulate = color
+	if _zone_plates.has(zone):
+		_zone_plates[zone].modulate = color
 
 # ─────────────────────────
 # Eingabe
@@ -388,7 +397,6 @@ func _refresh_catch() -> void:
 		dot.size_flags_vertical = SIZE_SHRINK_CENTER
 		var style := StyleBoxFlat.new()
 		style.bg_color = GOLD if i == _index else Color(0.5, 0.5, 0.5)
-		style.set_corner_radius_all(5)
 		dot.add_theme_stylebox_override("panel", style)
 		dots.add_child(dot)
 	_fill_badges(catch_badges, _pool[_index] if has_catch else null)
@@ -428,7 +436,7 @@ func _refresh_zones() -> void:
 		else:
 			desc.text = tr(ZONE_TITLES[zone] + "_EFFECT").format(vars)
 		var allowed = _held != null and reason == ""
-		drop_zone.add_theme_stylebox_override("panel", _box(GOLD if allowed else BOX.border_color))
+		_zone_plates[zone].set_rim(GOLD if allowed else IronPlate.RIM)
 		drop_zone.modulate.a = 0.45 if _held != null and not allowed else 1.0
 	hint_label.text = tr("JUDGEMENT_HINT_IDLE") if _held == null else tr("JUDGEMENT_HINT_HELD").format({"mon": Helper.mon_battle_name(_held)})
 	hint_label.add_theme_color_override("font_color", MUTED if _held == null else GOLD)
@@ -476,9 +484,9 @@ func _fill_badges(row: HBoxContainer, mon: Monster, slot: int = -1) -> void:
 			egg.tooltip_text = tr("EGG_SKILL_HINT")
 			row.add_child(egg)
 	elif not State.mons.has(mon):
-		row.add_child(_badge(tr("JUDGEMENT_BADGE_BENCHED"), Color(0.3, 0.3, 0.3), Color.WHITE))
+		row.add_child(_badge(tr("JUDGEMENT_BADGE_BENCHED"), Color(0.3, 0.3, 0.3), IronPlate.TEXT_COLOR))
 	if mon == State.starter:
-		row.add_child(_badge(tr("JUDGEMENT_BADGE_STARTER"), Color(0.3, 0.3, 0.3), Color.WHITE))
+		row.add_child(_badge(tr("JUDGEMENT_BADGE_STARTER"), Color(0.3, 0.3, 0.3), IronPlate.TEXT_COLOR))
 
 # ─────────────────────────
 # Aufbau
@@ -507,12 +515,11 @@ func _slot_overlay_at(pos: Vector2) -> bool:
 func _make_zone(zone: int) -> JudgementDropZone:
 	var drop_zone := JudgementDropZone.new()
 	drop_zone.size_flags_horizontal = SIZE_EXPAND_FILL
-	drop_zone.add_theme_stylebox_override("panel", _box(BOX.border_color))
 	_connect_zone(drop_zone, zone)
 	var box := VBoxContainer.new()
 	box.mouse_filter = MOUSE_FILTER_IGNORE
-	drop_zone.add_child(box)
-	var title := _label(19, Color.WHITE)
+	_zone_plates[zone] = IronPlate.frame(drop_zone, box, 12, 10)
+	var title := _label(19, GOLD)
 	title.text = tr(ZONE_TITLES[zone])
 	box.add_child(title)
 	var desc := _label(13, MUTED)
@@ -531,7 +538,6 @@ func _make_slot_overlay(slot: int) -> JudgementDropZone:
 	style.draw_center = true
 	style.set_border_width_all(4)
 	style.border_color = GOLD
-	style.set_corner_radius_all(4)
 	overlay.add_theme_stylebox_override("panel", style)
 	_connect_zone(overlay, Zone.SLOT_1 + slot)
 	var center := CenterContainer.new()
@@ -539,12 +545,11 @@ func _make_slot_overlay(slot: int) -> JudgementDropZone:
 	overlay.add_child(center)
 	var banner := PanelContainer.new()
 	banner.mouse_filter = MOUSE_FILTER_IGNORE
-	banner.add_theme_stylebox_override("panel", _box(GOLD))
 	center.add_child(banner)
 	var label := _label(17, GOLD)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.custom_minimum_size = Vector2(240, 0)
-	banner.add_child(label)
+	IronPlate.frame(banner, label, 12, 10).set_rim(GOLD)
 	overlay.set_meta("label", label)
 	var area = slot_area_1 if slot == 0 else slot_area_2
 	area.add_child(overlay)
@@ -564,7 +569,6 @@ func _make_frame(area: Control) -> Panel:
 	style.draw_center = false
 	style.set_border_width_all(4)
 	style.border_color = GOLD
-	style.set_corner_radius_all(4)
 	frame.add_theme_stylebox_override("panel", style)
 	area.add_child(frame)
 	frame.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
@@ -584,17 +588,9 @@ func _drag_preview(mon: Monster) -> Control:
 
 func _badge(text: String, background: Color, color: Color, icon: Texture2D = null, icon_material: Material = null) -> PanelContainer:
 	var badge := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = background
-	style.set_corner_radius_all(4)
-	style.content_margin_left = 8
-	style.content_margin_right = 8
-	style.content_margin_top = 2
-	style.content_margin_bottom = 2
-	badge.add_theme_stylebox_override("panel", style)
 	var row := HBoxContainer.new()
 	row.mouse_filter = MOUSE_FILTER_IGNORE
-	badge.add_child(row)
+	IronPlate.frame(badge, row, 8, 3).tint(background)
 	if icon:
 		var picture := TextureRect.new()
 		picture.texture = icon
@@ -618,9 +614,3 @@ func _label(font_size: int, color: Color) -> Label:
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.mouse_filter = MOUSE_FILTER_IGNORE
 	return label
-
-func _box(border: Color) -> StyleBoxFlat:
-	var box := BOX.duplicate() as StyleBoxFlat
-	box.border_color = border
-	box.set_content_margin_all(10)
-	return box

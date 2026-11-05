@@ -23,6 +23,14 @@ static func frame(panel: PanelContainer, content: Control, margin_x: int, margin
 	panel.add_child(margins)
 	return plate
 
+## Platte hinter einem Control ohne Container-Layout, z. B. einem Button
+static func back(control: Control) -> IronPlate:
+	var plate := IronPlate.new()
+	plate.show_behind_parent = true
+	plate.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	control.add_child(plate)
+	return plate
+
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var plate_material := ShaderMaterial.new()
@@ -31,3 +39,12 @@ func _init() -> void:
 
 func set_rim(rim: Color) -> void:
 	(material as ShaderMaterial).set_shader_parameter("rim_color", rim)
+
+## Kleine, ruhige Platte in einer Farbe, z. B. für Kennzeichnungen
+func tint(color: Color) -> void:
+	var plate_material := material as ShaderMaterial
+	plate_material.set_shader_parameter("pixel_size", 2.0)
+	plate_material.set_shader_parameter("mottle", 0.12)
+	plate_material.set_shader_parameter("fill_top", color)
+	plate_material.set_shader_parameter("fill_bottom", color.darkened(0.2))
+	set_rim(color.lightened(0.4))

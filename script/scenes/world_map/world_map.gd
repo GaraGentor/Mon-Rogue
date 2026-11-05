@@ -391,16 +391,17 @@ func show_biome(mask := State.current_biome()) -> void:
 # Alle Biome des Runs als Route: geschaffte blass, das aktuelle hervorgehoben, kommende in ihrer Farbe
 func show_biome_path() -> void:
 	var parts = []
+	var passed := Color(IronPlate.TEXT_COLOR, 0.35).to_html()
 	for depth in State.biome_path.size():
 		var combo = ColorMap.get_combo(State.biome_path[depth])
 		var text = "%d %s" % [depth + 1, tr(combo.label)]
 		if depth < State.map_level:
-			parts.append("[color=#ffffff59]%s[/color]" % text)
+			parts.append("[color=#%s]%s[/color]" % [passed, text])
 		elif depth == State.map_level:
 			parts.append("[b][u][color=#%s]%s[/color][/u][/b]" % [Color(combo.color).lightened(0.4).to_html(false), text])
 		else:
 			parts.append("[color=#%s]%s[/color]" % [Color(combo.color).lightened(0.2).to_html(false), text])
-	biome_path_label.text = "[color=#ffffff99]%s[/color] %s" % [tr("MAP_HEADER_ROUTE"), " [color=#ffffff59]›[/color] ".join(parts)]
+	biome_path_label.text = "[color=#%s]%s[/color] %s" % [SkillDetailPopup.GOLD.to_html(false), tr("MAP_HEADER_ROUTE"), (" [color=#%s]›[/color] " % passed).join(parts)]
 
 func reset_animation_state(ele) -> void:
 	ele._ui_item.scale = Vector2(1,1)

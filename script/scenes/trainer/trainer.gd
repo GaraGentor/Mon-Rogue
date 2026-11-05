@@ -37,6 +37,7 @@ class PlateMon extends RewardDialog.DropTarget:
 		_tween.tween_property(self, "scale", SELECTED_SCALE if selected else Vector2.ONE, SELECT_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 const TRAINER_CARD_SIZE := Vector2(210, 0)
+const TRAINER_TEXT_FONT_SIZE := 14
 ## Karte am Mauszeiger: kleiner als auf dem Tisch und leicht durchscheinend
 const DRAG_PREVIEW_SCALE := 0.8
 const DRAG_PREVIEW_ALPHA := 0.8
@@ -391,6 +392,8 @@ func _add_skill_card(skill: Dictionary) -> void:
 	card.on_click = _toggle_focus.bind(card)
 	# Titel in der Farbe des Elements
 	card.info.get_child(0).add_theme_color_override("font_color", SkillCardPaper.readable_color(Helper.color_by_type(skill.nature)))
+	# in der Pixel-Schrift passt die Stats-Zeile sonst nicht in die Kartenbreite
+	card.info.get_child(1).add_theme_font_size_override("font_size", TRAINER_TEXT_FONT_SIZE)
 	SkillCardPaper.attach(card, skill)
 	# Text nicht auf den Papierrahmen setzen
 	card.row.get_parent().add_theme_constant_override("margin_bottom", 14)
@@ -455,15 +458,13 @@ func _picker_box(skill_title: String) -> Control:
 	center.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var panel := PanelContainer.new()
-	var style := BOX.duplicate() as StyleBoxFlat
-	style.set_content_margin_all(20)
-	panel.add_theme_stylebox_override("panel", style)
 	center.add_child(panel)
 	var box := VBoxContainer.new()
-	panel.add_child(box)
+	IronPlate.frame(panel, box, 20, 20)
 	var title := Label.new()
 	title.theme = LABEL_THEME
 	title.text = skill_title
+	title.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
 	box.add_child(_picker)

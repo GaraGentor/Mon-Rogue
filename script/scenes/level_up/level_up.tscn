@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://drhymvpv6slla"]
+[gd_scene format=3 uid="uid://drhymvpv6slla"]
 
 [ext_resource type="Script" path="res://script/scenes/level_up/level_up.gd" id="1_j6ocv"]
 [ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_c4w1u"]
 [ext_resource type="PackedScene" uid="uid://caffuo82lusm" path="res://script/scenes/level_up/monster_scene.tscn" id="2_ciiwp"]
 [ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="2_qh7ft"]
 [ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="2_tk5hi"]
+[ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="3_plate"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7ldmi"]
 shader = ExtResource("2_c4w1u")
@@ -14,11 +15,28 @@ shader_parameter/wave_amp = 0.115
 shader_parameter/wave_size = 1.0
 shader_parameter/wave_time_mul = 0.933
 shader_parameter/total_phases = 8
+shader_parameter/living_pixels = true
+shader_parameter/pixel_size = 4.0
+shader_parameter/amplitude = 0.0
+shader_parameter/loop_seconds = 19.365
+shader_parameter/particle_min_size = 1.0
+shader_parameter/particle_max_size = 1.2
+shader_parameter/flicker = 0.15
+shader_parameter/color_levels = 8.0
+shader_parameter/dither_strength = 1.0
+shader_parameter/dither_scale = 2.0
+shader_parameter/dither_fps = 10.0
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_eutdi"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t6nt1"]
 bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_button"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
 
 [node name="LevelUp" type="Control" node_paths=PackedStringArray("monster_scene1", "monster_scene2", "killed_monsters_label", "go_button")]
 layout_mode = 3
@@ -73,6 +91,9 @@ theme_override_constants/separation = 24
 [node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("2_tk5hi")
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 30
 text = "LEVEL_UP_TITLE"
 horizontal_alignment = 1
@@ -80,6 +101,9 @@ horizontal_alignment = 1
 [node name="KilledMonsterLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("2_tk5hi")
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 30
 text = "Killed Monsters:"
 horizontal_alignment = 1
@@ -101,9 +125,30 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Button" type="Button" parent="Panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(220, 50)
 layout_mode = 2
+size_flags_horizontal = 4
 theme = ExtResource("2_qh7ft")
+theme_override_colors/font_color = Color(0.86, 0.83, 0.72, 1)
+theme_override_colors/font_hover_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_colors/font_pressed_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_button")
 disabled = true
 text = "COMMON_OK"
+
+[node name="Plate" type="ColorRect" parent="Panel/MarginContainer/VBoxContainer/Button"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_plate")
 
 [connection signal="pressed" from="Panel/MarginContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]

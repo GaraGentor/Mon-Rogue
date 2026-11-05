@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://degyfi6ckr318" path="res://script/scenes/selection/ui.gd" id="5_aea4x"]
 [ext_resource type="PackedScene" path="res://script/scenes/selection/starter_info_panel.tscn" id="7_f6ddp"]
 [ext_resource type="Script" uid="uid://bsftl68bgh2n1" path="res://script/scenes/selection/biome_path.gd" id="8_biome"]
+[ext_resource type="Theme" path="res://script/ui/materials/pixel_font_theme.tres" id="99_font_theme"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_k0ik4"]
 shader = ExtResource("2_7l32t")
@@ -30,25 +31,6 @@ shader_parameter/outline_color = Color(1, 1, 0, 0)
 shader_parameter/outline_thickness = 4.0
 shader_parameter/tint_color = Color(1, 1, 1, 0)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cjs1n"]
-bg_color = Color(0, 0, 0, 1)
-draw_center = false
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 8
-border_color = Color(0.858824, 0.717647, 0.45098, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0.858824, 0.717647, 0.45098, 0.266667)
-shadow_size = 8
-anti_aliasing_size = 0.01
-
-[sub_resource type="Theme" id="Theme_r3q1d"]
-Panel/styles/panel = SubResource("StyleBoxFlat_cjs1n")
-
 [sub_resource type="Gradient" id="Gradient_7ag31"]
 colors = PackedColorArray(0.0627451, 0.0862745, 0.0823529, 0, 0.0643197, 0.0863678, 0.0819577, 1)
 
@@ -66,6 +48,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme = ExtResource("99_font_theme")
 script = ExtResource("1_7et7b")
 title_label = NodePath("Selection/ChatGptImage26_Juni2025,124247/Label")
 go_button = NodePath("Selection/MarginContainer/VBoxContainer/Button2")
@@ -133,11 +116,9 @@ grow_vertical = 2
 theme_override_constants/separation = 50
 alignment = 1
 
-[node name="ColorRect1" type="Panel" parent="Selection/HBoxContainer" unique_id=635026405]
-self_modulate = Color(1, 1, 1, 0)
+[node name="ColorRect1" type="Control" parent="Selection/HBoxContainer" unique_id=635026405]
 custom_minimum_size = Vector2(195, 0)
 layout_mode = 2
-theme = SubResource("Theme_r3q1d")
 
 [node name="TextureRect1" type="TextureRect" parent="Selection/HBoxContainer/ColorRect1" unique_id=493081087]
 custom_minimum_size = Vector2(60, 60)
@@ -152,11 +133,9 @@ grow_vertical = 2
 texture = ExtResource("4_4snxg")
 expand_mode = 2
 
-[node name="ColorRect2" type="Panel" parent="Selection/HBoxContainer" unique_id=246900079]
-self_modulate = Color(1, 1, 1, 0)
+[node name="ColorRect2" type="Control" parent="Selection/HBoxContainer" unique_id=246900079]
 custom_minimum_size = Vector2(195, 0)
 layout_mode = 2
-theme = SubResource("Theme_r3q1d")
 
 [node name="TextureRect2" type="TextureRect" parent="Selection/HBoxContainer/ColorRect2" unique_id=990182621]
 custom_minimum_size = Vector2(60, 60)
@@ -171,11 +150,9 @@ grow_vertical = 2
 texture = ExtResource("4_4snxg")
 expand_mode = 2
 
-[node name="ColorRect3" type="Panel" parent="Selection/HBoxContainer" unique_id=1701817335]
-self_modulate = Color(1, 1, 1, 0)
+[node name="ColorRect3" type="Control" parent="Selection/HBoxContainer" unique_id=1701817335]
 custom_minimum_size = Vector2(195, 0)
 layout_mode = 2
-theme = SubResource("Theme_r3q1d")
 
 [node name="TextureRect3" type="TextureRect" parent="Selection/HBoxContainer/ColorRect3" unique_id=25231485]
 custom_minimum_size = Vector2(60, 60)

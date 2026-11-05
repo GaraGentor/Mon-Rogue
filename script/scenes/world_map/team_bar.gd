@@ -6,6 +6,7 @@ const PORTRAIT_SIZE := Vector2(40, 40)
 const BAR_SIZE := Vector2(150, 8)
 const FONT_SIZE := 16
 const HP_COLOR := Color(0.35, 0.8, 0.35)
+const BAR_BACKGROUND := Color(0.05, 0.07, 0.085)
 const LOW_HP_COLOR := Color(0.9, 0.3, 0.25)
 ## darunter wird der Balken rot
 const LOW_HP_SHARE := 0.3
@@ -37,6 +38,7 @@ func refresh() -> void:
 	var title := Label.new()
 	title.text = tr("MAP_HEADER_TEAM")
 	title.add_theme_font_size_override("font_size", FONT_SIZE)
+	title.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
 	add_child(title)
 	for mon: Monster in State.mons:
 		add_child(_entry(mon))
@@ -74,10 +76,14 @@ func _entry(mon: Monster) -> Control:
 	var fill := StyleBoxFlat.new()
 	fill.bg_color = LOW_HP_COLOR if hp < max_hp * LOW_HP_SHARE else HP_COLOR
 	bar.add_theme_stylebox_override("fill", fill)
+	var background := StyleBoxFlat.new()
+	background.bg_color = BAR_BACKGROUND
+	bar.add_theme_stylebox_override("background", background)
 	info.add_child(bar)
 
 	var hp_label := Label.new()
 	hp_label.text = tr("MAP_TEAM_HP").format({"hp": roundi(hp), "max": roundi(max_hp)})
 	hp_label.add_theme_font_size_override("font_size", FONT_SIZE - 3)
+	hp_label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	info.add_child(hp_label)
 	return entry
