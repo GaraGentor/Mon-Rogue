@@ -1,23 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://owmyxu3qq3so"]
+[gd_scene load_steps=4 format=3 uid="uid://owmyxu3qq3so"]
 
 [ext_resource type="Script" path="res://script/ui/element_chip/element_chip.gd" id="1_4i3xj"]
+[ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="2_plate"]
+[ext_resource type="FontFile" path="res://script/ui/fonts/pxelfont/PixelifySans-VariableFont_wght.ttf" id="3_font"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pegyy"]
-bg_color = Color(0.364706, 0.741176, 0.580392, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-expand_margin_left = 4.0
-expand_margin_top = 4.0
-expand_margin_right = 4.0
-expand_margin_bottom = 4.0
-
-[node name="ElementChip" type="Control" node_paths=PackedStringArray("label")]
+[node name="ElementChip" type="Control" node_paths=PackedStringArray("label", "plate")]
 layout_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
@@ -30,6 +17,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_4i3xj")
 label = NodePath("Label")
+plate = NodePath("Label/Plate")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 1
@@ -44,7 +32,23 @@ offset_right = 7.5
 offset_bottom = 13.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_pegyy")
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 17
 text = "FIRE"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Plate" type="ColorRect" parent="Label"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -7.0
+offset_top = -4.0
+offset_right = 7.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_plate")

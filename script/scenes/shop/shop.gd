@@ -1,7 +1,7 @@
 extends ShopDialog
 
 ## Laden als freie Bühne im Stil des Kerkermeisters: in der Mitte die Selbstzahler-Kasse mit Sprechblase,
-## links und rechts schräge Regale mit der Ware und Schildern, unten in den Ecken die eigenen Monster von
+## links und rechts Regale mit der Ware und Schildern, unten in den Ecken die eigenen Monster von
 ## hinten samt Typ und Werten, dazwischen die Tasche mit dem Geld.
 ## Tränke und Edelsteine zieht man auf ein Monster, Relikte in die Tasche; abgelegt ist die Ware gekauft.
 ## Tränke gibt es beliebig oft, Edelsteine und Relikte nur einmal. Beim Ziehen und bei angeklickter Ware
@@ -14,6 +14,8 @@ const Treasure = preload("res://script/scenes/treasure/treasure.gd")
 
 const SHELF_TEXTURE = preload("res://assets/ui/shop/shelf.svg")
 const GEM_TEXTURE = preload("res://assets/ui/shop/gem.svg")
+const FLASK_TEXTURE = preload("res://assets/ui/shop/potion_flask.svg")
+const LIQUID_TEXTURE = preload("res://assets/ui/shop/potion_liquid.svg")
 const BAG_BACK_TEXTURE = preload("res://assets/ui/jailer/bag_back.svg")
 const BAG_FRONT_TEXTURE = preload("res://assets/ui/jailer/bag_front.svg")
 const PROPS_MATERIAL = preload("res://script/scenes/jailer/jailer_props_material.tres")
@@ -32,9 +34,8 @@ const RELIC_PRICES := [150, 175, 200, 225, 250]
 const GEM_OFFERS := 2
 const RELIC_OFFERS := 1
 
-## Regale, alle Maße in Bühnen-Pixeln: innere Kante neben der Kasse, von dort fallen sie nach außen ab
+## Regale, alle Maße in Bühnen-Pixeln: innere Kante neben der Kasse, von dort gehen sie nach außen
 const SHELF_INNER_GAP := 128.0
-const SHELF_TILT := deg_to_rad(7.0)
 const SHELF_HEIGHT := 46.0
 const SHELF_LAYOUT := [
 	{"side": -1, "y": 90.0, "width": 370.0},
@@ -73,8 +74,6 @@ class ShelfItem extends RewardDialog.RewardCard:
 	const ART_SIZE := Vector2(84, 84)
 	## das Bild hat etwas Rand, so steht die Ware sichtbar auf dem Brett
 	const ART_SINK := 7.0
-	## je kleiner, desto breiter der Rand der Trank-Kugel
-	const POTION_GOLD_BORDER := 5.0
 	const TITLE_FONT_SIZE := 16
 	const TEXT_FONT_SIZE := 14
 	const PRICE_FONT_SIZE := 17
@@ -91,8 +90,6 @@ class ShelfItem extends RewardDialog.RewardCard:
 	var _price_label: Label
 	## Material des Bildes, darin wird es golden
 	var _gold_target: ShaderMaterial
-	var _is_potion := false
-	var _potion_border := 0.0
 
 	func _init(owner_dialog: RewardDialog, card_title: String, text: String, icon: Control, drag_data: Dictionary) -> void:
 		dialog = owner_dialog
@@ -116,6 +113,15 @@ class ShelfItem extends RewardDialog.RewardCard:
 		_text_label = _tag_label(box, description, TEXT_FONT_SIZE, IronPlate.TEXT_COLOR)
 		_holder.add_child(_tag)
 
+	## Ein umbrechendes Label misst seine Höhe an seiner aktuellen Breite. Vor dem ersten Layout ist die noch
+	## winzig und das Schild bliebe riesig, darum bekommen die Labels die Breite hier direkt gesetzt.
+	func _fit_tag(width: float) -> void:
+		for label: Label in [_title_label, _text_label]:
+			label.custom_minimum_size.x = width - 2 * TAG_MARGIN
+			label.size.x = label.custom_minimum_size.x
+			label.update_minimum_size()
+		_tag.reset_size()
+
 	func _tag_label(parent: Control, text: String, font_size: int, color: Color) -> Label:
 		var label := Label.new()
 		label.text = text
@@ -126,8 +132,7 @@ class ShelfItem extends RewardDialog.RewardCard:
 		parent.add_child(label)
 		return label
 
-	## Bild tauschen. Ein Trank hat seinen eigenen Shader, dort wird der Rand der Kugel golden,
-	## alle anderen Bilder bekommen den Pixel-Look mit eigenem Umriss.
+	## Bild tauschen, es bekommt den Pixel-Look mit eigenem Umriss
 	func set_art(icon: Control) -> void:
 		if art:
 			art.queue_free()
@@ -136,24 +141,15 @@ class ShelfItem extends RewardDialog.RewardCard:
 		art.size = ART_SIZE
 		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_holder.add_child(art)
-		_is_potion = not art is TextureRect
-		if _is_potion:
-			_gold_target = art.get_child(0).mat.material
-			_potion_border = _gold_target.get_shader_parameter("ball_border_ci")
-		else:
-			_gold_target = PROPS_MATERIAL.duplicate()
-			art.material = _gold_target
+		_gold_target = PROPS_MATERIAL.duplicate()
+		art.material = _gold_target
 		RewardDialog.ignore_mouse_below(self)
 
 	func set_tint(color: Color) -> void:
 		_gold_target.set_shader_parameter("tint_color", color)
 
 	func set_gold(gold: bool) -> void:
-		if _is_potion:
-			_gold_target.set_shader_parameter("ball_color", GOLD if gold else Color.WHITE)
-			_gold_target.set_shader_parameter("ball_border_ci", POTION_GOLD_BORDER if gold else _potion_border)
-		else:
-			_gold_target.set_shader_parameter("outline_color", GOLD if gold else NO_OUTLINE)
+		_gold_target.set_shader_parameter("outline_color", GOLD if gold else NO_OUTLINE)
 		_plate.set_rim(GOLD if gold else IronPlate.RIM)
 
 	## Preis neben dem Bild
@@ -168,20 +164,15 @@ class ShelfItem extends RewardDialog.RewardCard:
 		_holder.add_child(_price_label)
 		RewardDialog.ignore_mouse_below(self)
 
-	## center: Mitte des Brettes unter der Ware, Bild steht darauf, Schild hängt mit dem Brett geneigt darunter
-	func place_on_shelf(center: Vector2, width: float, tilt: float) -> void:
-		var text_width := width - 2 * TAG_MARGIN
-		_title_label.custom_minimum_size.x = text_width
-		_text_label.custom_minimum_size.x = text_width
-		_tag.reset_size()
-		size = Vector2(width, ART_SIZE.y + SHELF_HEIGHT / 2 + _tag.get_combined_minimum_size().y)
+	## center: Mitte des Brettes unter der Ware, Bild steht darauf, Schild hängt darunter
+	func place_on_shelf(center: Vector2, width: float) -> void:
+		_fit_tag(width)
 		position = center - Vector2(width / 2, ART_SIZE.y)
 		art.position = Vector2((width - ART_SIZE.x) / 2, ART_SINK)
 		if _price_label:
 			_price_label.position = Vector2(art.position.x + ART_SIZE.x, ART_SIZE.y - 26)
 		_tag.position = Vector2(0, ART_SIZE.y + SHELF_HEIGHT / 2)
-		_tag.pivot_offset = Vector2(width / 2, 0)
-		_tag.rotation = tilt
+		size = Vector2(width, _tag.position.y + _tag.size.y)
 
 ## Eigenes Monster in einer unteren Ecke: groß von hinten, daneben Name, Typ und Werte.
 ## Die ganze Fläche ist Ablegeziel, sie wird aber nur über Monster und Werten getroffen.
@@ -401,6 +392,10 @@ class ItemPopup extends PanelContainer:
 		_description.text = item.description
 		_hint.text = tr("SHOP_DETAIL_BAG" if item.drag.get("bag", false) else "SHOP_DETAIL_MON")
 		visible = true
+		# wie bei den Schildern: Breite direkt setzen, sonst misst der erste Aufruf das Popup riesig
+		for label: Label in [_title, _price, _description, _hint]:
+			label.size.x = label.custom_minimum_size.x
+			label.update_minimum_size()
 		reset_size()
 		var target_x := center_x - size.x / 2
 		position = Vector2(target_x + (FLY_IN if item.global_position.x > global_position.x else -FLY_IN), top)
@@ -501,24 +496,20 @@ func _layout_stage() -> void:
 	_bubble.position = Vector2(center_x + BUBBLE_LEFT + SpeechBubble.TAIL_SIZE.x, BUBBLE_TOP)
 	_exit_button.position = Vector2(area.x - ICON_BUTTON_SIZE.x, 0)
 
-## Brett von der inneren Kante aus neigen, die Ware gleichmäßig darauf verteilen
+## Brett neben die Kasse setzen, die Ware gleichmäßig darauf verteilen
 func _layout_shelf(shelf: Dictionary, center_x: float) -> void:
 	var layout: Dictionary = shelf.layout
 	var side: float = layout.side
 	var width: float = layout.width
-	var inner := Vector2(center_x + side * SHELF_INNER_GAP, layout.y)
-	var tilt := side * SHELF_TILT
+	var left: float = center_x + SHELF_INNER_GAP if side > 0 else center_x - SHELF_INNER_GAP - width
 	var image: TextureRect = shelf.image
 	image.size = Vector2(width, SHELF_HEIGHT)
-	image.pivot_offset = Vector2(width if side < 0 else 0.0, 0)
-	image.position = inner - image.pivot_offset
-	image.rotation = tilt
+	image.position = Vector2(left, layout.y)
 	var count: int = shelf.items.size()
 	var tag_width := minf(width / maxi(count, 1) - 10.0, MAX_TAG_WIDTH)
 	for i in count:
-		var distance := width * (i + 0.5) / count
-		var center := inner + Vector2(side * cos(SHELF_TILT), sin(SHELF_TILT)) * distance
-		shelf.items[i].place_on_shelf(center, tag_width, tilt)
+		var center := Vector2(left + width * (i + 0.5) / count, layout.y)
+		shelf.items[i].place_on_shelf(center, tag_width)
 
 func _fill_shelves() -> void:
 	var elements: Array = Treasure.ELEMENTS
@@ -526,14 +517,26 @@ func _fill_shelves() -> void:
 		_filling_shelf = SHELF_POTIONS_LEFT if i < elements.size() / 2 else SHELF_POTIONS_RIGHT
 		var card := Treasure.add_potion_card(self, elements[i])
 		card.drag.element = elements[i]
+		card.set_art(_potion_art(elements[i]))
 		set_price(card, ELEMENT_PRICE, true)
 	_filling_shelf = SHELF_GEMS
 	_add_gem_offers()
 	_filling_shelf = SHELF_RELICS
 	_add_relic_offers()
-	# umbrechende Schilder kennen ihre Höhe erst nach dem Layout
+	# die Bühne kennt ihre Größe erst nach dem ersten Layout
 	await get_tree().process_frame
 	_layout_stage()
+
+## Flasche im Pixel-Look, die Flüssigkeit hat die Farbe des Elements. Glas und Korken bleiben ungefärbt.
+func _potion_art(element: int) -> Control:
+	var liquid := texture_icon(LIQUID_TEXTURE)
+	liquid.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	var liquid_material: ShaderMaterial = PROPS_MATERIAL.duplicate()
+	liquid_material.set_shader_parameter("tint_color", Helper.color_by_type(element))
+	liquid.material = liquid_material
+	var flask := texture_icon(FLASK_TEXTURE)
+	flask.add_child(liquid)
+	return flask
 
 func _depth() -> int:
 	return clampi(State.map_level, 0, GEM_PRICES.size() - 1)
