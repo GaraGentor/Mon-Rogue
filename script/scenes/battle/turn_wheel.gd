@@ -8,8 +8,12 @@ extends Control
 signal turn_for(mon)
 signal end_round()
 
-const OWN_COLOR := Color("#3fa34d")
-const ENEMY_COLOR := Color("#c0392b")
+const IconFrame := preload("res://script/scenes/battle/wheel_icon_frame.gd")
+
+const OWN_COLOR := Color("#2f7a45")
+const OWN_PULSE_COLOR := Color("#52ad6d")
+const ENEMY_COLOR := Color("#8a1650")
+const ENEMY_PULSE_COLOR := Color("#b02468")
 const ROTATE_DURATION := 0.45
 const ACTIVE_SCALE := 1.35
 const INACTIVE_ALPHA := 0.7
@@ -128,8 +132,6 @@ func _create_icon(mon: Monster) -> Control:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0, 0, 0, 0.55)
 	style.set_corner_radius_all(int(wheel.icon_size / 2))
-	style.set_border_width_all(3)
-	style.border_color = OWN_COLOR if is_own(mon) else ENEMY_COLOR
 	icon.add_theme_stylebox_override("panel", style)
 
 	var texture := TextureRect.new()
@@ -139,6 +141,16 @@ func _create_icon(mon: Monster) -> Control:
 	texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.add_child(texture)
 	texture.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 5)
+
+	var frame := IconFrame.new()
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if is_own(mon):
+		frame.setup(OWN_COLOR, OWN_PULSE_COLOR)
+	else:
+		frame.setup(ENEMY_COLOR, ENEMY_PULSE_COLOR)
+	icon.add_child(frame)
+	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	icon.set_meta("frame", frame)
 	return icon
 
 func _highlight() -> void:
@@ -151,6 +163,7 @@ func _highlight() -> void:
 		var tween := create_tween().set_parallel()
 		tween.tween_property(icon, "scale", Vector2.ONE * (ACTIVE_SCALE if is_active else 1.0), ROTATE_DURATION)
 		tween.tween_property(icon, "modulate:a", 1.0 if is_active else INACTIVE_ALPHA, ROTATE_DURATION)
+		tween.tween_property(icon.get_meta("frame"), "active_amount", 1.0 if is_active else 0.0, ROTATE_DURATION)
 
 func _rotate_to(index: int) -> void:
 	if _rotation_tween:
