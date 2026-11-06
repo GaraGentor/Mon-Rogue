@@ -26,7 +26,7 @@ shader_parameter/dither_fps = 10.0
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_nfe6y"]
 
-[node name="HealCamp" type="Control" node_paths=PackedStringArray("left_slot", "right_slot", "fire")]
+[node name="HealCamp" type="Control" node_paths=PackedStringArray("left_slot", "right_slot", "fire", "feed_row")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,6 +37,7 @@ script = ExtResource("1_t64m8")
 left_slot = NodePath("MarginContainer/VBoxContainer/MonsterRow/LeftSlot")
 right_slot = NodePath("MarginContainer/VBoxContainer/MonsterRow/RightSlot")
 fire = NodePath("MarginContainer/VBoxContainer/MonsterRow/CampFire")
+feed_row = NodePath("MarginContainer/VBoxContainer/FeedRow")
 
 [node name="ColorRect" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_5bmje")
@@ -64,7 +65,7 @@ theme_override_constants/margin_bottom = 24
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = -60
 
 [node name="MonsterRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -81,3 +82,8 @@ layout_mode = 2
 [node name="RightSlot" type="CenterContainer" parent="MarginContainer/VBoxContainer/MonsterRow"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="FeedRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1

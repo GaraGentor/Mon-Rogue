@@ -33,4 +33,9 @@ Tasks:
 		> Key finder 50% increased.
 		> Der Langsamste wird der schnellste in Runde 1
 		> Alle Stats sind immer sichtbar
+		> Level Up zählt doppelt
+		> Steine haben ein Bonus von +2
 		> 
+	
+	> Passive
+		> Stat Switcher

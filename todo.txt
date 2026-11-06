@@ -1,12 +1,29 @@
-1. Da fehlt immernoch padding: C:\Users\sheni\Pictures\1.png siehe bild das ist in der EI Auswahl. die Headline kann ruhig zwei zeilig dann sein oder minimal kleiner
-2. Bei den EI Attacken mach mal folgendes: gib nur dem Monster dem Namen und Typ einen Rahmen. Füge dort noch die Stats hinzu und Lege die Ausgewählte fähigkeit aus dem Rahmen raus und ordne es darunter auf.
-3. Der GO Button bei den EI Attacken ist doch zu groß vill erstmal die größe wie bei den anderen Pfeil Button beibehalten nur mit einem Grünen Häckchen.
-4. Die Dialoge / Modals für Monster Preview in der Map und Edelsteine Schätze etc, können ein leichten Padding gebrauchen, damit das Dialog nicht so am Rand klebt. Orientiere dich an dem Header dort sind auch nach rechts kp 10-20 px platz?? und nach Links soll die Tasche der Indikator sein.
-6. Im Laden wird die Tasche nicht gehighlighted, wenn ich ein Relikt verschieben will
-9. Wenn ich ein Edelstein Zur option habe bei der Belohnung, möchte ich auch die Stats und Edelsteine Pro monster sehen.
-10. Das Glücksrad dürfen wir auch nicht vergessen. Das muss auch noch abgestimmt werden wie bei den anderen, dann ist der Code überall gleich und kann für weitere verwendet werden
-11. Der Reliktrahmen in der Map Header, ist plan blau, das soll der normale rahmen sein wie überall.
-12. Füg mal beim Level Up Screen auf der Rechten hälfte C:\Users\sheni\Downloads\mw558rdet7qr7h.jpeg hinzu, achte auf die Shader etc. und die Monster kommen dann Links untereinander. Darauf soll die Tasche zu sehen sein und auf dem Schlachtfeld die Belohnunge, als Icons, die man beim Kampf bekommen hat (derzeit ja nur das Gold), das soll man da rein ziehen sonst bekommt man nichts.
-13. Bei den Edelsteinen, brechen die aus dem Screen, da muss ne Scrollviel rein für die Belohnungen
-14. Im Judgement screen können die Stats auch untereinander stehen wie im Battle und bei der EI-Selection.
-15. Wenn ich beim Preis ein Trank auf ein Monster Ziehe soll es mit Anzeigen, von welchem Element zu welchem es Wechselt wie im Laden wenn ich ein Trank über ein Monster Mache.
+Beschreibung:
+	Ich möchte ein reward System haben nachdem ein Kampf Endet.
+	So soll es Funktionieren:
+		Pro Monster gibt es eine geringe chance random Loot zu bekommen. Dazu gehört einmal die Crystale zum Upgraden der Stats, Schlüssel, Geld, 25% Rabatt-Gutscheine für den Shop und Trainer
+		Bei Mini-Bosse kämpfen kommen noch ein Couver für Fähigkeiten, sowie eine Kiste für die Relikte (die Relikt kiste dropt immer, sowie der Couver)
+		Bei einem Biom Boss kommt immer eine Träne dazu und optional immer das Ei zum Freischalten, sobald ein monster nicht freigeschaltet ist dabei fällt dann die auswahl zwischen der einen oder anderen Option weg nachdem ein Boss gefallen ist
+		Wenn ich eine Kiste, Fähigkeiten Couver Loote, muss das sobald ich in die Map komme alles nach einander abgehandelt werden.
+		Schatzkisten sollen nun nur mit einem Schlüssel zu öffnen sein. Darin ist viel mehr Gold als sonst zu finden. 2-4 häufchen, die man einsammeln kann je 10-25 gold. Hierzu wird es allerdings nur die Map für geben wo man ein Schatz bekommen kann als Ort auf der Karte
+		
+		Ich habe neue Bilder hinzugefügt. Die müssen eingesetzt werden und auch die gleichen Animationen haben beim "Öffnen oder aussuchen"
+		
+		Bag für die Crystale, wenn ich auf ein Crystal Feld komme auf der Map.
+		Box für die Relikte
+		Envelop für die Fähigkeiten
+		rewacht_chest bleibt nur noch für die Schätze
+		
+	Gebe erst deine Meinung hierzu beovr du los legst.:
+		- Rewards immer nach kampf? Auch wenn ein Monster Gefangen wurde und nicht besiegt? Oder nur wenn mindestens eins besiegt wurde?
+		- Machen durch den Reward dann Feste Orte für die gleichen Rewards sinn oder sind die dann überflüssig? Z.B.: Kristalle, da man diese nun looten kann
+
+- Dazu muss noch die Fähigkeiten auswahl als Belohnung implementiert werden und auch im Debug modus hinzugefügt
+	- Nimm die Ansicht aus dem Trainer, da wird ja angezeigt für wen die Fähigkeiten geeignet sind und für wen nicht
+	- Das soll aus einem Fähigkeiten Set bestehen, das nicht jemandem beigebracht werden kann oder aus EI Attack hervorkommen kann. Dort sind die Fähigkeiten UNIQUE, denk dir erstmal 4 Stück aus fürs testen der basis elemente.
+	- Schon jemandem beigebrachte Skills werden aus dem Pool aus den 10 entfernt und kommen kein zweites mal
+	- Zur auswahl bei der Belohnung stehen 3 Skills
+
+Nebenquest:
+- Beim Lager bau ein, dass man Geld dem Feuer verfüttern kann bevor man leben bekommt, 1 gold = 5 Leben man kann 1er Stacks schmeißen oder 5 gold für 25 leben oder 10 gold für 50 leben. mach es ähnlich wie das rausziehen der Tränen beim Kärkermeister
+- Die Tasche soll etwas vor dem Feuer liegen mit dem Geld drin dass man drag and droppen muss.
