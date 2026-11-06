@@ -37,7 +37,8 @@ func calc_damage(from: Monster, to: Monster, skill: Dictionary) -> float:
 	var def = to.defense() if physical else to.s_defense()
 	var stat_factor = 2.0 * atk / max(atk + def, 0.001)
 	# aufrunden, damit angezeigter und abgezogener Schaden gleich sind (jeder Treffer macht mind. 1)
-	return ceilf(atk * (skill.value / 100) * stat_factor * element_multiplier(skill.nature, to._type))
+	var bonus_factor: float = Relics.modify("damage", Passives.damage_factor(from, to), from)
+	return ceilf(atk * (skill.value / 100) * stat_factor * element_multiplier(skill.nature, to._type) * bonus_factor)
 
 # ─────────────────────────
 # Element-Kreis: Wasser > Feuer > Luft > Erde > Wasser
@@ -193,13 +194,16 @@ func get_tier(skill_name: String) -> int:
 
 # Pro Biom-Tiefe werden höhere Stufen wahrscheinlicher (Faktor pro Stufe über 1).
 const DEPTH_TIER_BONUS := 0.4
+# Modus "3 Aktionen": Gegner steigern sich nicht mehr über Aktionen, dafür werden starke Skills mit der Tiefe schneller häufig.
+const THREE_ACTIONS_DEPTH_TIER_BONUS := 0.8
 
 # Maximale Anzahl Skills, die ein Monster gleichzeitig beherrscht.
 const MAX_SKILLS := 6
 
 func get_weight(skill_name: String, depth: int = 0) -> float:
 	var tier = get_tier(skill_name)
-	return TIER_WEIGHTS[tier] * pow(1.0 + DEPTH_TIER_BONUS * depth, tier - 1)
+	var tier_bonus: float = THREE_ACTIONS_DEPTH_TIER_BONUS if SaveManager.is_three_actions() else DEPTH_TIER_BONUS
+	return TIER_WEIGHTS[tier] * pow(1.0 + tier_bonus * depth, tier - 1)
 
 # Zieht einen Skill-Namen gewichtet nach Stufe (und Biom-Tiefe).
 func pick_weighted(skill_names: Array, depth: int = 0) -> String:

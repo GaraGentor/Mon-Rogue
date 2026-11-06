@@ -108,7 +108,8 @@ func _add_entry(list: VBoxContainer, type: Map.PATH_TYPE) -> void:
 	list.add_child(button)
 
 	var description := Label.new()
-	description.text = tr(Map.type_label(type) + "_DESC")
+	var is_passive_jailer: bool = type == Map.PATH_TYPE.JAILER and SaveManager.is_three_actions()
+	description.text = tr(Map.type_label(type) + ("_DESC_PASSIVE" if is_passive_jailer else "_DESC"))
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	description.add_theme_font_size_override("font_size", DESCRIPTION_SIZE)
 	description.add_theme_color_override("font_color", TEXT_COLOR)

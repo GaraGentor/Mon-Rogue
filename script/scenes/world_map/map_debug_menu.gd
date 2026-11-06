@@ -300,23 +300,24 @@ func _add_shards() -> void:
 	Helper.show_unlock_message("+%d Boss Tränen" % DEBUG_SHARDS)
 
 func _rotten_eggs_text() -> String:
-	return "FAULE EIER: " + ("AN" if SaveManager.has_full_reroll_charges() else "AUS")
+	return "FAULE EIER: " + ("AN" if DebugSettings.rotten_eggs else "AUS")
 
-## Volle Ladungen zeigen in der nächsten Ei-Auswahl den Button "Faule Eier", AUS leert sie
+## Zeigt in der nächsten Ei-Auswahl den Button "Faule Eier". Steht in den Debug-Einstellungen, die Ladungen im Spielstand bleiben unberührt.
 func _toggle_rotten_eggs() -> void:
-	SaveManager.set_reroll_charges(0 if SaveManager.has_full_reroll_charges() else SaveManager.REROLL_CHARGES_NEEDED)
+	DebugSettings.set_rotten_eggs(not DebugSettings.rotten_eggs)
 	_rotten_eggs_button.text = _rotten_eggs_text()
 
 # ─────────────────────────
 # Werte-Verteilung
 
-## Reserve pro Wert
+## Reserve pro Wert, gilt für den Kampfmodus des aktiven Slots
 func _build_stats_page() -> void:
 	_stats_page = VBoxContainer.new()
 	_stats_page.add_theme_constant_override("separation", 10)
 	add_footer(_stats_page)
 
-	_stats_page.add_child(_make_header("Werte-Verteilung: fester Anteil der BST pro Wert"))
+	var mode_name := "3 Aktionen" if SaveManager.is_three_actions() else "Klassisch"
+	_stats_page.add_child(_make_header("Werte-Verteilung (Slot %d, Modus %s): fester Anteil der BST pro Wert" % [SaveManager.active_slot, mode_name]))
 	for stat in DebugSettings.STATS:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
@@ -425,7 +426,7 @@ func _start_judgement() -> void:
 	for mon_species in _picked:
 		# wie beim Fangen (catch_anim.gd)
 		var mon := _wild_mon(mon_species, level)
-		mon._initial_moves = Monster.BASE_MOVES
+		mon._initial_moves = Monster.default_moves()
 		State.catched_mons.append(mon)
 		State.mark_mon_caught(mon_species)
 	if _fallen_check.button_pressed:

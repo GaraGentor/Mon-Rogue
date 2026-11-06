@@ -6,27 +6,38 @@ extends Node
 const PATH := "user://debug_settings.json"
 const STATS := ["hp", "atk", "def", "s_atk", "s_def", "speed"]
 const MAX_RESERVED := 100
-## Die Datei ist nach Kampfmodus gegliedert, weil der Branch new-conzept dieselbe Datei nutzt. Hier gibt es nur diesen Modus.
-const MODE := "classic"
+## Für den Start etwa doppelte KP: bei typisch 15 % KP-Anteil ergibt 18 % Reserve rund 30 % der BST
+const DEFAULT_RESERVED := {
+	SaveManager.MODE_CLASSIC: {},
+	SaveManager.MODE_THREE_ACTIONS: {"hp": 18},
+}
 
+## Zeigt den Button "Faule Eier" in der Ei-Auswahl, ohne die Ladungen im Spielstand anzurühren
+var rotten_eggs := false
 ## Kampfmodus -> Wert -> Prozent der BST, die fest diesem Wert gehören
-var _reserved := {MODE: {}}
+var _reserved := {}
 
 func _ready() -> void:
+	_reserved = DEFAULT_RESERVED.duplicate(true)
 	if not OS.is_debug_build() or not FileAccess.file_exists(PATH):
 		return
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(PATH))
 	if parsed is Dictionary:
+		rotten_eggs = parsed.get("rotten_eggs", false)
 		_reserved.merge(parsed.get("reserved_stats", {}), true)
 
 func save() -> void:
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
 	if file:
-		file.store_string(JSON.stringify({"reserved_stats": _reserved}))
+		file.store_string(JSON.stringify({"rotten_eggs": rotten_eggs, "reserved_stats": _reserved}))
 
-## Reservierter Anteil eines Werts in Prozent
+func set_rotten_eggs(on: bool) -> void:
+	rotten_eggs = on
+	save()
+
+## Reservierter Anteil eines Werts im Kampfmodus des aktiven Slots, in Prozent
 func reserved(stat: String) -> int:
-	return int(_reserved[MODE].get(stat, 0))
+	return int(_reserved[SaveManager.combat_mode()].get(stat, 0))
 
 func reserved_total() -> int:
 	var total := 0
@@ -37,11 +48,12 @@ func reserved_total() -> int:
 ## Über alle Werte hinweg kann höchstens die ganze BST reserviert werden
 func set_reserved(stat: String, percent: int) -> void:
 	var others := reserved_total() - reserved(stat)
-	_reserved[MODE][stat] = clampi(percent, 0, MAX_RESERVED - others)
+	_reserved[SaveManager.combat_mode()][stat] = clampi(percent, 0, MAX_RESERVED - others)
 	save()
 
 func reset_reserved() -> void:
-	_reserved[MODE] = {}
+	var mode := SaveManager.combat_mode()
+	_reserved[mode] = DEFAULT_RESERVED[mode].duplicate()
 	save()
 
 ## Anteil an der BST nach Reserve: fester Teil plus der übliche Anteil am Rest.

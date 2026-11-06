@@ -33,14 +33,21 @@ var _lost_hp: float = 0:
 			Events.monster_faints.emit(self)
 
 var _skills: Array
-# Aktionen pro Zug ohne Kerkermeister-Verbesserung (jede gesprengte Kette gibt +1, siehe jailer.gd)
+# Klassisch: Aktionen pro Zug ohne Kerkermeister-Verbesserung (jede gesprengte Kette gibt +1, siehe jailer.gd)
 const BASE_MOVES := 1
-# Gegner würfeln mehr (battle.gd ENCOUNTERS.moves), das verfällt beim Fangen
+# Modus "3 Aktionen": gilt für alle, Ketten geben stattdessen eine Passive (siehe Passives)
+const THREE_ACTIONS_MOVES := 3
+# Klassisch würfeln Gegner mehr (battle.gd ENCOUNTERS.moves), das verfällt beim Fangen
 var _initial_moves: int = BASE_MOVES
 var _computed_moves: int = BASE_MOVES:
 	set(value):
 		_computed_moves = value
 		Events.refresh_ui_for_monster.emit()
+# Für die Passive "erster Skill im Zug"
+var _skills_played_this_turn: int = 0
+
+static func default_moves() -> int:
+	return THREE_ACTIONS_MOVES if SaveManager.is_three_actions() else BASE_MOVES
 
 # Edelstein-Boni für diesen Run: Stat-Key aus STATS in gems.gd -> feste Punkte obendrauf (vor Buffs)
 var _gems: Dictionary = {}
@@ -62,6 +69,7 @@ func _init(level: int, meta_data: Dictionary) -> void:
 	## get saved data and apply.
 	Events.mon_upgraded.connect(mon_upgraded)
 
+	_initial_moves = default_moves()
 	_name = meta_data.name
 	_type = meta_data.initial_type
 	var rolled_stats = State.get_mon_stats(_name)
@@ -96,6 +104,7 @@ func reset_battle_state() -> void:
 	_s_shield = 0
 	_buffs = {}
 	_intent = []
+	_skills_played_this_turn = 0
 	for skill in _skills:
 		skill.erase("_cooldown_left")
 	Events.monster_status_changed.emit(self)
@@ -105,6 +114,7 @@ func reset_battle_state() -> void:
 func start_turn() -> void:
 	_shield = 0
 	_s_shield = 0
+	_skills_played_this_turn = 0
 	for skill in _skills:
 		Skills.tick_cooldown(skill)
 	for stat in _buffs.keys():
@@ -147,7 +157,8 @@ func is_buffed() -> bool:
 func reset_to_new_round():
 	Events.refresh_ui_for_monster.emit()
 	print("_upgrades", _upgrades, "_initial_moves", _initial_moves)
-	_computed_moves = Relics.modify("moves", _initial_moves + _upgrades, self)
+	var chain_moves: int = 0 if SaveManager.is_three_actions() else _upgrades
+	_computed_moves = Relics.modify("moves", _initial_moves + chain_moves, self)
 
 func unlock_skills():
 	for skill in _skills:
@@ -190,7 +201,7 @@ func is_alive() -> bool:
 # Die Reserve wird erst hier verrechnet: gespeicherte Eier bleiben gültig und Änderungen im Debug-Menü wirken sofort.
 func _base_stat(stat: String) -> float:
 	var share := DebugSettings.effective_share(stat, _growth[stat])
-	return share * _level * Helper.points_per_level(_best_points) * STAT_SCALE
+	return share * _level * Helper.points_per_level(_best_points) * STAT_SCALE * Passives.stat_factor(self, stat)
 
 func gem_bonus(stat: String) -> int:
 	return _gems.get(stat, 0)
