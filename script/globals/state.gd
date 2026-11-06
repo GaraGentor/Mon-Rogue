@@ -75,7 +75,7 @@ var keys: int = 0:
 		keys = val
 		keys_changed.emit(keys)
 
-# Rabatt-Gutscheine des aktuellen Runs, der nächste Kauf bei Shop oder Trainer verbraucht einen (ShopDialog.price_of)
+# Rabatt-Gutscheine des aktuellen Runs, das Ablegen auf Kasse oder Trainer verbraucht einen (ShopDialog)
 signal coupons_changed(coupons)
 var coupons: int = 0:
 	set(val):

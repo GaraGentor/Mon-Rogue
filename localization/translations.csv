@@ -136,7 +136,10 @@ KEY_DESC,An old key. It opens one treasure chest.,Ein alter Schlüssel. Er öffn
 KEY_LOOT_AMOUNT,+{amount} Key,+{amount} Schlüssel
 GEM_LOOT_AMOUNT,+{amount} Gem,+{amount} Edelstein
 COUPON_LOOT_AMOUNT,+{amount} Coupon,+{amount} Gutschein
-COUPON_DESC,25% off your next purchase at the shop or trainer.,25% Rabatt auf deinen nächsten Kauf bei Laden oder Trainer.
+COUPON_DESC,Drag onto the self-checkout or the trainer for 25% off your next purchase. Lost if you leave without buying.,Zieh ihn auf die Selbstzahler-Kasse oder den Trainer: 25% Rabatt auf deinen nächsten Kauf. Verfällt beim Gehen ohne Kauf.
+COUPON_ALREADY_ACTIVE,A coupon is already active.,Es gilt schon ein Gutschein.
+SHOP_SAY_COUPON,Beep! Coupon scanned. Your next purchase is 25% off.,Piep! Gutschein gescannt. Ihr nächster Einkauf ist 25% günstiger.
+TRAINER_SAY_COUPON,"A coupon? Fine, your next skill is 25% off.","Ein Gutschein? Na gut, dein nächster Skill kostet 25% weniger."
 SKILL_ENVELOPE_LOOT,Envelope,Couvert
 RELIC_CHEST_LOOT,Relic Box,Relikt-Kiste
 EGG_LOOT,Egg,Ei

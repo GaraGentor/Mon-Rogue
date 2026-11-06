@@ -2,7 +2,7 @@ extends ShopDialog
 
 ## Laden als freie Bühne im Stil des Kerkermeisters: in der Mitte die Selbstzahler-Kasse mit Sprechblase,
 ## links und rechts Regale mit der Ware und Schildern, unten links die eigenen Monster von hinten
-## samt Typ und Werten in gleich großen Feldern, unter der Kasse die Tasche mit dem Geld.
+## samt Typ und Werten in gleich großen Feldern, unter der Kasse die Tasche mit dem Geld, rechts daneben die Gutscheine.
 ## Tränke und Edelsteine zieht man auf ein Monster, Relikte und Schlüssel in die Tasche; abgelegt ist die Ware gekauft.
 ## Tränke gibt es beliebig oft, alles andere nur einmal. Beim Ziehen und bei angeklickter Ware
 ## zeigen die Monster, was sich ändern würde. Ein Klick auf eine Ware öffnet ihre Beschreibung,
@@ -59,6 +59,9 @@ const BUBBLE_LEFT := 142.0
 const BUBBLE_TOP := 416.0
 const POPUP_TOP := 8.0
 const BAG_OVERHANG := 26.0
+## Gutscheine rechts neben der Tasche: Abstand zur Tasche und zum unteren Bildschirmrand
+const COUPON_GAP := 4.0
+const COUPON_BOTTOM := 12.0
 
 ## Monster-Felder unten links: so weit endet die Bühne vor dem Bildschirmrand, so weit bleiben die Felder davon weg
 const STAGE_MARGIN := 24.0
@@ -71,13 +74,13 @@ const LINE_SECONDS_PER_CHAR := 0.04
 const THANKS_COUNT := 3
 const HOWTO_LINES := ["SHOP_SAY_WELCOME", "SHOP_SAY_POTIONS", "SHOP_SAY_GEMS", "SHOP_SAY_RELICS", "SHOP_SAY_CLICK"]
 
-## Ware im Regal: oben steht das Bild auf dem Brett, darunter hängt das Schild mit der Beschreibung
+## Ware im Regal: oben steht das Bild auf dem Brett, darunter hängt das Schild mit dem Namen.
+## Die Beschreibung steht nur im Popup, das ein Klick öffnet.
 class ShelfItem extends RewardDialog.RewardCard:
 	const ART_SIZE := Vector2(84, 84)
 	## das Bild hat etwas Rand, so steht die Ware sichtbar auf dem Brett
 	const ART_SINK := 7.0
 	const TITLE_FONT_SIZE := 16
-	const TEXT_FONT_SIZE := 14
 	const PRICE_FONT_SIZE := 17
 	const TAG_MARGIN := 7
 
@@ -88,7 +91,6 @@ class ShelfItem extends RewardDialog.RewardCard:
 	var _tag: PanelContainer
 	var _plate: IronPlate
 	var _title_label: Label
-	var _text_label: Label
 	var _price_label: Label
 	## Material des Bildes, darin wird es golden
 	var _gold_target: ShaderMaterial
@@ -112,16 +114,14 @@ class ShelfItem extends RewardDialog.RewardCard:
 		box.add_theme_constant_override("separation", 0)
 		_plate = IronPlate.frame(_tag, box, TAG_MARGIN, TAG_MARGIN - 2)
 		_title_label = _tag_label(box, title, TITLE_FONT_SIZE, GOLD)
-		_text_label = _tag_label(box, description, TEXT_FONT_SIZE, IronPlate.TEXT_COLOR)
 		_holder.add_child(_tag)
 
 	## Ein umbrechendes Label misst seine Höhe an seiner aktuellen Breite. Vor dem ersten Layout ist die noch
-	## winzig und das Schild bliebe riesig, darum bekommen die Labels die Breite hier direkt gesetzt.
+	## winzig und das Schild bliebe riesig, darum bekommt das Label die Breite hier direkt gesetzt.
 	func _fit_tag(width: float) -> void:
-		for label: Label in [_title_label, _text_label]:
-			label.custom_minimum_size.x = width - 2 * TAG_MARGIN
-			label.size.x = label.custom_minimum_size.x
-			label.update_minimum_size()
+		_title_label.custom_minimum_size.x = width - 2 * TAG_MARGIN
+		_title_label.size.x = _title_label.custom_minimum_size.x
+		_title_label.update_minimum_size()
 		_tag.reset_size()
 
 	func _tag_label(parent: Control, text: String, font_size: int, color: Color) -> Label:
@@ -176,23 +176,19 @@ class ShelfItem extends RewardDialog.RewardCard:
 		_tag.position = Vector2(0, ART_SIZE.y + SHELF_HEIGHT / 2)
 		size = Vector2(width, _tag.position.y + _tag.size.y)
 
-## Eigenes Monster unten links, immer gleich groß: links das Bild von hinten, daneben oben Name und Typ,
-## darunter die Werte. Das ganze Feld ist Ablegeziel.
+## Eigenes Monster unten links, immer gleich groß und in einem Rahmen: oben links das Bild von hinten,
+## daneben Name und Typ, unten die Reihe mit allen Werten. Das ganze Feld ist Ablegeziel.
 class MonField extends RewardDialog.DropTarget:
-	const FIELD_SIZE := Vector2(504, 128)
-	const IMAGE_SIZE := 128.0
-	## Name und Typ oben, Werte unten, beide rechts neben dem Bild
-	const BLOCK_LEFT := 132.0
-	const HEAD_HEIGHT := 44.0
-	const STATS_HEIGHT := 78.0
-	const BLOCK_SPACING := 6.0
-	const NAME_FONT_SIZE := 16
-	const STAT_FONT_SIZE := 18
-	const STAT_COLUMNS := 3
+	## die Höhe nutzt den Platz unter den Schildern der Regale
+	const FIELD_SIZE := Vector2(504, 136)
+	const IMAGE_SIZE := 84.0
+	const NAME_FONT_SIZE := 20
+	const STAT_FONT_SIZE := 16
 	const STAT_GETTERS := {"hp": "hp", "atk": "attack", "def": "defense", "s_atk": "s_attack", "s_def": "s_defense", "speed": "speed"}
 
 	var _image: TextureRect
 	var _chips: HBoxContainer
+	## Wert -> Labels für Bezeichnung und Zahl, untereinander
 	var _stat_labels := {}
 	var _pop: Tween
 
@@ -203,57 +199,55 @@ class MonField extends RewardDialog.DropTarget:
 		mouse_filter = Control.MOUSE_FILTER_PASS
 		custom_minimum_size = FIELD_SIZE
 		size = FIELD_SIZE
-		add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-		var holder := Control.new()
-		add_child(holder)
+		var box := VBoxContainer.new()
+		box.add_theme_constant_override("separation", 2)
+		IronPlate.frame(self, box, 10, 5)
 
+		var top := HBoxContainer.new()
+		top.add_theme_constant_override("separation", 10)
+		box.add_child(top)
 		_image = RewardDialog.texture_icon(Monmap.texture(monster._name, IMAGE_SIZE, true)) as TextureRect
 		_image.material = Monmap.LIVING_MATERIAL
-		_image.size = Vector2(IMAGE_SIZE, IMAGE_SIZE)
+		_image.custom_minimum_size = Vector2(IMAGE_SIZE, IMAGE_SIZE)
 		_image.pivot_offset = Vector2(IMAGE_SIZE / 2, IMAGE_SIZE)
-		holder.add_child(_image)
-
-		var block_width := FIELD_SIZE.x - BLOCK_LEFT
-		var head_plate := PanelContainer.new()
-		head_plate.position = Vector2(BLOCK_LEFT, 0)
-		head_plate.size = Vector2(block_width, HEAD_HEIGHT)
-		var head := HBoxContainer.new()
-		head.add_theme_constant_override("separation", 6)
-		IronPlate.frame(head_plate, head, 8, 4)
+		top.add_child(_image)
+		var mon_text := VBoxContainer.new()
+		mon_text.alignment = BoxContainer.ALIGNMENT_CENTER
+		mon_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mon_text.add_theme_constant_override("separation", 6)
+		top.add_child(mon_text)
 		var name_label := Label.new()
 		name_label.text = Helper.mon_display_name(monster._name)
-		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		name_label.clip_text = true
-		name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		name_label.add_theme_font_override("font", PIXEL_FONT)
 		name_label.add_theme_font_size_override("font_size", NAME_FONT_SIZE)
 		name_label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
-		head.add_child(name_label)
+		mon_text.add_child(name_label)
 		_chips = HBoxContainer.new()
 		_chips.add_theme_constant_override("separation", 4)
-		head.add_child(_chips)
-		holder.add_child(head_plate)
+		mon_text.add_child(_chips)
 
-		var stats_plate := PanelContainer.new()
-		stats_plate.position = Vector2(BLOCK_LEFT, HEAD_HEIGHT + BLOCK_SPACING)
-		stats_plate.size = Vector2(block_width, STATS_HEIGHT)
-		var grid := GridContainer.new()
-		grid.columns = STAT_COLUMNS
-		grid.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		grid.add_theme_constant_override("h_separation", 6)
-		grid.add_theme_constant_override("v_separation", 0)
-		IronPlate.frame(stats_plate, grid, 10, 7)
+		var stats := HBoxContainer.new()
+		stats.add_theme_constant_override("separation", 0)
+		box.add_child(stats)
 		for stat in GemField.STATS:
-			var label := Label.new()
-			label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			label.add_theme_font_override("font", PIXEL_FONT)
-			label.add_theme_font_size_override("font_size", STAT_FONT_SIZE)
-			grid.add_child(label)
-			_stat_labels[stat] = label
-		holder.add_child(stats_plate)
+			var column := VBoxContainer.new()
+			column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			column.add_theme_constant_override("separation", -4)
+			stats.add_child(column)
+			var stat_name := _stat_label(column)
+			stat_name.text = tr(GemField.STATS[stat].stat).trim_suffix(":")
+			_stat_labels[stat] = {"name": stat_name, "value": _stat_label(column)}
 
 		RewardDialog.ignore_mouse_below(self)
 		show_preview({})
+
+	func _stat_label(parent: Control) -> Label:
+		var label := Label.new()
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.add_theme_font_override("font", PIXEL_FONT)
+		label.add_theme_font_size_override("font_size", STAT_FONT_SIZE)
+		parent.add_child(label)
+		return label
 
 	func covers(global_point: Vector2) -> bool:
 		return get_global_rect().has_point(global_point)
@@ -262,13 +256,15 @@ class MonField extends RewardDialog.DropTarget:
 	func show_preview(drag: Dictionary) -> void:
 		RewardDialog.show_element_preview(_chips, mon, drag)
 		for stat in _stat_labels:
-			var label: Label = _stat_labels[stat]
+			var labels: Dictionary = _stat_labels[stat]
 			var value: int = roundi(mon.call(STAT_GETTERS[stat]))
 			var boosted: bool = drag.get("stat", "") == stat
-			label.text = "%s %d" % [tr(GemField.STATS[stat].stat), value]
+			labels.value.text = str(value)
 			if boosted:
-				label.text += " %s %d" % [RewardDialog.PREVIEW_ARROW, value + drag.bonus]
-			label.add_theme_color_override("font_color", GOLD if boosted else IronPlate.TEXT_COLOR)
+				labels.value.text += " %s %d" % [RewardDialog.PREVIEW_ARROW, value + drag.bonus]
+			var color: Color = GOLD if boosted else IronPlate.TEXT_COLOR
+			labels.name.add_theme_color_override("font_color", color)
+			labels.value.add_theme_color_override("font_color", color)
 
 	## Hat gerade etwas bekommen: kurz golden aufleuchten und wachsen
 	func celebrate() -> void:
@@ -417,6 +413,7 @@ func _ready() -> void:
 	# aufs Beutelschild passt nur die Zahl, die Preise daneben nennen die Währung
 	_money_suffix = ""
 	_watch_money()
+	add_coupons(_stage, checkout_image)
 	_explain()
 
 ## Freie Bühne statt der Standard-Spalten: alles wird in _layout_stage platziert.
@@ -476,6 +473,11 @@ func _layout_stage() -> void:
 	_bag.position = Vector2(center_x - ShopBag.BAG_SIZE.x / 2, area.y + BAG_OVERHANG - ShopBag.BAG_SIZE.y)
 	_bubble.position = Vector2(center_x + BUBBLE_LEFT + SpeechBubble.TAIL_SIZE.x, BUBBLE_TOP)
 	_exit_button.position = Vector2(area.x - ICON_BUTTON_SIZE.x, 0)
+	_coupon_stack.reset_size()
+	_coupon_stack.position = Vector2(_bag.position.x + ShopBag.BAG_SIZE.x + COUPON_GAP, area.y + STAGE_MARGIN - COUPON_BOTTOM - _coupon_stack.size.y)
+	# nur der Körper der Kasse zwischen den Regalen, die Tasche und der Stapel selbst bleiben frei
+	_coupon_target.position = Vector2(center_x - SHELF_INNER_GAP, CHECKOUT_FIRST_Y)
+	_coupon_target.size = Vector2(2 * SHELF_INNER_GAP, _bag.position.y - CHECKOUT_FIRST_Y)
 
 ## Brett neben die Kasse setzen, die Ware gleichmäßig darauf verteilen
 func _layout_shelf(shelf: Dictionary, center_x: float) -> void:
@@ -654,6 +656,12 @@ func _taken(card: RewardCard) -> void:
 
 func _show_blocked(reason: String) -> void:
 	_interrupt(reason)
+
+## Offene Beschreibung schließen, sie zeigt noch den alten Preis
+func _coupon_applied() -> void:
+	_set_selected(null)
+	_jump_for_joy()
+	_interrupt(tr("SHOP_SAY_COUPON"))
 
 func _show_targets(card: RewardCard) -> void:
 	_set_selected(null)

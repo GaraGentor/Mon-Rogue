@@ -124,7 +124,7 @@ func _ready() -> void:
 	_build_top_bar()
 	_first_layout()
 
-## Oben links die Tasche mit der Essenz, oben rechts der Verlassen-Button.
+## Oben links die Tasche mit der Essenz und daneben die Gutscheine, oben rechts der Verlassen-Button.
 ## Erst aufrufen, wenn alle Karten einen Preis haben
 func _build_top_bar() -> void:
 	var bar := HBoxContainer.new()
@@ -145,6 +145,13 @@ func _build_top_bar() -> void:
 	_money_label = _bag.label
 	_money_suffix = ""
 	_watch_money()
+	# im Couvert kostet nichts, da gibt es auch keinen Rabatt
+	if not reward_mode:
+		add_coupons(bar, trainer_image)
+		bar.move_child(_coupon_stack, _bag.get_index() + 1)
+
+func _coupon_applied() -> void:
+	_bubble.say(tr("TRAINER_SAY_COUPON"))
 
 func _money_changed(new_val) -> void:
 	super(new_val)
@@ -241,6 +248,9 @@ func _layout_stage() -> void:
 		plate.chips.size = Vector2(mon_size, CHIPS_HEIGHT)
 		plate.chips.position = plate.position + Vector2(0, mon_size + CHIPS_GAP)
 	_bubble.position = origin + Vector2(FACE_LEFT * image_size.x - BUBBLE_WIDTH - BUBBLE_TAIL, BUBBLE_TOP)
+	if _coupon_target:
+		_coupon_target.position = origin
+		_coupon_target.size = image_size
 
 func _place_card(card: RewardCard) -> void:
 	_card_layer.add_child(card)
