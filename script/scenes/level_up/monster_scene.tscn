@@ -83,8 +83,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 theme = ExtResource("1_08c52")
 theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
-text = "
-mob name"
+text = "mob name"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -105,10 +104,10 @@ alignment = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 40
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 4
 
 [node name="GridContainer" type="GridContainer" parent="MarginContainer/Panel/VBoxContainer/HBoxContainer/VBoxContainer2/MarginContainer" node_paths=PackedStringArray("label")]
 layout_mode = 2
@@ -121,16 +120,16 @@ is_leveling = true
 visible = false
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_u1j1l")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 18
 text = "ATK"
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer/Panel/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Panel/VBoxContainer/MarginContainer"]
 layout_mode = 2

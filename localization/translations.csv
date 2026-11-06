@@ -134,6 +134,7 @@ JUDGEMENT_REPLACE,Forget {skill},{skill} vergessen
 BATTLE_UNKNOWN_SKILL,? (Tier {tier}),? (Stufe {tier})
 BATTLE_UNKNOWN_SKILL_HINT,Element and tier are known. The details are revealed once the enemy uses this move or you catch it.,"Element und Stufe sind bekannt. Die Details zeigen sich, sobald der Gegner die Attacke einsetzt oder du ihn fängst."
 LEVEL_UP_TITLE,Level Up!,Level Up!
+LEVEL_UP_LOOT_HINT,"Drag your loot into the bag, or it stays behind.","Zieh die Beute in die Tasche, sonst bleibt sie liegen."
 SHOP_CHANGES_TO,Changes to,Wird zu
 SHOP_DRAG_HINT,"Drag an Element Potion
 or a Gem onto

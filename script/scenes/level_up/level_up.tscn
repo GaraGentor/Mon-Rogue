@@ -5,6 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://caffuo82lusm" path="res://script/scenes/level_up/monster_scene.tscn" id="2_ciiwp"]
 [ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="2_qh7ft"]
 [ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="3_plate"]
+[ext_resource type="Material" path="res://script/scenes/jailer/jailer_props_material.tres" id="4_props"]
+[ext_resource type="Texture2D" path="res://assets/ui/level_up/battlefield.jpg" id="5_field"]
+[ext_resource type="Theme" path="res://script/ui/materials/pixel_font_theme.tres" id="6_font"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7ldmi"]
 shader = ExtResource("2_c4w1u")
@@ -37,17 +40,19 @@ content_margin_top = 10.0
 content_margin_right = 16.0
 content_margin_bottom = 10.0
 
-[node name="LevelUp" type="Control" node_paths=PackedStringArray("monster_scene1", "monster_scene2", "go_button")]
+[node name="LevelUp" type="Control" node_paths=PackedStringArray("monster_scene1", "monster_scene2", "go_button", "battlefield")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("6_font")
 script = ExtResource("1_j6ocv")
-monster_scene1 = NodePath("Panel/MarginContainer/VBoxContainer/HBoxContainer/MonsterScene")
-monster_scene2 = NodePath("Panel/MarginContainer/VBoxContainer/HBoxContainer/MonsterScene2")
-go_button = NodePath("Panel/MarginContainer/VBoxContainer/Button")
+monster_scene1 = NodePath("Panel/MarginContainer/Columns/Monsters/MonsterScene")
+monster_scene2 = NodePath("Panel/MarginContainer/Columns/Monsters/MonsterScene2")
+go_button = NodePath("Panel/MarginContainer/Columns/Monsters/Button")
+battlefield = NodePath("Panel/MarginContainer/Columns/Battlefield")
 
 [node name="ColorRect" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_7ldmi")
@@ -82,27 +87,25 @@ theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+[node name="Columns" type="HBoxContainer" parent="Panel/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 12
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 24
-
-[node name="MonsterScene" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_ciiwp")]
+[node name="Monsters" type="VBoxContainer" parent="Panel/MarginContainer/Columns"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="MonsterScene" parent="Panel/MarginContainer/Columns/Monsters" instance=ExtResource("2_ciiwp")]
+layout_mode = 2
 size_flags_vertical = 3
 
-[node name="MonsterScene2" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_ciiwp")]
+[node name="MonsterScene2" parent="Panel/MarginContainer/Columns/Monsters" instance=ExtResource("2_ciiwp")]
 visible = false
 layout_mode = 2
-size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Button" type="Button" parent="Panel/MarginContainer/VBoxContainer"]
+[node name="Button" type="Button" parent="Panel/MarginContainer/Columns/Monsters"]
 custom_minimum_size = Vector2(220, 50)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -118,7 +121,7 @@ theme_override_styles/disabled = SubResource("StyleBoxEmpty_button")
 disabled = true
 text = "COMMON_OK"
 
-[node name="Plate" type="ColorRect" parent="Panel/MarginContainer/VBoxContainer/Button"]
+[node name="Plate" type="ColorRect" parent="Panel/MarginContainer/Columns/Monsters/Button"]
 show_behind_parent = true
 layout_mode = 1
 anchors_preset = 15
@@ -129,4 +132,23 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("3_plate")
 
-[connection signal="pressed" from="Panel/MarginContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]
+[node name="Battlefield" type="Control" parent="Panel/MarginContainer/Columns"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Image" type="TextureRect" parent="Panel/MarginContainer/Columns/Battlefield"]
+material = ExtResource("4_props")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5_field")
+expand_mode = 1
+stretch_mode = 6
+
+[connection signal="pressed" from="Panel/MarginContainer/Columns/Monsters/Button" to="." method="_on_button_pressed"]

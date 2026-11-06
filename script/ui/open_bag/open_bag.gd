@@ -20,8 +20,8 @@ var label: Label
 var _item_texture: Texture2D
 var _item_size: Vector2
 var _items: Control
-## eigenes Material der Rückwand, sie trägt den Umriss (set_gold)
-var _back_material: ShaderMaterial
+## eigenes Material beider Taschenteile, es trägt den Umriss (set_gold)
+var _outline_material: ShaderMaterial
 
 func _init(bag_size: Vector2, item_texture: Texture2D, item_size: Vector2, font_size: int) -> void:
 	_item_texture = item_texture
@@ -29,10 +29,8 @@ func _init(bag_size: Vector2, item_texture: Texture2D, item_size: Vector2, font_
 	custom_minimum_size = bag_size
 	size = bag_size
 	mouse_filter = MOUSE_FILTER_IGNORE
-	_back_material = PROPS_MATERIAL.duplicate()
-	var back := _layer(BACK_TEXTURE)
-	back.material = _back_material
-	add_child(back)
+	_outline_material = PROPS_MATERIAL.duplicate()
+	add_child(_layer(BACK_TEXTURE))
 	_items = Control.new()
 	_items.mouse_filter = MOUSE_FILTER_IGNORE
 	add_child(_items)
@@ -51,13 +49,13 @@ func _init(bag_size: Vector2, item_texture: Texture2D, item_size: Vector2, font_
 func _layer(texture: Texture2D) -> TextureRect:
 	var layer := RewardDialog.texture_icon(texture) as TextureRect
 	layer.size = custom_minimum_size
-	layer.material = PROPS_MATERIAL
+	layer.material = _outline_material
 	layer.mouse_filter = MOUSE_FILTER_IGNORE
 	return layer
 
 ## Goldener Umriss: die Tasche ist das Ziel der Ware in der Hand
 func set_gold(gold: bool) -> void:
-	_back_material.set_shader_parameter("outline_color", SkillDetailPopup.GOLD if gold else NO_OUTLINE)
+	_outline_material.set_shader_parameter("outline_color", SkillDetailPopup.GOLD if gold else NO_OUTLINE)
 
 ## So viele Gegenstände schauen oben heraus (höchstens SPOTS.size())
 func show_items(count: int) -> void:

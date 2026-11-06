@@ -19,7 +19,7 @@ const TARGET_SIZE := Vector2(120, 150)
 ## Höhe des Karten-Headers (world_map.tscn): darunter beginnt die Kartenfläche
 const MAP_HEADER_HEIGHT := 184.0
 ## Abstand der Dialoge auf der Kartenfläche zum Bildschirmrand: links bis zur Tasche im Header, rechts und unten wie der Header
-const MAP_DIALOG_MARGIN_LEFT := 16.0
+const MAP_DIALOG_MARGIN_LEFT := 10.0
 const MAP_DIALOG_MARGIN := 8.0
 ## zeigt im Typ-Chip, was ein Trank aus dem Monster macht
 const PREVIEW_ARROW := ">"
@@ -93,7 +93,7 @@ class DropTarget extends PanelContainer:
 	## optional: Werte des Monsters, zeigen beim Drüberziehen die Änderung durch den Edelstein
 	var stats: StatsGrid
 	## optional: Typ des Monsters, zeigt beim Ziehen die Änderung durch einen Trank
-	var chips: HBoxContainer
+	var type_row: HBoxContainer
 
 	func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 		return not locked and dialog._dragged != null and is_same(data, dialog._dragged.drag)
@@ -276,12 +276,12 @@ func show_element_chips() -> void:
 	for target in _fixed_targets:
 		if target.mon == null:
 			continue
-		target.chips = HBoxContainer.new()
-		target.chips.alignment = BoxContainer.ALIGNMENT_CENTER
-		target.chips.custom_minimum_size.y = 32
-		target.chips.add_theme_constant_override("separation", 4)
-		target.box.add_child(target.chips)
-		show_element_preview(target.chips, target.mon)
+		target.type_row = HBoxContainer.new()
+		target.type_row.alignment = BoxContainer.ALIGNMENT_CENTER
+		target.type_row.custom_minimum_size.y = 32
+		target.type_row.add_theme_constant_override("separation", 4)
+		target.box.add_child(target.type_row)
+		show_element_preview(target.type_row, target.mon)
 
 ## Typ des Monsters als Chip; drag (Ware in der Hand) zeigt dazu, was ein Trank daraus macht
 static func show_element_preview(row: Control, mon: Monster, drag := {}) -> void:
@@ -539,17 +539,18 @@ func _build_targets(card: RewardCard) -> void:
 		else:
 			target.locked = not mons.has(target.mon) or (can_drop.is_valid() and not can_drop.call(target.mon))
 		target.modulate = LOCKED_COLOR if target.locked else Color.WHITE
-		if target.chips and not target.locked:
-			show_element_preview(target.chips, target.mon, card.drag)
+		if target.type_row and not target.locked:
+			show_element_preview(target.type_row, target.mon, card.drag)
 
 func _lock_targets() -> void:
 	for target in _fixed_targets:
 		target.locked = true
-		target.modulate = LOCKED_COLOR
+		# Werte und Typ sollen auch vor dem Ziehen lesbar sein
+		target.modulate = Color.WHITE if target.stats or target.type_row else LOCKED_COLOR
 		if target.stats:
 			target.stats.show_gem_preview(target.mon)
-		if target.chips:
-			show_element_preview(target.chips, target.mon)
+		if target.type_row:
+			show_element_preview(target.type_row, target.mon)
 
 func _hide_targets() -> void:
 	_lock_targets()
@@ -590,7 +591,7 @@ func _process(_delta: float) -> void:
 			target.stats.show_gem_preview(target.mon, _dragged.drag.get("stat", "") if over and not target.locked else "", _dragged.drag.get("bonus", 0))
 	var tooltip: Callable = _dragged.drag.get("tooltip", Callable())
 	# zeigt das Ziel die Änderung selbst an, braucht es keinen Tooltip
-	var wants_tooltip: bool = hovered != null and hovered.mon != null and hovered.stats == null and hovered.chips == null and tooltip.is_valid()
+	var wants_tooltip: bool = hovered != null and hovered.mon != null and hovered.stats == null and hovered.type_row == null and tooltip.is_valid()
 	var text: String = tooltip.call(hovered.mon) if wants_tooltip else ""
 	_tooltip.visible = text != ""
 	if _tooltip.visible:

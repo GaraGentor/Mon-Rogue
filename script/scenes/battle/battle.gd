@@ -343,7 +343,7 @@ func _check_game_over(last_fainted:Monster) -> void:
 		State.killed_monsters += 1
 		State.run_kills += 1
 		State.mark_mon_defeated(last_fainted._name)
-		State.ep += last_fainted._ep
+		State.pending_ep += last_fainted._ep
 		var bounty_skill = Skills.claim_bounty(last_fainted)
 		if bounty_skill != "":
 			Helper.show_unlock_message(tr("BOUNTY_UNLOCKED").format({"skill": tr(bounty_skill), "mon": Helper.mon_display_name(last_fainted._last_hit_by._name)}))
@@ -367,8 +367,8 @@ func _check_game_over(last_fainted:Monster) -> void:
 		# der finale Boss beendet den Run, danach gibt es keine Karte mehr
 		if is_boss_battle and not State.is_final_boss:
 			State.pending_relic_reward = true
-		State.ep += Relics.modify("battle_ep", State.enemy_mons.map(func(mon): return mon._ep).reduce(func(a, b): return a + b, 0))
-		print("state ep", State.ep)
+		State.pending_ep += Relics.modify("battle_ep", State.enemy_mons.map(func(mon): return mon._ep).reduce(func(a, b): return a + b, 0))
+		print("state pending ep", State.pending_ep)
 		# clear dead monsters.
 		# open stats.
 		var fallen = _clear_fainted_mons()

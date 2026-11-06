@@ -264,6 +264,7 @@ func _collect_treasure() -> void:
 
 func _open_level_up() -> void:
 	State.killed_monsters = LEVEL_UP_KILLS
+	State.pending_ep = DEBUG_ESSENCE
 	_change_scene(LEVEL_UP_PATH)
 
 func _open_relic_reward() -> void:

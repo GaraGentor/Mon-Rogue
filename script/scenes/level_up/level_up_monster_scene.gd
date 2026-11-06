@@ -14,7 +14,7 @@ var mon: Monster:
 		mon = _mon
 		grid.init_with_mon(mon)
 		Monmap.show_on(monster_texture, mon._name, Monmap.MEDIUM)
-		name_label.text = "\n" + Helper.mon_display_name(mon._name)
+		name_label.text = Helper.mon_display_name(mon._name)
 
 func init_with_mon(_mon: Monster):
 	mon = _mon
@@ -25,7 +25,7 @@ func trigger_level_up() -> bool:
 	level_label.position = Vector2(level_label.position.x, 0)
 	level_label.visible = true
 	grid.show_p_labels(get_labels())
-	await get_tree().create_tween().tween_property(level_label, "position", Vector2(level_label.position.x, 500), 2).finished
+	await get_tree().create_tween().tween_property(level_label, "position", Vector2(level_label.position.x, size.y), 2).finished
 	level_label.visible = false
 	return true
 

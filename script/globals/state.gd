@@ -66,6 +66,8 @@ var boss_shards: int = 0:
 
 
 var killed_monsters: int = 0
+# im Kampf verdiente Monster Essenz: liegt auf dem Schlachtfeld, bis sie im Level-Up-Screen in die Tasche gezogen wird
+var pending_ep: int = 0
 
 # Run-Statistik für den Endbildschirm (run_end.gd). killed_monsters wird beim Level-Up verbraucht, daher eigene Zähler.
 var run_won := false
@@ -110,6 +112,7 @@ func reset() -> void:
 	fainted_own_mons = []
 	fainted_enemy_mons = []
 	killed_monsters = 0
+	pending_ep = 0
 	current_map_position = NO_MAP_POSITION
 	is_boss_fight = false
 	is_final_boss = false
