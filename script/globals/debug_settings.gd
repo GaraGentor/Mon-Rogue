@@ -12,6 +12,9 @@ const MODE := "classic"
 ## Kampfmodus -> Wert -> Prozent der BST, die fest diesem Wert gehören
 var _reserved := {MODE: {}}
 
+## Im Debug-Menü gewählte Gegnerzahl für den nächsten Kampf, 0 = wie im normalen Spiel. Wird nicht gespeichert.
+var next_enemy_count := 0
+
 func _ready() -> void:
 	if not OS.is_debug_build() or not FileAccess.file_exists(PATH):
 		return
@@ -23,6 +26,12 @@ func save() -> void:
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
 	if file:
 		file.store_string(JSON.stringify({"reserved_stats": _reserved}))
+
+## Gewählte Gegnerzahl, sonst usual_count. Die Wahl gilt nur für einen Kampf.
+func take_enemy_count(usual_count: int) -> int:
+	var count := next_enemy_count if next_enemy_count > 0 else usual_count
+	next_enemy_count = 0
+	return count
 
 ## Reservierter Anteil eines Werts in Prozent
 func reserved(stat: String) -> int:

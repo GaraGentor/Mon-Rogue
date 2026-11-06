@@ -26,6 +26,8 @@ const DEBUG_KEYS := 5
 const FALLEN_GEM_BONUS := 20
 ## Mit so vielen K.O.s startet der Level-Up-Bildschirm (2 K.O.s = +1 Stufe)
 const LEVEL_UP_KILLS := 2
+## So viele Gegner-Slots hat der Kampf (battle.tscn)
+const MAX_ENEMIES := 3
 
 const BATTLE_PATH := "res://script/scenes/battle/battle.tscn"
 const JUDGEMENT_PATH := "res://script/scenes/judgment/judgement.tscn"
@@ -39,6 +41,9 @@ const RELIC_REWARD_SCENE := preload("res://script/scenes/relic_reward/relic_rewa
 var map: Control
 
 var _main: VBoxContainer
+var _fight_page: VBoxContainer
+## Startet den Kampf, für den gerade die Gegnerzahl gewählt wird
+var _fight_start: Callable
 var _picker: VBoxContainer
 ## Arten, die im Judgement als Fänge bereitliegen
 var _picked: Array[String] = []
@@ -60,6 +65,7 @@ func _ready() -> void:
 	# keine Preise und Ziele, nur Buttons
 	_columns.visible = false
 	_build_main()
+	_build_fight_page()
 	_build_picker()
 	_build_egg_page()
 	_build_stats_page()
@@ -72,9 +78,9 @@ func _build_main() -> void:
 
 	var is_last_biome: bool = State.map_level == Map.map_settings.size() - 1
 	_add_section(_main, "Kämpfe", [
-		[tr(Map.type_label(Map.PATH_TYPE.COMBAT)), _change_scene.bind(BATTLE_PATH)],
-		["BOSS-FELD", _start_map_boss],
-		["ENDBOSS" if is_last_biome else "BIOM-BOSS", map.start_biome_boss],
+		[tr(Map.type_label(Map.PATH_TYPE.COMBAT)) + " ...", _open_fight_page.bind(_change_scene.bind(BATTLE_PATH))],
+		["BOSS-FELD ...", _open_fight_page.bind(_start_map_boss)],
+		["ENDBOSS ..." if is_last_biome else "BIOM-BOSS ...", _open_fight_page.bind(map.start_biome_boss)],
 	])
 
 	var fields := []
@@ -113,6 +119,21 @@ func _build_main() -> void:
 	var close_button := _make_button("SCHLIESSEN", close)
 	close_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_main.add_child(close_button)
+
+## Gegnerzahl vor dem Kampfstart. WIE IM SPIEL lässt das Biom bzw. den Boss entscheiden.
+func _build_fight_page() -> void:
+	_fight_page = VBoxContainer.new()
+	_fight_page.add_theme_constant_override("separation", 12)
+	add_footer(_fight_page)
+
+	var entries := [["WIE IM SPIEL", _start_fight.bind(0)]]
+	for count in range(1, MAX_ENEMIES + 1):
+		entries.append([str(count), _start_fight.bind(count)])
+	_add_section(_fight_page, "Gegen wie viele Monster?", entries)
+
+	var back_button := _make_button("ZURÜCK", _show_page.bind(_main))
+	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_fight_page.add_child(back_button)
 
 ## Judgement-Auswahl: beliebig viele Arten als Fänge, die dort bereitliegen
 func _build_picker() -> void:
@@ -189,7 +210,7 @@ func _build_egg_page() -> void:
 	first.button_pressed = true
 
 func _show_page(page: VBoxContainer) -> void:
-	for other in [_main, _picker, _egg_page, _stats_page]:
+	for other in [_main, _fight_page, _picker, _egg_page, _stats_page]:
 		other.visible = other == page
 
 func _refresh_start() -> void:
@@ -246,6 +267,14 @@ func _make_mon_button(mon_species: String) -> Button:
 
 func _change_scene(path: String) -> void:
 	get_tree().change_scene_to_file(path)
+
+func _open_fight_page(start: Callable) -> void:
+	_fight_start = start
+	_show_page(_fight_page)
+
+func _start_fight(enemy_count: int) -> void:
+	DebugSettings.next_enemy_count = enemy_count
+	_fight_start.call()
 
 func _start_map_boss() -> void:
 	State.is_map_boss = true

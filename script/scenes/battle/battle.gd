@@ -292,6 +292,7 @@ func _generate_battle():
 		count = _roll_weighted(encounter.counts, t)
 		level = roundi(lerpf(encounter.level[0], encounter.level[1], t))
 		State.biome_fight_index += 1
+	count = DebugSettings.take_enemy_count(count)
 	var ms = Helper.generate_mons({"count": count})
 	# kam kein Kopfgeld-Monster von selbst, wird in normalen Kämpfen selten eins eingestreut
 	if not State.is_boss_fight and not is_map_boss and not ms.any(func(mon): return mon._bounty != ""):
