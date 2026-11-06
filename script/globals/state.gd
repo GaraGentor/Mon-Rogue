@@ -94,10 +94,12 @@ var pending_coupons: int = 0
 # nach einem Boss-Sieg: Kiste und Couvert auf dem Schlachtfeld, ohne sie in der Tasche gibt es weder Relic noch Skill
 var pending_relic_chest: bool = false
 var pending_skill_envelope: bool = false
+# nach einem Biom-Boss: Boss Tränen auf dem Schlachtfeld
+var pending_boss_shards: int = 0
 
 # Liegt noch etwas auf dem Schlachtfeld? Dann führt der Weg zur Karte erst über den Level-Up-Bildschirm.
 func has_pending_loot() -> bool:
-	return pending_ep > 0 or pending_keys > 0 or pending_gems > 0 or pending_coupons > 0 or pending_relic_chest or pending_skill_envelope
+	return pending_ep > 0 or pending_keys > 0 or pending_gems > 0 or pending_coupons > 0 or pending_relic_chest or pending_skill_envelope or pending_boss_shards > 0
 
 # Was noch auf dem Schlachtfeld liegt, ist beim Weitergehen weg.
 func clear_pending_loot() -> void:
@@ -107,6 +109,7 @@ func clear_pending_loot() -> void:
 	pending_coupons = 0
 	pending_relic_chest = false
 	pending_skill_envelope = false
+	pending_boss_shards = 0
 
 # Run-Statistik für den Endbildschirm (run_end.gd). killed_monsters wird beim Level-Up verbraucht, daher eigene Zähler.
 var run_won := false

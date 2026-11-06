@@ -9,6 +9,8 @@ const BOX_ICON = preload("res://assets/ui/rewards/box.png")
 const ENVELOPE_ICON = preload("res://assets/ui/rewards/envelop.png")
 const GEM_ICON = preload("res://assets/ui/shop/gem.svg")
 const COUPON_ICON = preload("res://assets/ui/icons/coupon.svg")
+const BOSS_SHARD_ICON = preload("res://assets/ui/jailer/boss_tear.svg")
+const EGG_ICON = preload("res://assets/ui/eggs/common_1.png")
 const BAG_SIZE := Vector2(208, 196)
 const BAG_FONT_SIZE := 19
 const FIELD_MARGIN := 16
@@ -28,7 +30,7 @@ class LootIcon extends VBoxContainer:
 	var on_taken: Callable
 	var _art: TextureRect
 
-	func _init(texture: Texture2D, text: String) -> void:
+	func _init(texture: Texture2D, text: String, base_material: ShaderMaterial) -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		mouse_default_cursor_shape = Control.CURSOR_DRAG
 		# die Mitte sitzt auf dem Ankerpunkt, den _scatter_loot setzt
@@ -36,7 +38,7 @@ class LootIcon extends VBoxContainer:
 		grow_vertical = Control.GROW_DIRECTION_BOTH
 		_art = RewardDialog.texture_icon(texture) as TextureRect
 		_art.custom_minimum_size = ICON_SIZE
-		var art_material: ShaderMaterial = RewardDialog.ICON_BUTTON_MATERIAL.duplicate()
+		var art_material: ShaderMaterial = base_material.duplicate()
 		art_material.set_shader_parameter("outline_color", SkillDetailPopup.GOLD)
 		_art.material = art_material
 		add_child(_art)
@@ -181,11 +183,28 @@ func _build_battlefield() -> void:
 		_add_loot(BOX_ICON, tr("RELIC_CHEST_LOOT"), _take_relic_chest)
 	if State.pending_skill_envelope:
 		_add_loot(ENVELOPE_ICON, tr("SKILL_ENVELOPE_LOOT"), _take_skill_envelope)
+	if State.pending_boss_shards > 0:
+		var shard_text := "JAILER_TEAR_COUNT_ONE" if State.pending_boss_shards == 1 else "JAILER_TEAR_COUNT_MANY"
+		_add_loot(BOSS_SHARD_ICON, "+" + tr(shard_text).format({"amount": State.pending_boss_shards}), _take_boss_shards)
+	if State.is_boss_fight:
+		_add_egg_loot()
 	_hint_panel.visible = _loot_field.get_child_count() > 0
 	_scatter_loot()
 
-func _add_loot(texture: Texture2D, text: String, on_taken: Callable) -> void:
-	var loot := LootIcon.new(texture, text)
+## Ei eines Team-Monsters, das noch nicht freigeschaltet ist. Gelost wird erst hier, damit Fänge aus dem Judgement dabei sind.
+## Die Art steht schon fest, damit das Ei nach ihrer Seltenheit eingefärbt werden kann.
+func _add_egg_loot() -> void:
+	var unlocked: Array = SaveManager.save_data.catched_monsters.duplicate()
+	unlocked.append_array(State.INITIAL_MONS)
+	var missing := State.mons.filter(func(mon: Monster): return not unlocked.has(mon._name))
+	if missing.is_empty():
+		return
+	var mon_name: String = missing.pick_random()._name
+	var loot := _add_loot(EGG_ICON, tr("EGG_LOOT"), SaveManager.add_catched_monster_mon.bind(mon_name), Monmap.egg_material(Monmap.rarity_of(mon_name)))
+	loot.tooltip_text = tr("EGG_LOOT_DESC")
+
+func _add_loot(texture: Texture2D, text: String, on_taken: Callable, art_material: ShaderMaterial = RewardDialog.ICON_BUTTON_MATERIAL) -> LootIcon:
+	var loot := LootIcon.new(texture, text, art_material)
 	loot.on_taken = func():
 		on_taken.call()
 		_loot_field.remove_child(loot)
@@ -193,6 +212,7 @@ func _add_loot(texture: Texture2D, text: String, on_taken: Callable) -> void:
 		_hint_panel.visible = _loot_field.get_child_count() > 0
 	loot.drag_started.connect(_bag.art.set_gold.bind(true))
 	_loot_field.add_child(loot)
+	return loot
 
 ## Verteilt die Beute zufällig auf dem Bild, frei von Hinweis, Tasche und anderer Beute.
 ## Bis dahin unsichtbar, denn deren Größen stehen erst nach dem ersten Layout fest.
@@ -253,6 +273,12 @@ func _take_keys() -> void:
 func _take_coupons() -> void:
 	State.coupons += State.pending_coupons
 	State.pending_coupons = 0
+
+## wie beim Kerkermeister auch im Spielstand
+func _take_boss_shards() -> void:
+	SaveManager.add_boss_shard(State.pending_boss_shards)
+	State.boss_shards += State.pending_boss_shards
+	State.pending_boss_shards = 0
 
 ## Edelsteine, Relic-Auswahl und Skill-Auswahl erscheinen beim nächsten Betreten der Karte (world_map.gd)
 func _take_gems() -> void:

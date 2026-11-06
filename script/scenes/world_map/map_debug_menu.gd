@@ -32,7 +32,6 @@ const MAX_ENEMIES := 3
 const BATTLE_PATH := "res://script/scenes/battle/battle.tscn"
 const JUDGEMENT_PATH := "res://script/scenes/judgment/judgement.tscn"
 const LEVEL_UP_PATH := "res://script/scenes/level_up/level_up.tscn"
-const BOSS_REWARD_PATH := "res://script/scenes/boss_reward/boss_reward.tscn"
 const RUN_END_PATH := "res://script/scenes/run_end/run_end.tscn"
 const WORLD_MAP_PATH := "res://script/scenes/world_map/world_map.tscn"
 const RELIC_REWARD_SCENE := preload("res://script/scenes/relic_reward/relic_reward.tscn")
@@ -95,7 +94,6 @@ func _build_main() -> void:
 		["LEVEL-UP", _open_level_up],
 		["RELIC-AUSWAHL", _open_relic_reward],
 		["FÄHIGKEITEN-AUSWAHL", _open_skill_reward],
-		["BOSS-BELOHNUNG", _open_boss_reward],
 		["RUN-ENDE SIEG", _end_run.bind(true)],
 		["RUN-ENDE NIEDERL.", _end_run.bind(false)],
 	])
@@ -301,6 +299,7 @@ func _open_level_up() -> void:
 	State.pending_keys = 1
 	State.pending_gems = 1
 	State.pending_coupons = 1
+	State.pending_boss_shards = 1
 	State.pending_relic_chest = not Relics.get_unowned().is_empty()
 	State.pending_skill_envelope = not Skills.reward_offers().is_empty()
 	_change_scene(LEVEL_UP_PATH)
@@ -320,11 +319,6 @@ func _open_skill_reward() -> void:
 	var dialog: Control = map.skill_reward_dialog()
 	map.view_container.add_child(dialog)
 	dialog.visible = true
-
-## Wie nach einem Biom-Boss: die Belohnung führt ins nächste Biom, nach dem letzten endet der Run
-func _open_boss_reward() -> void:
-	State.current_map_position = State.NO_MAP_POSITION
-	_change_scene(BOSS_REWARD_PATH)
 
 func _end_run(won: bool) -> void:
 	State.end_run(won)

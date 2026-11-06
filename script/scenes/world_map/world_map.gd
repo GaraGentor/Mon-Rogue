@@ -102,8 +102,7 @@ func _ready() -> void:
 		get_tree().change_scene_to_file("res://script/scenes/level_up/level_up.tscn")
 		return 
 	if State.is_boss_fight:
-		get_tree().change_scene_to_file("res://script/scenes/boss_reward/boss_reward.tscn")
-		State.is_boss_fight = false
+		_finish_biome()
 		return
 	#Events.map_event_pressed.connect(_call_map_event)
 	if not State.current_map:
@@ -318,6 +317,26 @@ func _on_boss_button_pressed() -> void:
 	if State.current_map.size() > 0:
 		if State.current_map_position.y + 1 == State.current_map[0].size():
 			start_biome_boss()
+
+## Biom-Boss besiegt und Beute abgehandelt: weiter ins nächste Biom, nach dem letzten endet der Run mit einem Sieg.
+## Boss-Felder auf der Karte zählen nicht für den Meilenstein und die Faule-Eier-Ladung.
+func _finish_biome() -> void:
+	State.is_boss_fight = false
+	var unlocked: Array = Skills.add_milestone_progress(State.starter_name, "biome_boss_kills")
+	if not unlocked.is_empty():
+		Helper.show_unlock_message(tr("MILESTONE_UNLOCKED").format({
+			"mon": Helper.mon_display_name(State.starter_name),
+			"skills": ", ".join(PackedStringArray(unlocked.map(func(skill_name): return tr(skill_name)))),
+		}))
+	SaveManager.add_reroll_charge()
+	State.map_level += 1
+	State.biome_fight_index = 0
+	if State.map_level == Map.map_settings.size():
+		State.end_run(true)
+		get_tree().change_scene_to_file("res://script/scenes/run_end/run_end.tscn")
+		return
+	Map.generate_starting_points()
+	get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")
 
 func start_biome_boss() -> void:
 	State.is_boss_fight = true

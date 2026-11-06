@@ -36,6 +36,6 @@ Tasks:
 		> Level Up zählt doppelt
 		> Steine haben ein Bonus von +2
 		> 
-	
+	> Schwarze Tür dropped beim Endboss als loot, beim aufheben wird direkt ein neuer Endboss kampf getriggert mit dem Clue, dass dort der Endboss gefangen werden kann und der Run beendet wird ohne loot.
 	> Passive
 		> Stat Switcher

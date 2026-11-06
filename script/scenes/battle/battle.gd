@@ -11,6 +11,9 @@ const COUPON_LOOT_CHANCE := 0.05
 const GOLD_LOOT_MIN := 5
 const GOLD_LOOT_MAX := 15
 const GOLD_LOOT_PER_DEPTH := 5
+## Boss Tränen als Beute: Biom-Boss und finaler Boss, Boss-Felder auf der Karte lassen keine fallen
+const BIOME_BOSS_SHARDS := 1
+const FINAL_BOSS_SHARDS := 3
 const NOISE_SHADER := preload("res://script/scenes/world_map/map_noise.gdshader")
 
 @export var catch_anim: Control
@@ -403,8 +406,10 @@ func _roll_kill_loot() -> void:
 		State.pending_ep += randi_range(GOLD_LOOT_MIN, GOLD_LOOT_MAX) + State.map_level * GOLD_LOOT_PER_DEPTH
 
 ## Mini-Boss und Biom-Boss lassen bei jedem Sieg Kiste und Couvert fallen, auch wenn sie gefangen wurden.
-## Träne und Ei des Biom-Bosses gibt es danach in boss_reward.gd.
+## Biom-Bosse lassen zusätzlich Boss Tränen fallen, der finale Boss nur diese. Das Ei lost der Level-Up-Bildschirm.
 func _add_boss_loot() -> void:
+	if State.is_boss_fight:
+		State.pending_boss_shards = FINAL_BOSS_SHARDS if State.is_final_boss else BIOME_BOSS_SHARDS
 	if not is_boss_battle or State.is_final_boss:
 		return
 	State.pending_relic_chest = not Relics.get_unowned().is_empty()

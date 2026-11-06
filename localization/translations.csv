@@ -52,11 +52,7 @@ BATTLE_NEXT,next,weiter
 MONSTER_CLOSE_INFO,Close Info,Info schließen
 MONSTER_STATUS_EFFECTS,Status effects.,Statuseffekte.
 BOSS_REWARD_OK,OKE!,OKE!
-BOSS_REWARD_DEFEATED,Boss defeated,Boss besiegt
 BOSS_REWARD_SHARD_DESC,"Boss tear, needed to upgrade your monsters permanently","Boss Träne, damit verbesserst du deine Monster dauerhaft"
-BOSS_REWARD_CLAIM,Claim Reward!,Belohnung abholen!
-BOSS_REWARD_EGG_DESC,One of your current monsters appears as an egg in new runs,Eines deiner aktuellen Monster erscheint in neuen Läufen als Ei
-BOSS_REWARD_CLAIMED,Claimed,Abgeholt
 BOSS_REWARD_THANKS,Thanks for playing,Danke fürs Spielen
 BOSS_REWARD_NEW_RUN,Start a new run!,Neuen Lauf starten!
 JAILER_REROLL,Other prisoners for {cost} ME ({money}),Andere Gefangene für {cost} ME ({money})
@@ -143,6 +139,8 @@ COUPON_LOOT_AMOUNT,+{amount} Coupon,+{amount} Gutschein
 COUPON_DESC,25% off your next purchase at the shop or trainer.,25% Rabatt auf deinen nächsten Kauf bei Laden oder Trainer.
 SKILL_ENVELOPE_LOOT,Envelope,Couvert
 RELIC_CHEST_LOOT,Relic Box,Relikt-Kiste
+EGG_LOOT,Egg,Ei
+EGG_LOOT_DESC,One of your current monsters appears as an egg in new runs,Eines deiner aktuellen Monster erscheint in neuen Läufen als Ei
 SHOP_CHANGES_TO,Changes to,Wird zu
 SHOP_DRAG_HINT,"Drag an Element Potion
 or a Gem onto
@@ -550,7 +548,6 @@ EGG_CATEGORY_MAGIC,Magical,Magisch
 EGG_CATEGORY_SHIELD,Shield,Schild
 EGG_CATEGORY_BUFF,Buff,Buff
 EGG_CATEGORY_PASSIVE,Passive,Passiv
-BOSS_REWARD_SHARD_AMOUNT,+{amount} Boss Tear,+{amount} Boss Träne
 JAILER_TEAR_COUNT_ONE,{amount} Boss Tear,{amount} Boss Träne
 JAILER_TEAR_COUNT_MANY,{amount} Boss Tears,{amount} Boss Tränen
 TREASURE_HINT,Drag all the essence into the bag.,Zieh die ganze Essenz in die Tasche.

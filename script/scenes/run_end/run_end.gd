@@ -1,6 +1,6 @@
 extends Control
 
-# Endbildschirm eines Runs, für Sieg (boss_reward.gd) und Niederlage (battle.gd). Werte stehen in State.run_*.
+# Endbildschirm eines Runs, für Sieg (world_map.gd) und Niederlage (battle.gd). Werte stehen in State.run_*.
 
 const GOLD := SkillDetailPopup.GOLD
 const TEXT_COLOR := IronPlate.TEXT_COLOR
