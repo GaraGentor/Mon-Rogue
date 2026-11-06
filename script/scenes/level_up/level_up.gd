@@ -5,6 +5,7 @@ extends Control
 
 const ESSENCE_ICON = preload("res://assets/ui/icons/monster_essence.svg")
 const KEY_ICON = preload("res://assets/ui/icons/key.svg")
+const CHEST_ICON = preload("res://assets/ui/rewards/reward_chest.png")
 const BAG_SIZE := Vector2(208, 196)
 const BAG_FONT_SIZE := 19
 const FIELD_MARGIN := 16
@@ -170,6 +171,8 @@ func _build_battlefield() -> void:
 		_add_loot(ESSENCE_ICON, Helper.me_text(State.pending_ep), _take_essence)
 	if State.pending_keys > 0:
 		_add_loot(KEY_ICON, tr("KEY_LOOT_AMOUNT").format({"amount": State.pending_keys}), _take_keys)
+	if State.pending_relic_chest:
+		_add_loot(CHEST_ICON, tr("RELIC_CHEST_LOOT"), _take_relic_chest)
 	_hint_panel.visible = _loot_field.get_child_count() > 0
 	_scatter_loot()
 
@@ -222,6 +225,11 @@ func _take_keys() -> void:
 	State.keys += State.pending_keys
 	State.pending_keys = 0
 
+## Die Relic-Auswahl erscheint beim nächsten Betreten der Karte (world_map.gd)
+func _take_relic_chest() -> void:
+	State.pending_relic_chest = false
+	State.pending_relic_reward = true
+
 func _show_money(ep: int) -> void:
 	_bag.art.label.text = str(ep)
 
@@ -236,4 +244,5 @@ func _on_button_pressed() -> void:
 	# was nicht in der Tasche liegt, bleibt auf dem Schlachtfeld
 	State.pending_ep = 0
 	State.pending_keys = 0
+	State.pending_relic_chest = false
 	get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")

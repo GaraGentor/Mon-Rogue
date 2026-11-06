@@ -4,6 +4,9 @@ const ENEMY_THINK_TIME := 0.6
 const ENEMY_ACTION_TIME := 0.9
 ## Chance auf einen Schlüssel als Beute pro gewonnenem Kampf
 const KEY_LOOT_CHANCE := 0.25
+## Chance auf die Schatzkiste mit der Relic-Auswahl: Biom-Boss und Boss-Feld auf der Karte (Miniboss)
+const RELIC_CHEST_CHANCE_BOSS := 1.0
+const RELIC_CHEST_CHANCE_MINIBOSS := 0.8
 const NOISE_SHADER := preload("res://script/scenes/world_map/map_noise.gdshader")
 
 @export var catch_anim: Control
@@ -366,9 +369,7 @@ func _check_game_over(last_fainted:Monster) -> void:
 	if State.enemy_mons.all(func(mon: Monster): return not mon.is_alive()) or State.enemy_mons.size() == 0:
 		print("will close battle")
 		State.stage_clear()
-		# der finale Boss beendet den Run, danach gibt es keine Karte mehr
-		if is_boss_battle and not State.is_final_boss:
-			State.pending_relic_reward = true
+		State.pending_relic_chest = _rolls_relic_chest()
 		State.pending_ep += Relics.modify("battle_ep", State.enemy_mons.map(func(mon): return mon._ep).reduce(func(a, b): return a + b, 0))
 		print("state pending ep", State.pending_ep)
 		if randf() < KEY_LOOT_CHANCE:
@@ -383,6 +384,13 @@ func _check_game_over(last_fainted:Monster) -> void:
 			get_tree().change_scene_to_file("res://script/scenes/judgment/judgement.tscn")
 			return
 		get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")
+
+## Nur Bosse lassen eine Kiste fallen. State.is_boss_fight gilt noch bis zur Karte, is_map_boss nicht mehr.
+## Der finale Boss beendet den Run, danach gibt es keine Karte mehr.
+func _rolls_relic_chest() -> bool:
+	if not is_boss_battle or State.is_final_boss or Relics.get_unowned().is_empty():
+		return false
+	return randf() < (RELIC_CHEST_CHANCE_BOSS if State.is_boss_fight else RELIC_CHEST_CHANCE_MINIBOSS)
 
 func _clear_fainted_mons() -> Array:
 	var v = State.mons.filter(func(mon:Monster): return not mon.is_alive())

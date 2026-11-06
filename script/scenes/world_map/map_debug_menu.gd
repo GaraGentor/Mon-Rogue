@@ -268,6 +268,7 @@ func _open_level_up() -> void:
 	State.killed_monsters = LEVEL_UP_KILLS
 	State.pending_ep = DEBUG_ESSENCE
 	State.pending_keys = 1
+	State.pending_relic_chest = not Relics.get_unowned().is_empty()
 	_change_scene(LEVEL_UP_PATH)
 
 func _open_relic_reward() -> void:

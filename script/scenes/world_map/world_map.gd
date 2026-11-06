@@ -95,7 +95,7 @@ func _ready() -> void:
 	team_bar.dialog_parent = view_container
 
 	await get_tree().process_frame
-	if State.killed_monsters >= 1 or State.pending_ep > 0 or State.pending_keys > 0:
+	if State.killed_monsters >= 1 or State.pending_ep > 0 or State.pending_keys > 0 or State.pending_relic_chest:
 		get_tree().change_scene_to_file("res://script/scenes/level_up/level_up.tscn")
 		return 
 	if State.is_boss_fight:

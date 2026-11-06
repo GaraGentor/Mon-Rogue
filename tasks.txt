@@ -31,4 +31,6 @@ Tasks:
 
 	> Relics
 		> Key finder 50% increased.
+		> Der Langsamste wird der schnellste in Runde 1
+		> Alle Stats sind immer sichtbar
 		> 

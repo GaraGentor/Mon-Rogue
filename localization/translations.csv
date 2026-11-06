@@ -138,6 +138,7 @@ LEVEL_UP_LOOT_HINT,"Drag your loot into the bag, or it stays behind.","Zieh die 
 KEY_NAME,Key,Schlüssel
 KEY_DESC,An old key. Somewhere there is a lock for it.,Ein alter Schlüssel. Irgendwo gibt es ein Schloss dafür.
 KEY_LOOT_AMOUNT,+{amount} Key,+{amount} Schlüssel
+RELIC_CHEST_LOOT,Treasure Chest,Schatzkiste
 SHOP_CHANGES_TO,Changes to,Wird zu
 SHOP_DRAG_HINT,"Drag an Element Potion
 or a Gem onto

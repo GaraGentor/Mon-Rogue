@@ -45,7 +45,7 @@ var is_boss_fight: bool = false
 var is_final_boss: bool = false
 # Boss-Feld mitten auf der Karte: Kampf in Boss-Stärke, beendet das Biom aber nicht
 var is_map_boss: bool = false
-# nach einem Boss-Sieg: beim nächsten Betreten der Karte die Relic-Auswahl zeigen (relic_reward.tscn)
+# Schatzkiste in die Tasche gezogen: beim nächsten Betreten der Karte die Relic-Auswahl zeigen (relic_reward.tscn)
 var pending_relic_reward: bool = false
 
 # money
@@ -77,6 +77,8 @@ var killed_monsters: int = 0
 var pending_ep: int = 0
 # im Kampf gefundene Schlüssel, liegen genauso auf dem Schlachtfeld wie die Essenz
 var pending_keys: int = 0
+# nach einem Boss-Sieg: Schatzkiste auf dem Schlachtfeld, ohne sie in der Tasche gibt es kein Relic
+var pending_relic_chest: bool = false
 
 # Run-Statistik für den Endbildschirm (run_end.gd). killed_monsters wird beim Level-Up verbraucht, daher eigene Zähler.
 var run_won := false
@@ -129,6 +131,7 @@ func reset() -> void:
 	is_final_boss = false
 	is_map_boss = false
 	pending_relic_reward = false
+	pending_relic_chest = false
 	rolled_mon_stats = {}
 	defeated_mon_names = []
 	caught_mon_names = []
