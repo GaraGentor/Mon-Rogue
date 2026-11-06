@@ -162,22 +162,22 @@ func get_unlockable_egg_skill() -> Dictionary:
 
 func hp():
 	# passive Skills im Team (z. B. +15 KP) kommen obendrauf
-	return _base_stat(_growth.hp) + gem_bonus("hp") + Skills.passive_bonus(self, "hp")
+	return _base_stat("hp") + gem_bonus("hp") + Skills.passive_bonus(self, "hp")
 
 func attack():
-	return (_base_stat(_growth.atk) + gem_bonus("atk")) * buff_factor("atk")
+	return (_base_stat("atk") + gem_bonus("atk")) * buff_factor("atk")
 
 func defense():
-	return (_base_stat(_growth.def) + gem_bonus("def")) * buff_factor("def")
-	
+	return (_base_stat("def") + gem_bonus("def")) * buff_factor("def")
+
 func s_attack():
-	return (_base_stat(_growth.s_atk) + gem_bonus("s_atk")) * buff_factor("s_atk")
-	
+	return (_base_stat("s_atk") + gem_bonus("s_atk")) * buff_factor("s_atk")
+
 func s_defense():
-	return (_base_stat(_growth.s_def) + gem_bonus("s_def")) * buff_factor("s_def")
+	return (_base_stat("s_def") + gem_bonus("s_def")) * buff_factor("s_def")
 
 func speed():
-	return (_base_stat(_growth.speed) + gem_bonus("speed")) * buff_factor("speed")
+	return (_base_stat("speed") + gem_bonus("speed")) * buff_factor("speed")
 
 func best():
 	return _best_points
@@ -186,8 +186,10 @@ func best():
 func is_alive() -> bool:
 	return roundi(hp() - _lost_hp) > 0
 
-# Wert aus Stufe und Basiswerten, ohne Edelsteine und Buffs
-func _base_stat(share: float) -> float:
+# Wert aus Stufe und Basiswerten, ohne Edelsteine und Buffs.
+# Die Reserve wird erst hier verrechnet: gespeicherte Eier bleiben gültig und Änderungen im Debug-Menü wirken sofort.
+func _base_stat(stat: String) -> float:
+	var share := DebugSettings.effective_share(stat, _growth[stat])
 	return share * _level * Helper.points_per_level(_best_points) * STAT_SCALE
 
 func gem_bonus(stat: String) -> int:

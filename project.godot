@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 SaveManager="*res://script/globals/save_manager.gd"
+DebugSettings="*res://script/globals/debug_settings.gd"
 State="*res://script/globals/state.gd"
 Skills="*res://script/globals/skills.gd"
 Map="*res://script/globals/map.gd"
