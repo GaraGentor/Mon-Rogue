@@ -26,7 +26,7 @@ func _init(mon: Monster) -> void:
 func _ready() -> void:
 	offset_top = RewardDialog.MAP_HEADER_HEIGHT
 	var panel := PanelContainer.new()
-	panel.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	RewardDialog.fit_to_map_area(panel)
 	add_child(panel)
 	var columns := HBoxContainer.new()
 	columns.add_theme_constant_override("separation", 24)

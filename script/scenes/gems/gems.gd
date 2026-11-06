@@ -33,16 +33,22 @@ func _ready() -> void:
 	set_title(tr("GEM_CHOOSE"))
 	set_drag_hint("GEM_HINT")
 	show_fixed_targets(State.mons, false)
-	for target in _fixed_targets:
-		target.box.add_child(gem_counts(target.mon))
-		target.stats = StatsGrid.stacked_for(target.mon)
-		target.box.add_child(target.stats)
-		ignore_mouse_below(target)
+	show_gem_info(self)
 	_bonus = BONUS_BY_DEPTH[clampi(State.map_level, 0, BONUS_BY_DEPTH.size() - 1)]
 	var stats = STATS.keys()
 	stats.shuffle()
 	for stat in stats.slice(0, GEM_CHOICES):
 		add_gem_card(self, stat, _bonus)
+
+## Monster-Ziele zeigen ihre gesammelten Steine und ihre Werte, beim Ziehen auch die Änderung durch den Stein
+static func show_gem_info(dialog: RewardDialog) -> void:
+	for target in dialog._fixed_targets:
+		if target.mon == null:
+			continue
+		target.box.add_child(gem_counts(target.mon))
+		target.stats = StatsGrid.stacked_for(target.mon)
+		target.box.add_child(target.stats)
+		ignore_mouse_below(target)
 
 ## Eine Zeile mit allen Steinarten und wie viele davon das Monster schon hat
 static func gem_counts(mon: Monster) -> HBoxContainer:
@@ -69,13 +75,11 @@ static func gem_counts(mon: Monster) -> HBoxContainer:
 	return row
 
 ## Edelstein-Karte, auch von Schatz und Shop genutzt: wird auf ein Monster gezogen.
-## Beim Drüberziehen zeigt der Tooltip, wie viel Bonus das Monster schon hat.
+## Die Änderung zeigen die Werte am Ziel (show_gem_info).
 static func add_gem_card(dialog: RewardDialog, stat: String, bonus: int) -> RewardDialog.RewardCard:
 	var info: Dictionary = STATS[stat]
 	var stat_name = dialog.tr(info.stat).trim_suffix(":")
 	var text = dialog.tr("GEM_DESC").format({"stat": stat_name, "value": bonus})
 	var give := func(mon: Monster):
 		mon.add_gem(stat, bonus)
-	var tooltip := func(mon: Monster) -> String:
-		return "%s +%d\n%s" % [stat_name, bonus, dialog.tr("GEM_CURRENT").format({"value": mon.gem_bonus(stat)})]
-	return dialog.add_mon_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, tooltip, {"stat": stat, "bonus": bonus})
+	return dialog.add_mon_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, Callable(), {"stat": stat, "bonus": bonus})

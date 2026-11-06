@@ -3,19 +3,17 @@ extends HBoxContainer
 ## Zeigt die gesammelten Relics als Icons, ein Klick öffnet ein Popup mit Name und Beschreibung.
 
 const ICON_SIZE := Vector2(40, 40)
+const ICON_MARGIN := 6
 const INSET_BOX := preload("res://script/ui/materials/iron_inset_box.tres")
 const FONT_THEME := preload("res://script/ui/materials/pixel_font_theme.tres")
 
 var _popup: PopupPanel
 var _popup_label: RichTextLabel
-var _button_style: StyleBoxFlat
-var _button_hover_style: StyleBoxFlat
+var _button_style: StyleBoxEmpty
 
 func _ready() -> void:
-	_button_style = INSET_BOX.duplicate()
-	_button_style.set_content_margin_all(4)
-	_button_hover_style = _button_style.duplicate()
-	_button_hover_style.border_color = SkillDetailPopup.GOLD
+	_button_style = StyleBoxEmpty.new()
+	_button_style.set_content_margin_all(ICON_MARGIN)
 	_popup = PopupPanel.new()
 	_popup.theme = FONT_THEME
 	var popup_style: StyleBoxFlat = INSET_BOX.duplicate()
@@ -47,7 +45,10 @@ func refresh() -> void:
 		button.icon = load(relic.icon)
 		button.expand_icon = true
 		RewardDialog.clear_button_styles(button, _button_style)
-		button.add_theme_stylebox_override("hover", _button_hover_style)
+		# derselbe Rahmen wie überall, wird beim Drüberfahren golden
+		var plate := IronPlate.back(button)
+		button.mouse_entered.connect(plate.set_rim.bind(SkillDetailPopup.GOLD))
+		button.mouse_exited.connect(plate.set_rim.bind(IronPlate.RIM))
 		button.pressed.connect(_show_info.bind(button, relic))
 		add_child(button)
 

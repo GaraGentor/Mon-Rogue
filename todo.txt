@@ -1,0 +1,12 @@
+1. Da fehlt immernoch padding: C:\Users\sheni\Pictures\1.png siehe bild das ist in der EI Auswahl. die Headline kann ruhig zwei zeilig dann sein oder minimal kleiner
+2. Bei den EI Attacken mach mal folgendes: gib nur dem Monster dem Namen und Typ einen Rahmen. Füge dort noch die Stats hinzu und Lege die Ausgewählte fähigkeit aus dem Rahmen raus und ordne es darunter auf.
+3. Der GO Button bei den EI Attacken ist doch zu groß vill erstmal die größe wie bei den anderen Pfeil Button beibehalten nur mit einem Grünen Häckchen.
+4. Die Dialoge / Modals für Monster Preview in der Map und Edelsteine Schätze etc, können ein leichten Padding gebrauchen, damit das Dialog nicht so am Rand klebt. Orientiere dich an dem Header dort sind auch nach rechts kp 10-20 px platz?? und nach Links soll die Tasche der Indikator sein.
+6. Im Laden wird die Tasche nicht gehighlighted, wenn ich ein Relikt verschieben will
+9. Wenn ich ein Edelstein Zur option habe bei der Belohnung, möchte ich auch die Stats und Edelsteine Pro monster sehen.
+10. Das Glücksrad dürfen wir auch nicht vergessen. Das muss auch noch abgestimmt werden wie bei den anderen, dann ist der Code überall gleich und kann für weitere verwendet werden
+11. Der Reliktrahmen in der Map Header, ist plan blau, das soll der normale rahmen sein wie überall.
+12. Füg mal beim Level Up Screen auf der Rechten hälfte C:\Users\sheni\Downloads\mw558rdet7qr7h.jpeg hinzu, achte auf die Shader etc. und die Monster kommen dann Links untereinander. Darauf soll die Tasche zu sehen sein und auf dem Schlachtfeld die Belohnunge, als Icons, die man beim Kampf bekommen hat (derzeit ja nur das Gold), das soll man da rein ziehen sonst bekommt man nichts.
+13. Bei den Edelsteinen, brechen die aus dem Screen, da muss ne Scrollviel rein für die Belohnungen
+14. Im Judgement screen können die Stats auch untereinander stehen wie im Battle und bei der EI-Selection.
+15. Wenn ich beim Preis ein Trank auf ein Monster Ziehe soll es mit Anzeigen, von welchem Element zu welchem es Wechselt wie im Laden wenn ich ein Trank über ein Monster Mache.

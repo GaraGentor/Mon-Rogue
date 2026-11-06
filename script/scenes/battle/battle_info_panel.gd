@@ -99,8 +99,10 @@ func _build_egg_skill_overview() -> void:
 
 	var total: int = egg_skills.available.size() + egg_skills.locked.size()
 	var title := _label("%s  %d/%d" % [tr("EGG_OVERVIEW_TITLE"), egg_skills.available.size(), total], EGG_SKILL_COLOR)
-	title.add_theme_font_size_override("font_size", 22)
+	title.add_theme_font_size_override("font_size", EGG_CATEGORY_FONT_SIZE)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# langer Titel bricht um, statt die Spalte über den Rand der Platte zu drücken
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	skill_grid.add_child(title)
 
 	for category in Skills.EGG_SKILL_CATEGORIES:

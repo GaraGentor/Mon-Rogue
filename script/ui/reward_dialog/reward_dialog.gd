@@ -18,6 +18,11 @@ const VERTICAL_TITLE_FONT_SIZE := 22
 const TARGET_SIZE := Vector2(120, 150)
 ## Höhe des Karten-Headers (world_map.tscn): darunter beginnt die Kartenfläche
 const MAP_HEADER_HEIGHT := 184.0
+## Abstand der Dialoge auf der Kartenfläche zum Bildschirmrand: links bis zur Tasche im Header, rechts und unten wie der Header
+const MAP_DIALOG_MARGIN_LEFT := 16.0
+const MAP_DIALOG_MARGIN := 8.0
+## zeigt im Typ-Chip, was ein Trank aus dem Monster macht
+const PREVIEW_ARROW := ">"
 ## Bild des Preises am Mauszeiger
 const DRAG_ICON_SIZE := Vector2(84, 84)
 ## so weit darf sich die Maus bei einem Klick auf eine Karte bewegen, sonst ist es ein Ziehen
@@ -87,6 +92,8 @@ class DropTarget extends PanelContainer:
 	var box: VBoxContainer
 	## optional: Werte des Monsters, zeigen beim Drüberziehen die Änderung durch den Edelstein
 	var stats: StatsGrid
+	## optional: Typ des Monsters, zeigt beim Ziehen die Änderung durch einen Trank
+	var chips: HBoxContainer
 
 	func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 		return not locked and dialog._dragged != null and is_same(data, dialog._dragged.drag)
@@ -108,6 +115,8 @@ var _content: VBoxContainer
 var _columns: BoxContainer
 ## Spalte mit den Kartengruppen, neue Karten landen immer in der letzten Gruppe
 var _card_groups: VBoxContainer
+## nur auf der Kartenfläche: dort können die Preise höher sein als der Platz
+var _card_scroll: ScrollContainer
 var _card_grid: GridContainer
 var _card_columns := 1
 var _target_side: VBoxContainer
@@ -229,10 +238,23 @@ func use_map_layout() -> void:
 	_center.queue_free()
 	add_child(_panel)
 	move_child(_panel, 0)
-	_panel.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	fit_to_map_area(_panel)
 	_content.add_theme_constant_override("separation", 12)
 	_columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_target_header.visible = true
+	_card_scroll = ScrollContainer.new()
+	_card_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_columns.remove_child(_card_groups)
+	_card_scroll.add_child(_card_groups)
+	_columns.add_child(_card_scroll)
+	_columns.move_child(_card_scroll, 0)
+
+## Panel eines Dialogs auf der Kartenfläche: mit Abstand zum Rand, die Karte bleibt ringsum sichtbar
+static func fit_to_map_area(panel: Control) -> void:
+	panel.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	panel.offset_left = MAP_DIALOG_MARGIN_LEFT
+	panel.offset_right = -MAP_DIALOG_MARGIN
+	panel.offset_bottom = -MAP_DIALOG_MARGIN
 
 ## Ziele sind ab jetzt immer da und abgedunkelt: die Monster nebeneinander, die Tasche unter dem ersten
 func show_fixed_targets(mons: Array, with_bag: bool) -> void:
@@ -248,6 +270,34 @@ func show_fixed_targets(mons: Array, with_bag: bool) -> void:
 			gap.mouse_filter = MOUSE_FILTER_IGNORE
 			_target_grid.add_child(gap)
 	_lock_targets()
+
+## Monster-Ziele zeigen ihren Typ und beim Ziehen eines Tranks, was daraus wird
+func show_element_chips() -> void:
+	for target in _fixed_targets:
+		if target.mon == null:
+			continue
+		target.chips = HBoxContainer.new()
+		target.chips.alignment = BoxContainer.ALIGNMENT_CENTER
+		target.chips.custom_minimum_size.y = 32
+		target.chips.add_theme_constant_override("separation", 4)
+		target.box.add_child(target.chips)
+		show_element_preview(target.chips, target.mon)
+
+## Typ des Monsters als Chip; drag (Ware in der Hand) zeigt dazu, was ein Trank daraus macht
+static func show_element_preview(row: Control, mon: Monster, drag := {}) -> void:
+	for chip in row.get_children():
+		row.remove_child(chip)
+		chip.queue_free()
+	add_element_chip(row, mon._type)
+	if drag.has("element") and not ColorMap.has_element(mon._type, drag.element):
+		var arrow := Label.new()
+		arrow.text = PREVIEW_ARROW
+		arrow.mouse_filter = MOUSE_FILTER_IGNORE
+		arrow.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
+		arrow.add_theme_color_override("font_outline_color", Color.BLACK)
+		arrow.add_theme_constant_override("outline_size", 4)
+		row.add_child(arrow)
+		add_element_chip(row, ColorMap.add_element(mon._type, drag.element))
 
 ## Eigener Inhalt unter den Zielen, z. B. die Auswahl, welcher Skill vergessen wird (Trainer)
 func add_side_content(control: Control) -> void:
@@ -401,6 +451,9 @@ func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary
 	card.drag = drag
 	card.custom_minimum_size = _card_size
 	card.mouse_default_cursor_shape = Control.CURSOR_DRAG
+	# das Mausrad soll auch über den Karten scrollen, Ziehen klappt trotzdem
+	if _card_scroll:
+		card.mouse_filter = Control.MOUSE_FILTER_PASS
 
 	card.row = VBoxContainer.new() if _vertical_cards else HBoxContainer.new()
 	card.row.add_theme_constant_override("separation", 8 if _vertical_cards else 12)
@@ -486,6 +539,8 @@ func _build_targets(card: RewardCard) -> void:
 		else:
 			target.locked = not mons.has(target.mon) or (can_drop.is_valid() and not can_drop.call(target.mon))
 		target.modulate = LOCKED_COLOR if target.locked else Color.WHITE
+		if target.chips and not target.locked:
+			show_element_preview(target.chips, target.mon, card.drag)
 
 func _lock_targets() -> void:
 	for target in _fixed_targets:
@@ -493,6 +548,8 @@ func _lock_targets() -> void:
 		target.modulate = LOCKED_COLOR
 		if target.stats:
 			target.stats.show_gem_preview(target.mon)
+		if target.chips:
+			show_element_preview(target.chips, target.mon)
 
 func _hide_targets() -> void:
 	_lock_targets()
@@ -533,7 +590,7 @@ func _process(_delta: float) -> void:
 			target.stats.show_gem_preview(target.mon, _dragged.drag.get("stat", "") if over and not target.locked else "", _dragged.drag.get("bonus", 0))
 	var tooltip: Callable = _dragged.drag.get("tooltip", Callable())
 	# zeigt das Ziel die Änderung selbst an, braucht es keinen Tooltip
-	var wants_tooltip: bool = hovered != null and hovered.mon != null and hovered.stats == null and tooltip.is_valid()
+	var wants_tooltip: bool = hovered != null and hovered.mon != null and hovered.stats == null and hovered.chips == null and tooltip.is_valid()
 	var text: String = tooltip.call(hovered.mon) if wants_tooltip else ""
 	_tooltip.visible = text != ""
 	if _tooltip.visible:

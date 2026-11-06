@@ -33,6 +33,7 @@ func _ready() -> void:
 	set_title(tr("TREASURE_CHOOSE"))
 	set_drag_hint("TREASURE_HINT")
 	show_fixed_targets(State.mons, true)
+	show_element_chips()
 	_depth = clampi(State.map_level, 0, GemField.BONUS_BY_DEPTH.size() - 1)
 	var gold := randi_range(GOLD_MIN, GOLD_MAX) + _depth * GOLD_PER_DEPTH
 	add_bag_card(tr("TREASURE_GOLD"), Helper.me_text(gold), texture_icon(ESSENCE_ICON), _on_gold_chosen.bind(gold))
@@ -59,6 +60,7 @@ func _add_bonus_card() -> void:
 	# Fallback, falls kein passendes Relic oder Element übrig ist
 	var stat: String = GemField.STATS.keys().pick_random()
 	var bonus: int = GemField.BONUS_BY_DEPTH[_depth]
+	GemField.show_gem_info(self)
 	GemField.add_gem_card(self, stat, bonus)
 
 func _roll_bonus() -> String:
@@ -76,17 +78,14 @@ func _roll_bonus() -> String:
 
 ## Trank-Karte: wird auf ein Monster gezogen, dem das Element noch fehlt.
 ## Die Liste wird erst beim Ziehen bestimmt, damit sie im Shop nach jedem Kauf stimmt.
+## Was aus dem Monster wird, zeigt der Typ am Ziel (RewardDialog.show_element_preview).
 static func add_potion_card(dialog: RewardDialog, element: int) -> RewardDialog.RewardCard:
 	var element_name = dialog.tr(ColorMap.get_combo(element).label)
 	var text = dialog.tr("TREASURE_POTION_DESC").format({"element": element_name})
 	var potion_title = dialog.tr("TREASURE_POTION").format({"element": element_name})
 	var give := func(mon: Monster):
 		mon.gain_element(element)
-	# Tooltip beim Drüberziehen: altes Element und was daraus wird
-	var tooltip := func(mon: Monster) -> String:
-		var new_type = ColorMap.add_element(mon._type, element)
-		return "%s\n%s %s" % [dialog.tr(ColorMap.get_combo(mon._type).label), dialog.tr("SHOP_CHANGES_TO"), dialog.tr(ColorMap.get_combo(new_type).label)]
-	return dialog.add_mon_card(potion_title, text, potion_art(element), dialog.tr("TREASURE_POTION_CHOOSE_MON"), func(): return mons_without(element), give, tooltip)
+	return dialog.add_mon_card(potion_title, text, potion_art(element), dialog.tr("TREASURE_POTION_CHOOSE_MON"), func(): return mons_without(element), give, Callable(), {"element": element})
 
 static func mons_without(element: int) -> Array:
 	return State.mons.filter(func(mon): return not ColorMap.has_element(mon._type, element))

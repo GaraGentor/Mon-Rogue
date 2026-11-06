@@ -13,13 +13,10 @@ const RelicReward = preload("res://script/scenes/relic_reward/relic_reward.gd")
 const Treasure = preload("res://script/scenes/treasure/treasure.gd")
 
 const SHELF_TEXTURE = preload("res://assets/ui/shop/shelf.svg")
-const BAG_BACK_TEXTURE = preload("res://assets/ui/jailer/bag_back.svg")
-const BAG_FRONT_TEXTURE = preload("res://assets/ui/jailer/bag_front.svg")
 const PROPS_MATERIAL = preload("res://script/scenes/jailer/jailer_props_material.tres")
 const PIXEL_FONT = preload("res://script/ui/fonts/pxelfont/PixelifySans-VariableFont_wght.ttf")
 const GOLD := SkillDetailPopup.GOLD
 const NO_OUTLINE := Color(1, 1, 0, 0)
-const PREVIEW_ARROW := ">"
 
 ## Preise: grob ein Kampf bringt 10-30 EP, ein Biom also etwa 100-150 EP.
 ## Elemente sind die günstigste Ware, damit sich ein zweites Element früh lohnt. Edelsteine steigen
@@ -260,26 +257,14 @@ class MonField extends RewardDialog.DropTarget:
 
 	## Aktueller Stand; drag (Ware in der Hand oder angeklickt) zeigt dazu, was sich ändern würde
 	func show_preview(drag: Dictionary) -> void:
-		for chip in _chips.get_children():
-			_chips.remove_child(chip)
-			chip.queue_free()
-		RewardDialog.add_element_chip(_chips, mon._type)
-		if drag.has("element") and not ColorMap.has_element(mon._type, drag.element):
-			var arrow := Label.new()
-			arrow.text = PREVIEW_ARROW
-			arrow.add_theme_font_override("font", PIXEL_FONT)
-			arrow.add_theme_color_override("font_color", GOLD)
-			arrow.add_theme_color_override("font_outline_color", Color.BLACK)
-			arrow.add_theme_constant_override("outline_size", 4)
-			_chips.add_child(arrow)
-			RewardDialog.add_element_chip(_chips, ColorMap.add_element(mon._type, drag.element))
+		RewardDialog.show_element_preview(_chips, mon, drag)
 		for stat in _stat_labels:
 			var label: Label = _stat_labels[stat]
 			var value: int = roundi(mon.call(STAT_GETTERS[stat]))
 			var boosted: bool = drag.get("stat", "") == stat
 			label.text = "%s %d" % [tr(GemField.STATS[stat].stat), value]
 			if boosted:
-				label.text += " %s %d" % [PREVIEW_ARROW, value + drag.bonus]
+				label.text += " %s %d" % [RewardDialog.PREVIEW_ARROW, value + drag.bonus]
 			label.add_theme_color_override("font_color", GOLD if boosted else IronPlate.TEXT_COLOR)
 
 	## Hat gerade etwas bekommen: kurz golden aufleuchten und wachsen
@@ -296,10 +281,10 @@ class MonField extends RewardDialog.DropTarget:
 ## Offene Tasche in der Mitte, auf der Plakette steht das Geld. Ablegeziel für Relikte.
 class ShopBag extends RewardDialog.DropTarget:
 	const BAG_SIZE := Vector2(208, 196)
-	const PLAQUE_CENTER := Vector2(0.5, 0.73)
 	const FONT_SIZE := 19
 
 	var money: Label
+	var _art: OpenBag
 	var _pop: Tween
 
 	func _init(owner_dialog: RewardDialog) -> void:
@@ -312,24 +297,17 @@ class ShopBag extends RewardDialog.DropTarget:
 		add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 		var holder := Control.new()
 		add_child(holder)
-		for texture in [BAG_BACK_TEXTURE, BAG_FRONT_TEXTURE]:
-			var layer := RewardDialog.texture_icon(texture) as TextureRect
-			layer.size = BAG_SIZE
-			layer.material = PROPS_MATERIAL
-			holder.add_child(layer)
-		money = Label.new()
-		money.add_theme_font_override("font", PIXEL_FONT)
-		money.add_theme_font_size_override("font_size", FONT_SIZE)
-		money.add_theme_color_override("font_color", GOLD)
-		money.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		money.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		money.size = Vector2(80, 44)
-		money.position = BAG_SIZE * PLAQUE_CENTER - money.size / 2
-		holder.add_child(money)
+		_art = OpenBag.new(BAG_SIZE, null, Vector2.ZERO, FONT_SIZE)
+		holder.add_child(_art)
+		money = _art.label
 		RewardDialog.ignore_mouse_below(self)
 
 	func covers(global_point: Vector2) -> bool:
 		return get_global_rect().has_point(global_point)
+
+	## Golden, solange ein Relikt gezogen wird oder angeklickt ist
+	func set_gold(gold: bool) -> void:
+		_art.set_gold(gold)
 
 	func celebrate() -> void:
 		if _pop:
@@ -515,9 +493,7 @@ func _fill_shelves() -> void:
 	var elements: Array = Treasure.ELEMENTS
 	for i in elements.size():
 		_filling_shelf = SHELF_POTIONS_LEFT if i < elements.size() / 2 else SHELF_POTIONS_RIGHT
-		var card := Treasure.add_potion_card(self, elements[i])
-		card.drag.element = elements[i]
-		set_price(card, ELEMENT_PRICE, true)
+		set_price(Treasure.add_potion_card(self, elements[i]), ELEMENT_PRICE, true)
 	_filling_shelf = SHELF_GEMS
 	_add_gem_offers()
 	_filling_shelf = SHELF_RELICS
@@ -586,9 +562,11 @@ func _update_previews() -> void:
 		drag = _dragged.drag
 	elif _selected:
 		drag = _selected.drag
-	var buyers := [] if drag.is_empty() or drag.get("bag", false) else _buyers(drag)
+	var into_bag: bool = drag.get("bag", false)
+	var buyers := [] if drag.is_empty() or into_bag else _buyers(drag)
 	for field in _mon_fields:
 		field.show_preview(drag if buyers.has(field.mon) else {})
+	_bag.set_gold(into_bag)
 
 ## Monster, die diese Ware bekommen können
 func _buyers(drag: Dictionary) -> Array:

@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dh2ojcafocmeo"]
 
 [ext_resource type="Shader" uid="uid://be467lblpkpfs" path="res://script/ui/shader/living_pixels.gdshader" id="1_lp"]
 

@@ -12,8 +12,7 @@ const BG_TOP := Color(0.560784, 0.301961, 0.85098, 1)
 const MISSING_COLOR := Color(1, 0.45, 0.45)
 const MAP_BACKGROUND := preload("res://script/scenes/world_map/map_background.gdshader")
 const BATTLE_CARD := preload("res://script/scenes/battle/battle_card.tscn")
-const GO_ICON := preload("res://assets/ui/icons/arrow_go.svg")
-const GO_BUTTON_SIZE := Vector2(192, 96)
+const GO_ICON := preload("res://assets/ui/icons/check_go.svg")
 const GRID_SEPARATION := 16
 const EMPTY_SLOT_COLOR := Color(0.2, 0.2, 0.22, 0.85)
 const EMPTY_SLOT_BORDER := Color(0.36, 0.36, 0.38)
@@ -91,13 +90,16 @@ func _build() -> void:
 	content.add_theme_constant_override("separation", 40)
 	margin.add_child(content)
 
-	# links: oben das gewählte Monster, darunter die Karte der angeklickten Attacke
+	# links: oben im Rahmen das gewählte Monster mit Typ und Werten, darunter frei die Karte der angeklickten Attacke
+	var left := VBoxContainer.new()
+	left.add_theme_constant_override("separation", GRID_SEPARATION)
+	content.add_child(left)
 	var mon_box := VBoxContainer.new()
 	mon_box.custom_minimum_size = Vector2(300, 0)
 	mon_box.add_theme_constant_override("separation", 4)
 	var mon_panel := PanelContainer.new()
 	IronPlate.frame(mon_panel, mon_box, 16, 16)
-	content.add_child(mon_panel)
+	left.add_child(mon_panel)
 	var texture := TextureRect.new()
 	Monmap.show_on(texture, _mon._name, Monmap.MEDIUM)
 	texture.material = Monmap.LIVING_MATERIAL
@@ -111,6 +113,7 @@ func _build() -> void:
 	chip_row.custom_minimum_size.y = 32
 	RewardDialog.add_element_chip(chip_row, _mon._type)
 	mon_box.add_child(chip_row)
+	mon_box.add_child(StatsGrid.stacked_for(_mon))
 
 	_detail_card = BATTLE_CARD.instantiate()
 	_detail_card.custom_minimum_size = Vector2(220, 200)
@@ -118,11 +121,11 @@ func _build() -> void:
 	_detail_card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_detail_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_detail_card.visible = false
-	mon_box.add_child(_detail_card)
+	left.add_child(_detail_card)
 	_detail_note = _label(tr("CONFIGURATOR_PICK_HINT"), 14, TEXT_COLOR)
 	_detail_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_detail_note.custom_minimum_size = Vector2(300, 0)
-	mon_box.add_child(_detail_note)
+	left.add_child(_detail_note)
 
 	# rechts: oben Zähler und Aufbruch, darunter die feste Box, darunter die scrollbare Auswahl
 	var right := VBoxContainer.new()
@@ -176,7 +179,6 @@ func _build_top_row() -> Control:
 	IronPlate.frame(counter_panel, _counter_label, 16, 10)
 	row.add_child(counter_panel)
 	_go_button = RewardDialog.icon_button(GO_ICON)
-	_go_button.custom_minimum_size = GO_BUTTON_SIZE
 	_go_button.tooltip_text = tr("CONFIGURATOR_GO")
 	_go_button.focus_mode = Control.FOCUS_NONE
 	_go_button.pressed.connect(_on_go_pressed)
