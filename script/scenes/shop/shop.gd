@@ -1,8 +1,8 @@
 extends ShopDialog
 
 ## Laden als freie Bühne im Stil des Kerkermeisters: in der Mitte die Selbstzahler-Kasse mit Sprechblase,
-## links und rechts Regale mit der Ware und Schildern, unten in den Ecken die eigenen Monster von
-## hinten samt Typ und Werten, dazwischen die Tasche mit dem Geld.
+## links und rechts Regale mit der Ware und Schildern, unten links die eigenen Monster von hinten
+## samt Typ und Werten in gleich großen Feldern, unter der Kasse die Tasche mit dem Geld.
 ## Tränke und Edelsteine zieht man auf ein Monster, Relikte in die Tasche; abgelegt ist die Ware gekauft.
 ## Tränke gibt es beliebig oft, Edelsteine und Relikte nur einmal. Beim Ziehen und bei angeklickter Ware
 ## zeigen die Monster, was sich ändern würde. Ein Klick auf eine Ware öffnet ihre Beschreibung,
@@ -61,6 +61,11 @@ const BUBBLE_LEFT := 142.0
 const BUBBLE_TOP := 416.0
 const POPUP_TOP := 8.0
 const BAG_OVERHANG := 26.0
+
+## Monster-Felder unten links: so weit endet die Bühne vor dem Bildschirmrand, so weit bleiben die Felder davon weg
+const STAGE_MARGIN := 24.0
+const FIELD_SCREEN_GAP := 8.0
+const FIELD_SPACING := 4.0
 
 ## Sprechblase: Anzeigedauer pro Satz, danach der Dank
 const LINE_BASE_SECONDS := 2.5
@@ -173,34 +178,33 @@ class ShelfItem extends RewardDialog.RewardCard:
 		_tag.position = Vector2(0, ART_SIZE.y + SHELF_HEIGHT / 2)
 		size = Vector2(width, _tag.position.y + _tag.size.y)
 
-## Eigenes Monster in einer unteren Ecke: groß von hinten, daneben Name, Typ und Werte.
-## Die ganze Fläche ist Ablegeziel, sie wird aber nur über Monster und Werten getroffen.
-class MonCorner extends RewardDialog.DropTarget:
-	const CORNER_SIZE := Vector2(590, 450)
-	const IMAGE_SIZE := 440.0
-	## so weit ragt die Ecke aus dem Bild
-	const OVERHANG := Vector2(90, 44)
-	## Werte-Block, Abstand zur Außenkante des Bildschirms
-	const BLOCK_EDGE := 205.0
-	const BLOCK_SIZE := Vector2(320, 104)
-	const NAME_FONT_SIZE := 20
-	const STAT_FONT_SIZE := 17
+## Eigenes Monster unten links, immer gleich groß: links das Bild von hinten, daneben oben Name und Typ,
+## darunter die Werte. Das ganze Feld ist Ablegeziel.
+class MonField extends RewardDialog.DropTarget:
+	const FIELD_SIZE := Vector2(504, 128)
+	const IMAGE_SIZE := 128.0
+	## Name und Typ oben, Werte unten, beide rechts neben dem Bild
+	const BLOCK_LEFT := 132.0
+	const HEAD_HEIGHT := 44.0
+	const STATS_HEIGHT := 78.0
+	const BLOCK_SPACING := 6.0
+	const NAME_FONT_SIZE := 16
+	const STAT_FONT_SIZE := 18
 	const STAT_COLUMNS := 3
 	const STAT_GETTERS := {"hp": "hp", "atk": "attack", "def": "defense", "s_atk": "s_attack", "s_def": "s_defense", "speed": "speed"}
 
 	var _image: TextureRect
-	var _block: VBoxContainer
 	var _chips: HBoxContainer
 	var _stat_labels := {}
 	var _pop: Tween
 
-	func _init(owner_dialog: RewardDialog, monster: Monster, left: bool) -> void:
+	func _init(owner_dialog: RewardDialog, monster: Monster) -> void:
 		dialog = owner_dialog
 		mon = monster
 		# Klicks gehen durch bis zum Boden (_on_floor_input), Ablegen klappt trotzdem
 		mouse_filter = Control.MOUSE_FILTER_PASS
-		custom_minimum_size = CORNER_SIZE
-		size = CORNER_SIZE
+		custom_minimum_size = FIELD_SIZE
+		size = FIELD_SIZE
 		add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 		var holder := Control.new()
 		add_child(holder)
@@ -208,39 +212,39 @@ class MonCorner extends RewardDialog.DropTarget:
 		_image = RewardDialog.texture_icon(Monmap.texture(monster._name, IMAGE_SIZE, true)) as TextureRect
 		_image.material = Monmap.LIVING_MATERIAL
 		_image.size = Vector2(IMAGE_SIZE, IMAGE_SIZE)
-		_image.position = Vector2(0.0 if left else CORNER_SIZE.x - IMAGE_SIZE, CORNER_SIZE.y - IMAGE_SIZE)
 		_image.pivot_offset = Vector2(IMAGE_SIZE / 2, IMAGE_SIZE)
 		holder.add_child(_image)
 
-		_block = VBoxContainer.new()
-		_block.alignment = BoxContainer.ALIGNMENT_END
-		_block.add_theme_constant_override("separation", 6)
-		_block.size = BLOCK_SIZE
-		var edge := OVERHANG.x + BLOCK_EDGE
-		_block.position = Vector2(edge if left else CORNER_SIZE.x - edge - BLOCK_SIZE.x, CORNER_SIZE.y - OVERHANG.y - BLOCK_SIZE.y - 6)
-		holder.add_child(_block)
-
+		var block_width := FIELD_SIZE.x - BLOCK_LEFT
+		var head_plate := PanelContainer.new()
+		head_plate.position = Vector2(BLOCK_LEFT, 0)
+		head_plate.size = Vector2(block_width, HEAD_HEIGHT)
 		var head := HBoxContainer.new()
-		head.add_theme_constant_override("separation", 10)
+		head.add_theme_constant_override("separation", 6)
+		IronPlate.frame(head_plate, head, 8, 4)
 		var name_label := Label.new()
 		name_label.text = Helper.mon_display_name(monster._name)
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_label.clip_text = true
+		name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		name_label.add_theme_font_override("font", PIXEL_FONT)
 		name_label.add_theme_font_size_override("font_size", NAME_FONT_SIZE)
-		name_label.add_theme_color_override("font_outline_color", Color.BLACK)
-		name_label.add_theme_constant_override("outline_size", 5)
+		name_label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 		head.add_child(name_label)
 		_chips = HBoxContainer.new()
-		_chips.add_theme_constant_override("separation", 6)
-		_chips.custom_minimum_size.y = 32
+		_chips.add_theme_constant_override("separation", 4)
 		head.add_child(_chips)
-		_block.add_child(head)
+		holder.add_child(head_plate)
 
-		var plate := PanelContainer.new()
+		var stats_plate := PanelContainer.new()
+		stats_plate.position = Vector2(BLOCK_LEFT, HEAD_HEIGHT + BLOCK_SPACING)
+		stats_plate.size = Vector2(block_width, STATS_HEIGHT)
 		var grid := GridContainer.new()
 		grid.columns = STAT_COLUMNS
+		grid.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		grid.add_theme_constant_override("h_separation", 6)
 		grid.add_theme_constant_override("v_separation", 0)
-		IronPlate.frame(plate, grid, 10, 7)
+		IronPlate.frame(stats_plate, grid, 10, 7)
 		for stat in GemField.STATS:
 			var label := Label.new()
 			label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -248,16 +252,13 @@ class MonCorner extends RewardDialog.DropTarget:
 			label.add_theme_font_size_override("font_size", STAT_FONT_SIZE)
 			grid.add_child(label)
 			_stat_labels[stat] = label
-		_block.add_child(plate)
+		holder.add_child(stats_plate)
 
 		RewardDialog.ignore_mouse_below(self)
 		show_preview({})
 
 	func covers(global_point: Vector2) -> bool:
-		return _image.get_global_rect().has_point(global_point) or _block.get_global_rect().has_point(global_point)
-
-	func _has_point(point: Vector2) -> bool:
-		return covers(get_global_transform() * point)
+		return get_global_rect().has_point(global_point)
 
 	## Aktueller Stand; drag (Ware in der Hand oder angeklickt) zeigt dazu, was sich ändern würde
 	func show_preview(drag: Dictionary) -> void:
@@ -413,7 +414,7 @@ var _item_layer: Control
 var _shelves: Array[Dictionary] = []
 ## Regal, auf dem die nächste Ware landet
 var _filling_shelf := 0
-var _corners: Array[MonCorner] = []
+var _mon_fields: Array[MonField] = []
 var _bag: ShopBag
 var _bubble: SpeechBubble
 var _popup: ItemPopup
@@ -460,9 +461,9 @@ func _build_stage() -> void:
 		_stage.add_child(shelf)
 		_shelves.append({"layout": layout, "image": shelf, "items": []})
 	for i in mini(State.mons.size(), 2):
-		var corner := MonCorner.new(self, State.mons[i], i == 0)
-		_stage.add_child(corner)
-		_corners.append(corner)
+		var field := MonField.new(self, State.mons[i])
+		_stage.add_child(field)
+		_mon_fields.append(field)
 	_item_layer = Control.new()
 	_item_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_stage.add_child(_item_layer)
@@ -488,11 +489,11 @@ func _layout_stage() -> void:
 	checkout_image.pivot_offset = Vector2(checkout_image.size.x / 2, CHECKOUT_BOTTOM * checkout_image.size.y)
 	for shelf in _shelves:
 		_layout_shelf(shelf, center_x)
-	for i in _corners.size():
-		var corner := _corners[i]
-		var overhang := MonCorner.OVERHANG + Vector2(24, 24)
-		corner.position.y = area.y + overhang.y - MonCorner.CORNER_SIZE.y
-		corner.position.x = -overhang.x if i == 0 else area.x + overhang.x - MonCorner.CORNER_SIZE.x
+	# von unten gestapelt: ein einzelnes Monster bleibt gleich groß und steht ganz unten
+	var field_bottom := area.y + STAGE_MARGIN - FIELD_SCREEN_GAP
+	for i in _mon_fields.size():
+		var row := _mon_fields.size() - i
+		_mon_fields[i].position = Vector2(FIELD_SCREEN_GAP - STAGE_MARGIN, field_bottom - row * MonField.FIELD_SIZE.y - (row - 1) * FIELD_SPACING)
 	_bag.position = Vector2(center_x - ShopBag.BAG_SIZE.x / 2, area.y + BAG_OVERHANG - ShopBag.BAG_SIZE.y)
 	_bubble.position = Vector2(center_x + BUBBLE_LEFT + SpeechBubble.TAIL_SIZE.x, BUBBLE_TOP)
 	_exit_button.position = Vector2(area.x - ICON_BUTTON_SIZE.x, 0)
@@ -602,8 +603,8 @@ func _update_previews() -> void:
 	elif _selected:
 		drag = _selected.drag
 	var buyers := [] if drag.is_empty() or drag.get("bag", false) else _buyers(drag)
-	for corner in _corners:
-		corner.show_preview(drag if buyers.has(corner.mon) else {})
+	for field in _mon_fields:
+		field.show_preview(drag if buyers.has(field.mon) else {})
 
 ## Monster, die diese Ware bekommen können
 func _buyers(drag: Dictionary) -> Array:
@@ -668,9 +669,9 @@ func _jump_for_joy() -> void:
 func _taken(card: RewardCard) -> void:
 	var mouse := get_global_mouse_position()
 	pay(card)
-	for corner in _corners:
-		if corner.covers(mouse):
-			corner.celebrate()
+	for field in _mon_fields:
+		if field.covers(mouse):
+			field.celebrate()
 	if card.drag.get("bag", false):
 		_bag.celebrate()
 	_jump_for_joy()
@@ -689,8 +690,8 @@ func _build_targets(card: RewardCard) -> void:
 	var into_bag: bool = card.drag.get("bag", false)
 	_bag.locked = not into_bag
 	var buyers := [] if into_bag else _buyers(card.drag)
-	for corner in _corners:
-		corner.locked = not buyers.has(corner.mon)
+	for field in _mon_fields:
+		field.locked = not buyers.has(field.mon)
 	if not into_bag and buyers.is_empty():
 		_interrupt(tr("REWARD_NO_TARGET"))
 	_update_previews()
@@ -705,7 +706,7 @@ func _hide_targets() -> void:
 	_update_previews()
 
 func _drop_targets() -> Array:
-	var targets: Array = _corners.duplicate()
+	var targets: Array = _mon_fields.duplicate()
 	targets.append(_bag)
 	return targets
 
