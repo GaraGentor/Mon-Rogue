@@ -2,6 +2,7 @@ extends ChestRewardDialog
 
 ## Edelstein-Feld: drei Edelsteine zur Wahl, der gewählte erhöht einen Wert eines eigenen
 ## Monsters um feste Punkte für den restlichen Run. Pro Biom-Tiefe werden die Steine stärker.
+## Als Beute aus dem Kampf kommt nur ein einzelner Stein (gem_choices, siehe world_map.gd).
 
 const GEM_CHOICES := 3
 const ACCENT := Color(0.2, 0.6, 0.65)
@@ -25,10 +26,11 @@ const COUNT_FONT_SIZE := 16
 ## noch nicht gesammelte Steine treten zurück
 const NO_GEM_ALPHA := 0.35
 
+var gem_choices := GEM_CHOICES
 var _bonus: int
 
 func _ready() -> void:
-	use_chest_layout()
+	use_chest_layout(BAG_TEXTURE)
 	set_accent(ACCENT)
 	set_title(tr("GEM_CHOOSE"))
 	set_drag_hint("GEM_HINT")
@@ -37,7 +39,7 @@ func _ready() -> void:
 	_bonus = BONUS_BY_DEPTH[clampi(State.map_level, 0, BONUS_BY_DEPTH.size() - 1)]
 	var stats = STATS.keys()
 	stats.shuffle()
-	for stat in stats.slice(0, GEM_CHOICES):
+	for stat in stats.slice(0, gem_choices):
 		add_gem_card(self, stat, _bonus)
 	play_chest_intro()
 

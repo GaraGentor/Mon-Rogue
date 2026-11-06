@@ -1,12 +1,14 @@
 class_name ChestRewardDialog
 extends RewardDialog
 
-## Belohnungs-Dialog mit Schatzkiste (Edelstein-Feld, Schatz, Relic-Auswahl): statt der Kartenspalte
-## springt links eine Truhe auf, die Preise fliegen heraus, die Truhe verschwindet, ein Teppich kommt
+## Belohnungs-Dialog mit Behälter (Edelstein-Feld: Beutel, Schatz: Truhe, Relic-Auswahl: Kiste): statt der
+## Kartenspalte springt links der Behälter auf, die Preise fliegen heraus, er verschwindet, ein Teppich kommt
 ## von unten und die Preise fallen darauf. Von dort werden sie wie gewohnt auf die Ziele gezogen.
 ## Ablauf im _ready() der Unterklasse: erst use_chest_layout(), zuletzt play_chest_intro().
 
 const CHEST_TEXTURE = preload("res://assets/ui/rewards/reward_chest.png")
+const BAG_TEXTURE = preload("res://assets/ui/rewards/bag.png")
+const BOX_TEXTURE = preload("res://assets/ui/rewards/box.png")
 const RUG_TEXTURE = preload("res://assets/ui/rewards/rug.png")
 ## abgedunkelt, damit der goldene Text darauf lesbar bleibt
 const RUG_TINT := Color(0.55, 0.55, 0.55)
@@ -20,6 +22,7 @@ const LOOT_SPOTS := {
 	1: [Vector2(0.5, 0.5)],
 	2: [Vector2(0.3, 0.38), Vector2(0.7, 0.62)],
 	3: [Vector2(0.3, 0.3), Vector2(0.7, 0.33), Vector2(0.5, 0.72)],
+	4: [Vector2(0.28, 0.28), Vector2(0.72, 0.28), Vector2(0.28, 0.72), Vector2(0.72, 0.72)],
 }
 ## so weit weicht ein Preis zufällig von seinem Platz ab, ohne die anderen zu berühren
 const LOOT_JITTER := 0.025
@@ -35,7 +38,7 @@ var _chest: TextureRect
 var _rug: TextureRect
 var _loot: Array[RewardCard] = []
 
-func use_chest_layout() -> void:
+func use_chest_layout(container_texture: Texture2D = CHEST_TEXTURE) -> void:
 	use_map_layout()
 	_stage = Control.new()
 	_stage.custom_minimum_size.x = STAGE_WIDTH
@@ -48,7 +51,7 @@ func use_chest_layout() -> void:
 	_rug.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	_rug.visible = false
 	_rug.modulate = RUG_TINT
-	_chest = _stage_image(CHEST_TEXTURE)
+	_chest = _stage_image(container_texture)
 
 func _stage_image(texture: Texture2D) -> TextureRect:
 	var image := texture_icon(texture) as TextureRect
@@ -105,24 +108,32 @@ func play_chest_intro() -> void:
 		card.info.modulate.a = 0.0
 		card.position = stage_size * Vector2(0.5, CHEST_MOUTH_Y) - card.size / 2
 	await _pop_chest(stage_size)
+	await _wait_before_burst()
 	await _burst_loot(stage_size)
 	await _swap_chest_for_rug(stage_size)
 	await _drop_loot(stage_size)
 	for card in _loot:
 		card.mouse_filter = Control.MOUSE_FILTER_STOP
 
+## Der Behälter steht schon da, die Preise bleiben noch drin (Schatz: bis der Schlüssel benutzt wurde)
+func _wait_before_burst() -> void:
+	pass
+
 func _pop_chest(stage_size: Vector2) -> void:
 	var chest_size := Vector2.ONE * stage_size.y * CHEST_HEIGHT
 	_chest.size = chest_size
 	_chest.position = Vector2((stage_size.x - chest_size.x) / 2, stage_size.y - chest_size.y)
-	_chest.pivot_offset = Vector2(chest_size.x / 2, chest_size.y)
-	_chest.scale = Vector2.ZERO
-	var tween := create_tween()
-	tween.tween_property(_chest, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	# Wackeln, bevor sie aufplatzt
+	await pop_container(_chest).finished
+
+## Behälter springt von unten auf und wackelt, bevor er aufplatzt; auch für das Couvert beim Trainer
+static func pop_container(image: Control) -> Tween:
+	image.pivot_offset = Vector2(image.size.x / 2, image.size.y)
+	image.scale = Vector2.ZERO
+	var tween := image.create_tween()
+	tween.tween_property(image, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	for angle in [-3.0, 3.0, -2.0, 0.0]:
-		tween.tween_property(_chest, "rotation_degrees", angle, 0.07)
-	await tween.finished
+		tween.tween_property(image, "rotation_degrees", angle, 0.07)
+	return tween
 
 func _burst_loot(stage_size: Vector2) -> void:
 	var tween := create_tween().set_parallel()

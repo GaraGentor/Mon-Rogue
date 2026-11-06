@@ -8,6 +8,9 @@ extends ShopDialog
 ## Links liegen die Karten geneigt und überlappend in zwei Reihen. Ein Klick richtet eine Karte auf
 ## und schiebt die anderen ihrer Reihe zur Seite. Rechts hält der Trainer die eigenen Monster auf
 ## seinen Platten; ein Klick auf ein Monster öffnet dessen Skills über den Karten.
+##
+## Mit reward_mode ist das die Skill-Auswahl aus dem Couvert der Bosse: drei einzigartige Skills ohne Preis,
+## erst öffnet sich das Couvert, nach dem ersten gelernten Skill ist der Dialog vorbei.
 
 ## Monster auf der Platte: Ablegeziel für Karten, per Klick auswählbar
 class PlateMon extends RewardDialog.DropTarget:
@@ -36,6 +39,10 @@ class PlateMon extends RewardDialog.DropTarget:
 		_tween = create_tween()
 		_tween.tween_property(self, "scale", SELECTED_SCALE if selected else Vector2.ONE, SELECT_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
+const ENVELOPE_TEXTURE = preload("res://assets/ui/rewards/envelop.png")
+## Couvert im Anteil der kleineren Seite des Kartentischs
+const ENVELOPE_SIZE := 0.7
+const ENVELOPE_VANISH_SECONDS := 0.3
 ## Tasche oben links, zeigt die Essenz (wie die Boss Tränen beim Kerkermeister), nur zur Anzeige
 const BAG_SIZE := Vector2(104, 98)
 const ESSENCE_SIZE := Vector2(34, 34)
@@ -90,6 +97,8 @@ const BUBBLE_TAIL := 18.0
 ## Trainerbild aus der Szene, dort lassen sich auch die Shader-Werte einstellen
 @export var trainer_image: TextureRect
 
+## Skill-Auswahl aus dem Couvert statt Verkauf, vor dem Hinzufügen zum Baum setzen
+var reward_mode := false
 ## gerade offene Auswahl, welcher Skill vergessen wird (null = keine)
 var _picker: SkillReplacePicker
 var _left_side: Control
@@ -108,9 +117,9 @@ func _ready() -> void:
 	use_scene_layout(background)
 	_title.visible = false
 	_build_sides()
-	set_drag_hint("TRAINER_HINT")
-	set_card_layout(CARD_COLUMNS, TRAINER_CARD_SIZE, true)
-	for skill in _pick_offers():
+	set_drag_hint("SKILL_REWARD_HINT" if reward_mode else "TRAINER_HINT")
+	set_card_layout(Skills.REWARD_SKILL_OFFERS if reward_mode else CARD_COLUMNS, TRAINER_CARD_SIZE, true)
+	for skill in Skills.reward_offers() if reward_mode else _pick_offers():
 		_add_skill_card(skill)
 	_build_top_bar()
 	_first_layout()
@@ -129,7 +138,7 @@ func _build_top_bar() -> void:
 	gap.mouse_filter = MOUSE_FILTER_IGNORE
 	bar.add_child(gap)
 	var exit_button := icon_button(EXIT_ICON)
-	exit_button.tooltip_text = tr("SHOP_FINISH")
+	exit_button.tooltip_text = tr("SKILL_REWARD_SKIP" if reward_mode else "SHOP_FINISH")
 	exit_button.size_flags_vertical = SIZE_SHRINK_BEGIN
 	exit_button.pressed.connect(close)
 	bar.add_child(exit_button)
@@ -191,7 +200,29 @@ func _first_layout() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_layout_cards()
+	if reward_mode:
+		await _open_envelope()
 	create_tween().tween_property(_card_layer, "modulate:a", 1.0, 0.15)
+
+## Wie die Behälter der anderen Belohnungen: das Couvert springt auf, wackelt und verschwindet, dann liegen die Karten da.
+## Die Fläche darunter fängt solange die Maus ab, damit noch nichts gezogen werden kann.
+func _open_envelope() -> void:
+	var cover := Control.new()
+	cover.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	_left_side.add_child(cover)
+	var area := _left_side.size
+	var envelope := texture_icon(ENVELOPE_TEXTURE)
+	envelope.material = Monmap.LIVING_MATERIAL
+	envelope.mouse_filter = MOUSE_FILTER_IGNORE
+	envelope.size = Vector2.ONE * minf(area.x, area.y) * ENVELOPE_SIZE
+	envelope.position = (area - envelope.size) / 2
+	cover.add_child(envelope)
+	await ChestRewardDialog.pop_container(envelope).finished
+	var vanish := create_tween().set_parallel()
+	vanish.tween_property(envelope, "modulate:a", 0.0, ENVELOPE_VANISH_SECONDS)
+	vanish.tween_property(envelope, "scale", Vector2(0.8, 0.8), ENVELOPE_VANISH_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await vanish.finished
+	cover.queue_free()
 
 func _layout_stage() -> void:
 	var texture_size := trainer_image.texture.get_size()
@@ -223,8 +254,8 @@ func _layout_cards(animate := false) -> void:
 	var card_size := TRAINER_CARD_SIZE
 	for card in _cards:
 		card_size.y = maxf(card_size.y, card.get_combined_minimum_size().y)
-	var rows := ceili(_cards.size() / float(CARD_COLUMNS))
-	var fit_x := (area.x - TILT_MARGIN) / (card_size.x * (CARD_COLUMNS - (CARD_COLUMNS - 1) * CARD_OVERLAP))
+	var rows := ceili(_cards.size() / float(_card_columns))
+	var fit_x := (area.x - TILT_MARGIN) / (card_size.x * (_card_columns - (_card_columns - 1) * CARD_OVERLAP))
 	var fit_y := (area.y - TILT_MARGIN) / (card_size.y * (rows - (rows - 1) * ROW_OVERLAP))
 	var base_scale := minf(fit_x, fit_y)
 	var focus_scale := minf(base_scale * FOCUS_ZOOM, area.y / card_size.y)
@@ -237,7 +268,7 @@ func _layout_cards(animate := false) -> void:
 	if animate:
 		_card_tween = create_tween().set_parallel().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	for row in rows:
-		var cards := _cards.slice(row * CARD_COLUMNS, (row + 1) * CARD_COLUMNS)
+		var cards := _cards.slice(row * _card_columns, (row + 1) * _card_columns)
 		var focused: int = cards.find(_focused_card)
 		var centers := _row_centers(cards.size(), focused, scaled.x, card_size.x * focus_scale, area.x)
 		for i in cards.size():
@@ -332,12 +363,16 @@ func _make_drag_preview(card: RewardCard) -> Control:
 
 ## Gekaufte Karte verschwindet, die übrigen rücken zusammen
 func pay(card: RewardCard) -> void:
+	var skill_name: String = card.drag.skill.name
 	super(card)
 	_price_labels.erase(card)
 	_cards.erase(card)
 	_card_layer.remove_child(card)
 	card.queue_free()
 	_set_focus(null)
+	if reward_mode:
+		State.taught_reward_skills.append(skill_name)
+		close()
 
 func _on_table_input(event: InputEvent) -> void:
 	if _focused_card and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -417,7 +452,7 @@ func _add_skill_card(skill: Dictionary) -> void:
 	var element_name = tr(ColorMap.get_combo(skill.nature).label)
 	var stats := "%s · %s" % [tr("CONFIGURATOR_TIER").format({"tier": skill.get("tier", 1)}),
 		tr("CONFIGURATOR_SKILL_STATS").format({"cost": skill.cost, "cooldown": skill.cooldown}).trim_suffix(" ·")]
-	var text = tr(skill.description).format({"value": roundi(skill.value)}) + "\n" + tr("TRAINER_ELEMENT").format({"element": element_name}) + "\n" + stats
+	var text = Helper.skill_description(skill) + "\n" + tr("TRAINER_ELEMENT").format({"element": element_name}) + "\n" + stats
 	var learners := func(): return State.mons.filter(func(mon): return not Skills.knows_skill(mon, skill.name))
 	var card := add_mon_card(tr(skill.name), text, _portraits(skill), tr("TRAINER_CHOOSE_MON"), learners,
 		func(mon: Monster): _learn(_dragged, mon), _target_tooltip.bind(skill), {"no_target": tr("TRAINER_ALL_KNOW")})
@@ -430,7 +465,11 @@ func _add_skill_card(skill: Dictionary) -> void:
 	SkillCardPaper.attach(card, skill)
 	# Text nicht auf den Papierrahmen setzen
 	card.row.get_parent().add_theme_constant_override("margin_bottom", 14)
-	set_price(card, randi_range(skill.shop_cost.min, skill.shop_cost.max))
+	if reward_mode:
+		card.drag.price = 0
+		card.drag.repeatable = false
+	else:
+		set_price(card, randi_range(skill.shop_cost.min, skill.shop_cost.max))
 	card.tooltip_text = _fits_text(skill)
 	ignore_mouse_below(card)
 

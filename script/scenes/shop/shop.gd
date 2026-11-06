@@ -367,7 +367,7 @@ class ItemPopup extends PanelContainer:
 		copy.custom_minimum_size = ART_SIZE
 		_art_holder.add_child(copy)
 		_title.text = item.title
-		_price.text = Helper.me_text(item.drag.price)
+		_price.text = Helper.me_text(item.dialog.price_of(item))
 		_description.text = item.description
 		_hint.text = tr("SHOP_DETAIL_BAG" if item.drag.get("bag", false) else "SHOP_DETAIL_MON")
 		visible = true

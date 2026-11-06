@@ -17,6 +17,7 @@ extends Control
 @export var boss_shard_label: Label
 @export var money_label: Label
 @export var key_label: Label
+@export var coupon_label: Label
 @export var depth_level: Label
 @export var biome_path_label: RichTextLabel
 @export var team_bar: HBoxContainer
@@ -79,11 +80,13 @@ func _ready() -> void:
 	State.ep_changed.connect(change_ep_text)
 	State.boss_shards_changed.connect(monster_shard_changed)
 	State.keys_changed.connect(change_key_text)
+	State.coupons_changed.connect(change_coupon_text)
 	State.pos_changed.connect(change_position)
 
 	show_biome()
 	monster_shard_changed(State.boss_shards)
 	change_key_text(State.keys)
+	change_coupon_text(State.coupons)
 	weather = MapWeather.new()
 	weather.scroll_container = scroll_container
 	weather.z_index = -1
@@ -95,7 +98,7 @@ func _ready() -> void:
 	team_bar.dialog_parent = view_container
 
 	await get_tree().process_frame
-	if State.killed_monsters >= 1 or State.pending_ep > 0 or State.pending_keys > 0 or State.pending_relic_chest:
+	if State.killed_monsters >= 1 or State.has_pending_loot():
 		get_tree().change_scene_to_file("res://script/scenes/level_up/level_up.tscn")
 		return 
 	if State.is_boss_fight:
@@ -117,7 +120,7 @@ func _ready() -> void:
 	change_ep_text(State.ep)
 	if OS.is_debug_build():
 		add_debug_button()
-	show_relic_reward()
+	show_pending_rewards()
 
 # Nur in Debug-Builds: links neben dem Legenden-Button im Header
 func add_debug_button() -> void:
@@ -141,6 +144,7 @@ func _exit_tree() -> void:
 	State.ep_changed.disconnect(change_ep_text)
 	State.boss_shards_changed.disconnect(monster_shard_changed)
 	State.keys_changed.disconnect(change_key_text)
+	State.coupons_changed.disconnect(change_coupon_text)
 	State.pos_changed.disconnect(change_position)
 
 func set_map():
@@ -413,6 +417,9 @@ func change_ep_text(ep) -> void:
 func change_key_text(keys) -> void:
 	key_label.text = str(keys)
 
+func change_coupon_text(coupons) -> void:
+	coupon_label.text = str(coupons)
+
 # Name des aktuellen Bioms in seiner Farbe, dazu die Tiefe
 func show_biome(mask := State.current_biome()) -> void:
 	var biome = ColorMap.get_combo(mask)
@@ -439,11 +446,34 @@ func reset_animation_state(ele) -> void:
 	ele._ui_item.scale = Vector2(1,1)
 	ele._ui_item.modulate = PASSED_MODULATE
 
-# Relic-Auswahl nach einem Boss-Sieg, erst hier, damit Level-Up und Boss-Belohnung vorher durch sind
-func show_relic_reward() -> void:
-	if not State.pending_relic_reward:
+# Geloottes nacheinander abhandeln, erst hier, damit Level-Up und Boss-Belohnung vorher durch sind:
+# Relic-Kiste, Skill-Couvert, dann einzelne Edelsteine. Schließt ein Dialog, kommt der nächste.
+func show_pending_rewards() -> void:
+	var dialog := _next_pending_reward()
+	if dialog == null:
 		return
-	if Relics.get_unowned().is_empty():
+	dialog.tree_exited.connect(show_pending_rewards, CONNECT_DEFERRED | CONNECT_ONE_SHOT)
+	view_container.add_child(dialog)
+	dialog.visible = true
+
+func _next_pending_reward() -> Control:
+	if State.pending_relic_reward:
 		State.pending_relic_reward = false
-		return
-	view_container.add_child(RELIC_REWARD_SCENE.instantiate())
+		if not Relics.get_unowned().is_empty():
+			return RELIC_REWARD_SCENE.instantiate()
+	if State.pending_skill_reward:
+		State.pending_skill_reward = false
+		if not Skills.reward_offers().is_empty():
+			return skill_reward_dialog()
+	if State.pending_gem_rewards > 0:
+		State.pending_gem_rewards -= 1
+		var gem := GEM_SCENE.instantiate()
+		gem.gem_choices = 1
+		return gem
+	return null
+
+# Skill-Auswahl aus dem Couvert: die Ansicht des Trainers, nur mit den einzigartigen Skills und ohne Preise
+func skill_reward_dialog() -> Control:
+	var dialog := trainer_scene.instantiate()
+	dialog.reward_mode = true
+	return dialog

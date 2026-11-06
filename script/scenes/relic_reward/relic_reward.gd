@@ -7,8 +7,7 @@ const RELIC_CHOICES := 3
 const ACCENT := Color(0.55, 0.32, 0.75)
 
 func _ready() -> void:
-	State.pending_relic_reward = false
-	use_chest_layout()
+	use_chest_layout(BOX_TEXTURE)
 	set_accent(ACCENT)
 	set_title(tr("RELIC_REWARD_CHOOSE"))
 	set_drag_hint("RELIC_REWARD_HINT")

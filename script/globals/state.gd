@@ -45,8 +45,12 @@ var is_boss_fight: bool = false
 var is_final_boss: bool = false
 # Boss-Feld mitten auf der Karte: Kampf in Boss-Stärke, beendet das Biom aber nicht
 var is_map_boss: bool = false
-# Schatzkiste in die Tasche gezogen: beim nächsten Betreten der Karte die Relic-Auswahl zeigen (relic_reward.tscn)
+# Beute in die Tasche gezogen: beim nächsten Betreten der Karte nacheinander abhandeln (world_map.gd show_pending_rewards)
 var pending_relic_reward: bool = false
+var pending_skill_reward: bool = false
+var pending_gem_rewards: int = 0
+# Einzigartige Skills, die in diesem Run schon jemand gelernt hat, sie kommen kein zweites Mal (Skills.reward_offers)
+var taught_reward_skills: Array[String] = []
 
 # money
 signal ep_changed(ep)
@@ -64,12 +68,19 @@ var boss_shards: int = 0:
 		boss_shards = val
 		boss_shards_changed.emit(boss_shards)
 
-# Schlüssel des aktuellen Runs, ihr Zweck kommt später
+# Schlüssel des aktuellen Runs, öffnen Schatzkisten (treasure.gd)
 signal keys_changed(keys)
 var keys: int = 0:
 	set(val):
 		keys = val
 		keys_changed.emit(keys)
+
+# Rabatt-Gutscheine des aktuellen Runs, der nächste Kauf bei Shop oder Trainer verbraucht einen (ShopDialog.price_of)
+signal coupons_changed(coupons)
+var coupons: int = 0:
+	set(val):
+		coupons = val
+		coupons_changed.emit(coupons)
 
 
 var killed_monsters: int = 0
@@ -77,8 +88,25 @@ var killed_monsters: int = 0
 var pending_ep: int = 0
 # im Kampf gefundene Schlüssel, liegen genauso auf dem Schlachtfeld wie die Essenz
 var pending_keys: int = 0
-# nach einem Boss-Sieg: Schatzkiste auf dem Schlachtfeld, ohne sie in der Tasche gibt es kein Relic
+# Zufallsbeute besiegter Monster, liegt genauso auf dem Schlachtfeld
+var pending_gems: int = 0
+var pending_coupons: int = 0
+# nach einem Boss-Sieg: Kiste und Couvert auf dem Schlachtfeld, ohne sie in der Tasche gibt es weder Relic noch Skill
 var pending_relic_chest: bool = false
+var pending_skill_envelope: bool = false
+
+# Liegt noch etwas auf dem Schlachtfeld? Dann führt der Weg zur Karte erst über den Level-Up-Bildschirm.
+func has_pending_loot() -> bool:
+	return pending_ep > 0 or pending_keys > 0 or pending_gems > 0 or pending_coupons > 0 or pending_relic_chest or pending_skill_envelope
+
+# Was noch auf dem Schlachtfeld liegt, ist beim Weitergehen weg.
+func clear_pending_loot() -> void:
+	pending_ep = 0
+	pending_keys = 0
+	pending_gems = 0
+	pending_coupons = 0
+	pending_relic_chest = false
+	pending_skill_envelope = false
 
 # Run-Statistik für den Endbildschirm (run_end.gd). killed_monsters wird beim Level-Up verbraucht, daher eigene Zähler.
 var run_won := false
@@ -109,7 +137,7 @@ func _ready() -> void:
 func reset() -> void:
 	ep = 0
 	keys = 0
-	pending_keys = 0
+	coupons = 0
 	map_level = 0
 	biome_fight_index = 0
 	biome_path = []
@@ -125,13 +153,15 @@ func reset() -> void:
 	fainted_own_mons = []
 	fainted_enemy_mons = []
 	killed_monsters = 0
-	pending_ep = 0
+	clear_pending_loot()
 	current_map_position = NO_MAP_POSITION
 	is_boss_fight = false
 	is_final_boss = false
 	is_map_boss = false
 	pending_relic_reward = false
-	pending_relic_chest = false
+	pending_skill_reward = false
+	pending_gem_rewards = 0
+	taught_reward_skills = []
 	rolled_mon_stats = {}
 	defeated_mon_names = []
 	caught_mon_names = []

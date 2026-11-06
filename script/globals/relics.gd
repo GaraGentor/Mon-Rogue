@@ -17,7 +17,7 @@ extends Node
 
 signal relics_changed
 
-## Gewöhnliche Relics gibt es auch in Schätzen, seltene nur als Boss-Belohnung und im Shop
+## Relics gibt es als Boss-Belohnung und im Shop
 enum Rarity { COMMON, RARE }
 
 # var statt const: Lambdas sind keine konstanten Ausdrücke

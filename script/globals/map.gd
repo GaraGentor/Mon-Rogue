@@ -61,7 +61,7 @@ var max_cols = 3
 #var path = 
 
 var map_settings = {
-	0: {"paths":6, "special_nodes": 1, "bosses": [], "lines": 1, "tresures": [1], "shops": [], "trainers": [], "jailer": [], "gems": [3]},
+	0: {"paths":6, "special_nodes": 1, "bosses": [], "lines": 1, "tresures": [4], "shops": [], "trainers": [], "jailer": [], "gems": [3]},
 	1: {"paths":8, "special_nodes": 2, "bosses": [3], "lines": 2, "tresures": [1], "shops": [], "trainers": [5], "jailer": [], "gems": [6]},
 	2: {"paths":11, "special_nodes": 3, "bosses": [5], "lines": 2, "tresures": [2], "shops": [6], "trainers": [], "jailer": [0], "gems": [8]},
 	3: {"paths":14, "special_nodes": 4, "bosses": [7], "lines": 3, "tresures": [7], "shops": [5], "trainers": [8], "jailer": [2], "gems": [10]},
@@ -86,6 +86,10 @@ func roll_event() -> EVENT_TYPE:
 
 var all_nodes = []
 var starting_nodes = []
+
+# Felder, die man nie betreten muss (generate_optional_tiles), und was stattdessen entsteht, wenn es keine Alternative gibt
+const OPTIONAL_TYPES := [PATH_TYPE.TREASURE, PATH_TYPE.GEM]
+const SPECIAL_FALLBACKS := [PATH_TYPE.CAMP, PATH_TYPE.SHOP, PATH_TYPE.TRAINER, PATH_TYPE.JAILER, PATH_TYPE.EVENT]
 
 const MAX_BIOME_TIER = 4
 
@@ -212,10 +216,10 @@ func generate_grid(grid: Array):
 	generate_additional_nodes_per_path(grid)
 	generate_last_fire_camps(grid)
 	generate_hard_node_tiles(grid, "bosses", PATH_TYPE.BOSS)
-	generate_hard_node_tiles(grid, "tresures", PATH_TYPE.TREASURE)
 	generate_hard_node_tiles(grid, "shops", PATH_TYPE.SHOP)
 	generate_hard_node_tiles(grid, "trainers", PATH_TYPE.TRAINER)
-	generate_hard_node_tiles(grid, "gems", PATH_TYPE.GEM)
+	generate_optional_tiles(grid, "tresures", PATH_TYPE.TREASURE)
+	generate_optional_tiles(grid, "gems", PATH_TYPE.GEM)
 	generate_specials(grid)
 	print_new_map(grid)
 	State.current_map = grid
@@ -253,6 +257,8 @@ func generate_specials(grid: Array):
 			if all_nodes_that_can_be_transformed.size() >= 1:
 				var what_special_node = randi_range(1, PATH_TYPE.GEM)
 				var np = all_nodes_that_can_be_transformed.pick_random()
+				if OPTIONAL_TYPES.has(what_special_node) and not _has_alternative(grid, np):
+					what_special_node = SPECIAL_FALLBACKS.pick_random()
 				np._type = what_special_node
 
 func generate_hard_node_tiles(grid: Array, key, type):
@@ -262,6 +268,41 @@ func generate_hard_node_tiles(grid: Array, key, type):
 		var filtered_nodes = all_nodes.filter(func(_path:path): return _path._pos.y == hard_node_position)
 		for hard_to_set_node: path in filtered_nodes:
 			hard_to_set_node._type = type
+
+# Schatz und Edelstein-Feld sind nie Pflicht: pro Pfad wird nur eins von mehreren Feldern einer Zeile umgewandelt,
+# in der Zeile, die der Wunschposition am nächsten liegt. Ein Pfad ganz ohne Abzweigung bekommt keins.
+func generate_optional_tiles(grid: Array, key: String, type: PATH_TYPE) -> void:
+	for wanted_row in map_settings[State.map_level][key]:
+		for line in starting_nodes:
+			var choices := _closest_branch(grid, line, wanted_row)
+			if not choices.is_empty():
+				choices.pick_random()._type = type
+
+# Kampf-Felder der Zeile mit mindestens zwei davon, die wanted_row am nächsten liegt. Zeile 0 bleibt der Einstieg.
+func _closest_branch(grid: Array, line: int, wanted_row: int) -> Array:
+	var best: Array = []
+	var best_distance := -1
+	for row in range(1, grid[line].size()):
+		var combat := _line_nodes(grid, line, row).filter(func(node: path): return node._type == PATH_TYPE.COMBAT)
+		var distance := absi(row - wanted_row)
+		if combat.size() >= 2 and (best_distance < 0 or distance < best_distance):
+			best = combat
+			best_distance = distance
+	return best
+
+# Alle Felder eines Pfads in einer Zeile: das Feld auf dem Pfad selbst und seine Abzweigungen
+func _line_nodes(grid: Array, line: int, row: int) -> Array:
+	var nodes := []
+	for column in grid:
+		var node = column[row]
+		if node != null and node._pos.z == line:
+			nodes.append(node)
+	return nodes
+
+# Gibt es in der Zeile ein anderes Feld, das man statt node nehmen kann, ohne auf ein optionales Feld zu müssen?
+func _has_alternative(grid: Array, node: path) -> bool:
+	return _line_nodes(grid, int(node._pos.z), int(node._pos.y)).any(
+		func(other: path): return other != node and not OPTIONAL_TYPES.has(other._type))
 
 func generate_last_fire_camps(grid: Array):
 	for x_paths in grid:

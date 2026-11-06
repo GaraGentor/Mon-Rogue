@@ -55,8 +55,8 @@ BOSS_REWARD_OK,OKE!,OKE!
 BOSS_REWARD_DEFEATED,Boss defeated,Boss besiegt
 BOSS_REWARD_SHARD_DESC,"Boss tear, needed to upgrade your monsters permanently","Boss Träne, damit verbesserst du deine Monster dauerhaft"
 BOSS_REWARD_CLAIM,Claim Reward!,Belohnung abholen!
-BOSS_REWARD_EGG_DESC,Choose one of your current monsters to appear as eggs in a new run,"Wähle eines deiner Monster, das in einem neuen Lauf als Ei erscheint"
-BOSS_REWARD_CHOOSE_ONE,Choose wisely one of two rewards,Wähle weise eine von zwei Belohnungen
+BOSS_REWARD_EGG_DESC,One of your current monsters appears as an egg in new runs,Eines deiner aktuellen Monster erscheint in neuen Läufen als Ei
+BOSS_REWARD_CLAIMED,Claimed,Abgeholt
 BOSS_REWARD_THANKS,Thanks for playing,Danke fürs Spielen
 BOSS_REWARD_NEW_RUN,Start a new run!,Neuen Lauf starten!
 JAILER_REROLL,Other prisoners for {cost} ME ({money}),Andere Gefangene für {cost} ME ({money})
@@ -136,9 +136,13 @@ BATTLE_UNKNOWN_SKILL_HINT,Element and tier are known. The details are revealed o
 LEVEL_UP_TITLE,Level Up!,Level Up!
 LEVEL_UP_LOOT_HINT,"Drag your loot into the bag, or it stays behind.","Zieh die Beute in die Tasche, sonst bleibt sie liegen."
 KEY_NAME,Key,Schlüssel
-KEY_DESC,An old key. Somewhere there is a lock for it.,Ein alter Schlüssel. Irgendwo gibt es ein Schloss dafür.
+KEY_DESC,An old key. It opens one treasure chest.,Ein alter Schlüssel. Er öffnet eine Schatzkiste.
 KEY_LOOT_AMOUNT,+{amount} Key,+{amount} Schlüssel
-RELIC_CHEST_LOOT,Treasure Chest,Schatzkiste
+GEM_LOOT_AMOUNT,+{amount} Gem,+{amount} Edelstein
+COUPON_LOOT_AMOUNT,+{amount} Coupon,+{amount} Gutschein
+COUPON_DESC,25% off your next purchase at the shop or trainer.,25% Rabatt auf deinen nächsten Kauf bei Laden oder Trainer.
+SKILL_ENVELOPE_LOOT,Envelope,Couvert
+RELIC_CHEST_LOOT,Relic Box,Relikt-Kiste
 SHOP_CHANGES_TO,Changes to,Wird zu
 SHOP_DRAG_HINT,"Drag an Element Potion
 or a Gem onto
@@ -158,7 +162,12 @@ die Fähigkeit lernen?"
 TRAINER_RECOMMENDED,<Recommended>,<Empfohlen>
 TRAINER_MONSTER_1,Monster 1,Monster 1
 TRAINER_MONSTER_2,Monster 2,Monster 2
-TREASURE_CHOOSE,Choose one prize.,Wähle einen Preis.
+TREASURE_CHOOSE,The chest is open!,Die Kiste ist offen!
+TREASURE_LOCKED,A locked chest,Eine verschlossene Kiste
+TREASURE_KEY_HINT,A key fits. Do you want to use it?,Ein Schlüssel passt. Willst du ihn benutzen?
+TREASURE_NO_KEY,You need a key to open it.,Du brauchst einen Schlüssel.
+TREASURE_OPEN,Open ({keys} left),Öffnen ({keys} übrig)
+TREASURE_LEAVE,Move on,Weiterziehen
 TREASURE_GOLD,Monster Essence,Monster Essenz
 TREASURE_POTION,{element} Potion,{element}-Trank
 TREASURE_POTION_DESC,Adds the element {element} to one of your monsters.,Fügt einem deiner Monster das Element {element} hinzu.
@@ -500,7 +509,7 @@ MAP_NODE_SHOP_DESC,"Spend your Monster Essence: element potions give a monster a
 MAP_NODE_TRAINER_DESC,"Teaches your monsters rare skills, half of them with several elements. A monster can only use a skill if it has all of its elements, the pictures on each card show who fits. Without a free slot you replace an old skill. You only pay once the skill is learned.","Bringt deinen Monstern seltene Skills bei, die Hälfte davon mit mehreren Elementen. Ein Monster kann einen Skill nur einsetzen, wenn es alle seine Elemente hat, die Bilder auf jeder Karte zeigen, wer passt. Ohne freien Platz ersetzt du einen alten Skill. Bezahlt wird erst, wenn der Skill gelernt ist."
 MAP_NODE_JAILER_DESC,"The jailer keeps up to three monster species in chains. Every chain is a missing upgrade (+1 action per turn). Hand him a boss tear to break a chain, once the last one is gone the species is free and fully upgraded, permanently, also for future runs. Showing other prisoners costs Monster Essence.","Der Kerkermeister hält bis zu drei Monster-Arten in Ketten. Jede Kette ist eine fehlende Verbesserung (+1 Aktion pro Zug). Gib ihm eine Boss Träne, um eine Kette zu sprengen, ist die letzte weg, ist die Art frei und voll verbessert, dauerhaft, auch für spätere Runs. Andere Gefangene zeigen kostet Monster Essenz."
 MAP_NODE_EVENT_DESC,"A random event: either a camp that heals your monsters, or the wheel of fortune where you win or lose half of your Monster Essence.","Ein Zufallsereignis: entweder ein Lager, das deine Monster heilt, oder das Glücksrad, bei dem du die Hälfte deiner Monster Essenz gewinnst oder verlierst."
-MAP_NODE_TREASURE_DESC,"Choose Monster Essence or a bonus prize. The bonus is usually a gem, otherwise an element potion or rarely a relic.","Wähle Monster Essenz oder einen Bonus-Preis. Der Bonus ist meist ein Edelstein, sonst ein Element-Trank oder selten ein Relikt."
+MAP_NODE_TREASURE_DESC,"A chest full of Monster Essence, you need a key to open it.","Eine Kiste voller Monster Essenz, zum Öffnen brauchst du einen Schlüssel."
 MAP_NODE_GEM_DESC,"Pick one of three gems. It raises one stat of a monster (e.g. attack or HP) for the rest of the run. The deeper you are, the stronger the gems.","Wähle einen von drei Edelsteinen. Er erhöht einen Wert eines Monsters (z. B. Angriff oder KP) für den restlichen Run. Je tiefer du bist, desto stärker die Steine."
 MAP_NODE_HUB,OUTPOST,RASTLAGER
 MAP_NODE_HUB_DESC,"The last stop of every path, right before the boss. Here you can rest (heals half of the maximum HP), visit the shop and the trainer, each once. Prepare your team for the boss fight!","Das letzte Feld jedes Pfads, direkt vor dem Boss. Hier kannst du dich ausruhen (heilt die Hälfte der maximalen KP), den Laden und den Trainer besuchen, jedes einmal. Mach dein Team bereit für den Bosskampf!"
@@ -508,6 +517,24 @@ CAMP_FEED_HINT,"Drag essence into the fire before you rest: 1 ME = {hp} HP for e
 CAMP_FEED_BONUS,"The fire burns brighter: +{hp} HP for each monster.","Das Feuer brennt heller: +{hp} KP für jedes Monster."
 CAMP_FEED_POOR,"You don't have enough essence for that.","Dafür hast du nicht genug Essenz."
 CAMP_FEED_FULL,"Resting will already heal your monsters completely.","Ausruhen heilt deine Monster schon vollständig."
+SKILL_REWARD_HINT,Drag a skill onto a monster to teach it. Only one!,"Zieh einen Skill auf ein Monster, um ihn ihm beizubringen. Nur einen!"
+SKILL_REWARD_SKIP,Take no skill,Keinen Skill nehmen
+SKILL_QUAKE_HAMMER,Quake Hammer,Bebenhammer
+SKILL_LANDSLIDE,Landslide,Erdrutsch
+SKILL_BEDROCK_WARD,Bedrock Ward,Felsgrundwacht
+SKILL_DEEP_ROOTS,Deep Roots,Tiefe Wurzeln
+SKILL_SUNFORGE_BLOW,Sunforge Blow,Sonnenschmiede
+SKILL_ASH_RAIN,Ash Rain,Aschenregen
+SKILL_KILN_HIDE,Kiln Hide,Ofenhaut
+SKILL_HEARTH_SOUL,Hearth Soul,Herdseele
+SKILL_ABYSS_LANCE,Abyss Lance,Abgrundlanze
+SKILL_RIPTIDE_WAVE,Riptide Wave,Sogwelle
+SKILL_PEARL_WARD,Pearl Ward,Perlenwacht
+SKILL_WELLSPRING,Wellspring,Urquell
+SKILL_SKY_RENDER,Sky Render,Himmelsriss
+SKILL_GALE_SWEEP,Gale Sweep,Orkanfeger
+SKILL_ZEPHYR_MANTLE,Zephyr Mantle,Zephirmantel
+SKILL_STORM_HEART,Storm Heart,Sturmherz
 HUB_TITLE,Outpost,Rastlager
 HUB_DESC,"Last rest before the boss. Every station can be used once.","Letzte Rast vor dem Boss. Jede Station kannst du einmal nutzen."
 HUB_REST,REST,AUSRUHEN
@@ -526,7 +553,7 @@ EGG_CATEGORY_PASSIVE,Passive,Passiv
 BOSS_REWARD_SHARD_AMOUNT,+{amount} Boss Tear,+{amount} Boss Träne
 JAILER_TEAR_COUNT_ONE,{amount} Boss Tear,{amount} Boss Träne
 JAILER_TEAR_COUNT_MANY,{amount} Boss Tears,{amount} Boss Tränen
-TREASURE_HINT,Drag a prize onto a monster or into the bag.,Zieh einen Preis auf ein Monster oder in die Tasche.
+TREASURE_HINT,Drag all the essence into the bag.,Zieh die ganze Essenz in die Tasche.
 GEM_HINT,Drag a gem onto one of your monsters.,Zieh einen Edelstein auf eines deiner Monster.
 RELIC_REWARD_HINT,Drag a relic into the bag.,Zieh ein Relikt in die Tasche.
 BATTLE_CATCH_CALL_1,Come...,Komm...

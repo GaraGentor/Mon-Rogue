@@ -2,11 +2,15 @@ extends Control
 
 const ENEMY_THINK_TIME := 0.6
 const ENEMY_ACTION_TIME := 0.9
-## Chance auf einen Schlüssel als Beute pro gewonnenem Kampf
-const KEY_LOOT_CHANCE := 0.25
-## Chance auf die Schatzkiste mit der Relic-Auswahl: Biom-Boss und Boss-Feld auf der Karte (Miniboss)
-const RELIC_CHEST_CHANCE_BOSS := 1.0
-const RELIC_CHEST_CHANCE_MINIBOSS := 0.8
+## Chancen auf Zufallsbeute pro besiegtem Monster, gefangene Monster würfeln nicht. Jede Beute wird einzeln gewürfelt.
+const KEY_LOOT_CHANCE := 0.15
+const GEM_LOOT_CHANCE := 0.10
+const GOLD_LOOT_CHANCE := 0.15
+const COUPON_LOOT_CHANCE := 0.05
+## Essenz als Zufallsbeute: Grundbetrag plus Zuschlag pro Biom-Tiefe
+const GOLD_LOOT_MIN := 5
+const GOLD_LOOT_MAX := 15
+const GOLD_LOOT_PER_DEPTH := 5
 const NOISE_SHADER := preload("res://script/scenes/world_map/map_noise.gdshader")
 
 @export var catch_anim: Control
@@ -348,7 +352,7 @@ func _check_game_over(last_fainted:Monster) -> void:
 		State.killed_monsters += 1
 		State.run_kills += 1
 		State.mark_mon_defeated(last_fainted._name)
-		State.pending_ep += last_fainted._ep
+		_roll_kill_loot()
 		var bounty_skill = Skills.claim_bounty(last_fainted)
 		if bounty_skill != "":
 			Helper.show_unlock_message(tr("BOUNTY_UNLOCKED").format({"skill": tr(bounty_skill), "mon": Helper.mon_display_name(last_fainted._last_hit_by._name)}))
@@ -369,11 +373,10 @@ func _check_game_over(last_fainted:Monster) -> void:
 	if State.enemy_mons.all(func(mon: Monster): return not mon.is_alive()) or State.enemy_mons.size() == 0:
 		print("will close battle")
 		State.stage_clear()
-		State.pending_relic_chest = _rolls_relic_chest()
+		_add_boss_loot()
+		# besiegte Gegner bleiben in enemy_mons, gefangene nicht: nur Kills bringen Essenz
 		State.pending_ep += Relics.modify("battle_ep", State.enemy_mons.map(func(mon): return mon._ep).reduce(func(a, b): return a + b, 0))
 		print("state pending ep", State.pending_ep)
-		if randf() < KEY_LOOT_CHANCE:
-			State.pending_keys += 1
 		# clear dead monsters.
 		# open stats.
 		var fallen = _clear_fainted_mons()
@@ -385,12 +388,26 @@ func _check_game_over(last_fainted:Monster) -> void:
 			return
 		get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")
 
-## Nur Bosse lassen eine Kiste fallen. State.is_boss_fight gilt noch bis zur Karte, is_map_boss nicht mehr.
-## Der finale Boss beendet den Run, danach gibt es keine Karte mehr.
-func _rolls_relic_chest() -> bool:
-	if not is_boss_battle or State.is_final_boss or Relics.get_unowned().is_empty():
-		return false
-	return randf() < (RELIC_CHEST_CHANCE_BOSS if State.is_boss_fight else RELIC_CHEST_CHANCE_MINIBOSS)
+## Zufallsbeute für ein besiegtes Monster. Der finale Boss beendet den Run, danach bringt Beute nichts mehr.
+func _roll_kill_loot() -> void:
+	if State.is_final_boss:
+		return
+	if randf() < KEY_LOOT_CHANCE:
+		State.pending_keys += 1
+	if randf() < GEM_LOOT_CHANCE:
+		State.pending_gems += 1
+	if randf() < COUPON_LOOT_CHANCE:
+		State.pending_coupons += 1
+	if randf() < GOLD_LOOT_CHANCE:
+		State.pending_ep += randi_range(GOLD_LOOT_MIN, GOLD_LOOT_MAX) + State.map_level * GOLD_LOOT_PER_DEPTH
+
+## Mini-Boss und Biom-Boss lassen bei jedem Sieg Kiste und Couvert fallen, auch wenn sie gefangen wurden.
+## Träne und Ei des Biom-Bosses gibt es danach in boss_reward.gd.
+func _add_boss_loot() -> void:
+	if not is_boss_battle or State.is_final_boss:
+		return
+	State.pending_relic_chest = not Relics.get_unowned().is_empty()
+	State.pending_skill_envelope = not Skills.reward_offers().is_empty()
 
 func _clear_fainted_mons() -> Array:
 	var v = State.mons.filter(func(mon:Monster): return not mon.is_alive())

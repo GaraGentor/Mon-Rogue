@@ -1,12 +1,16 @@
 extends Control
 
+## Nach einem Biom-Boss: immer eine Boss Träne, dazu das Ei, wenn ein Monster im Team noch nicht freigeschaltet ist.
+## Es gibt keine Auswahl, sind alle Belohnungen abgeholt, geht es ins nächste Biom.
+
 ## Boss Tränen, die man als Belohnung bekommt
 const SHARD_REWARD := 1
 
 @export var mon_reward: Control
 @export var egg_rect: TextureRect
 @export var shard_amount_label: Label
-@export var more_label: Label
+@export var shard_button: Button
+@export var egg_button: Button
 
 # Hinweis auf neu freigeschaltete Meilenstein-Ei-Attacken (Spielende: run_end.gd)
 @export var unlock_label: Label
@@ -14,6 +18,8 @@ const SHARD_REWARD := 1
 var missing_mon_egg = []
 # Art im Ei, wird beim Öffnen gelost
 var mon_to_save: Monster
+# noch nicht abgeholte Belohnungen
+var _unclaimed := 1
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -23,20 +29,15 @@ func _ready() -> void:
 	SaveManager.add_reroll_charge()
 	var catched_mons = SaveManager.save_data.catched_monsters.duplicate(true)
 	catched_mons.append_array(State.INITIAL_MONS)
-	var missing_mon = false
 	for mon in State.mons:
-		var has_mon = catched_mons.has(mon._name)
-		if not has_mon:
+		if not catched_mons.has(mon._name):
 			missing_mon_egg.append(mon)
-			show_mon_reward()
-			more_label.text = tr("BOSS_REWARD_CHOOSE_ONE")
 	if not missing_mon_egg.is_empty():
+		mon_reward.visible = true
+		_unclaimed += 1
 		# Art steht schon fest, damit das Ei nach ihrer Seltenheit eingefärbt werden kann
 		mon_to_save = missing_mon_egg.pick_random()
 		egg_rect.material = Monmap.egg_material(Monmap.rarity_of(mon_to_save._name))
-
-func show_mon_reward() -> void:
-	mon_reward.visible = true
 
 func show_unlocks(label: Label, skill_names: Array) -> void:
 	if skill_names.is_empty():
@@ -48,11 +49,6 @@ func show_unlocks(label: Label, skill_names: Array) -> void:
 	})
 	label.visible = true
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-
 func finish() -> void:
 	State.map_level += 1
 	State.biome_fight_index = 0
@@ -63,14 +59,18 @@ func finish() -> void:
 	Map.generate_starting_points()
 	get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")
 
+func _claimed(button: Button) -> void:
+	button.disabled = true
+	button.text = tr("BOSS_REWARD_CLAIMED")
+	_unclaimed -= 1
+	if _unclaimed == 0:
+		finish()
+
 func _on_shard_button_pressed() -> void:
 	SaveManager.add_boss_shard(SHARD_REWARD)
 	State.boss_shards += SHARD_REWARD
-	finish()
-	pass # Replace with function body.
-
+	_claimed(shard_button)
 
 func _on_egg_button_pressed() -> void:
 	SaveManager.add_catched_monster_mon(mon_to_save._name)
-	finish()
-	pass # Replace with function body.
+	_claimed(egg_button)

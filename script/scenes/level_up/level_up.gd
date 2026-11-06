@@ -5,15 +5,17 @@ extends Control
 
 const ESSENCE_ICON = preload("res://assets/ui/icons/monster_essence.svg")
 const KEY_ICON = preload("res://assets/ui/icons/key.svg")
-const CHEST_ICON = preload("res://assets/ui/rewards/reward_chest.png")
+const BOX_ICON = preload("res://assets/ui/rewards/box.png")
+const ENVELOPE_ICON = preload("res://assets/ui/rewards/envelop.png")
+const GEM_ICON = preload("res://assets/ui/shop/gem.svg")
+const COUPON_ICON = preload("res://assets/ui/icons/coupon.svg")
 const BAG_SIZE := Vector2(208, 196)
 const BAG_FONT_SIZE := 19
 const FIELD_MARGIN := 16
 ## so weit bleibt die Beute vom Bildrand weg, dort liegt der Wolkenrand
 const LOOT_EDGE_MARGIN := 60.0
-## Abstand der Beute zu allem, was schon auf dem Feld liegt
+## Abstand der Beute untereinander
 const LOOT_GAP := 16.0
-const LOOT_PLACE_TRIES := 60
 
 ## Stück Beute auf dem Schlachtfeld, lässt sich in die Tasche ziehen
 class LootIcon extends VBoxContainer:
@@ -171,8 +173,14 @@ func _build_battlefield() -> void:
 		_add_loot(ESSENCE_ICON, Helper.me_text(State.pending_ep), _take_essence)
 	if State.pending_keys > 0:
 		_add_loot(KEY_ICON, tr("KEY_LOOT_AMOUNT").format({"amount": State.pending_keys}), _take_keys)
+	if State.pending_gems > 0:
+		_add_loot(GEM_ICON, tr("GEM_LOOT_AMOUNT").format({"amount": State.pending_gems}), _take_gems)
+	if State.pending_coupons > 0:
+		_add_loot(COUPON_ICON, tr("COUPON_LOOT_AMOUNT").format({"amount": State.pending_coupons}), _take_coupons)
 	if State.pending_relic_chest:
-		_add_loot(CHEST_ICON, tr("RELIC_CHEST_LOOT"), _take_relic_chest)
+		_add_loot(BOX_ICON, tr("RELIC_CHEST_LOOT"), _take_relic_chest)
+	if State.pending_skill_envelope:
+		_add_loot(ENVELOPE_ICON, tr("SKILL_ENVELOPE_LOOT"), _take_skill_envelope)
 	_hint_panel.visible = _loot_field.get_child_count() > 0
 	_scatter_loot()
 
@@ -192,30 +200,47 @@ func _scatter_loot() -> void:
 	_loot_field.modulate.a = 0.0
 	await get_tree().process_frame
 	var area := Rect2(Vector2.ZERO, _loot_field.size).grow(-LOOT_EDGE_MARGIN)
-	var taken: Array[Rect2] = []
-	for blocker: Control in [_hint_panel, _bag]:
-		taken.append(Rect2(blocker.global_position - _loot_field.global_position, blocker.size).grow(LOOT_GAP))
-	for loot: LootIcon in _loot_field.get_children():
-		var rect := _free_spot(area, loot.get_combined_minimum_size(), taken)
-		taken.append(rect.grow(LOOT_GAP))
+	var icons := _loot_field.get_children()
+	var biggest := Vector2.ZERO
+	for loot: LootIcon in icons:
+		biggest = biggest.max(loot.get_combined_minimum_size())
+	var cells := _free_cells(area, biggest + Vector2.ONE * LOOT_GAP)
+	for i in icons.size():
+		var loot: LootIcon = icons[i]
+		var cell: Rect2 = cells[i % cells.size()]
+		var loot_size := loot.get_combined_minimum_size()
+		var room := (cell.size - loot_size) / 2
+		var center := cell.get_center() + Vector2(randf_range(-room.x, room.x), randf_range(-room.y, room.y))
 		# Anteil statt Pixel: bleibt passend, wenn sich die Fläche ändert
-		var center := rect.get_center() / _loot_field.size
+		center /= _loot_field.size
 		for side in [SIDE_LEFT, SIDE_RIGHT]:
 			loot.set_anchor_and_offset(side, center.x, 0.0, true)
 		for side in [SIDE_TOP, SIDE_BOTTOM]:
 			loot.set_anchor_and_offset(side, center.y, 0.0, true)
 	_loot_field.modulate.a = 1.0
 
-## Zufällige Stelle ohne Überschneidung; ist nach allen Versuchen keine frei, bleibt es beim letzten
-func _free_spot(area: Rect2, spot_size: Vector2, taken: Array[Rect2]) -> Rect2:
-	var rect := Rect2(area.position, spot_size)
-	for i in LOOT_PLACE_TRIES:
-		rect.position = Vector2(
-			randf_range(area.position.x, area.end.x - spot_size.x),
-			randf_range(area.position.y, area.end.y - spot_size.y))
-		if not taken.any(func(other: Rect2): return other.intersects(rect)):
-			break
-	return rect
+## Raster über der Fläche, zufällig sortiert: erst die Zellen, die weder Hinweis noch Tasche berühren, dann die übrigen.
+## So liegt die Beute verstreut, aber nie übereinander.
+func _free_cells(area: Rect2, min_cell: Vector2) -> Array[Rect2]:
+	var columns := maxi(floori(area.size.x / min_cell.x), 1)
+	var rows := maxi(floori(area.size.y / min_cell.y), 1)
+	var cell_size := area.size / Vector2(columns, rows)
+	var blockers: Array[Rect2] = []
+	for blocker: Control in [_hint_panel, _bag]:
+		blockers.append(Rect2(blocker.global_position - _loot_field.global_position, blocker.size))
+	var free: Array[Rect2] = []
+	var blocked: Array[Rect2] = []
+	for row in rows:
+		for column in columns:
+			var cell := Rect2(area.position + cell_size * Vector2(column, row), cell_size)
+			if blockers.any(func(other: Rect2): return other.intersects(cell)):
+				blocked.append(cell)
+			else:
+				free.append(cell)
+	free.shuffle()
+	blocked.shuffle()
+	free.append_array(blocked)
+	return free
 
 func _take_essence() -> void:
 	State.ep += State.pending_ep
@@ -225,10 +250,22 @@ func _take_keys() -> void:
 	State.keys += State.pending_keys
 	State.pending_keys = 0
 
-## Die Relic-Auswahl erscheint beim nächsten Betreten der Karte (world_map.gd)
+func _take_coupons() -> void:
+	State.coupons += State.pending_coupons
+	State.pending_coupons = 0
+
+## Edelsteine, Relic-Auswahl und Skill-Auswahl erscheinen beim nächsten Betreten der Karte (world_map.gd)
+func _take_gems() -> void:
+	State.pending_gem_rewards += State.pending_gems
+	State.pending_gems = 0
+
 func _take_relic_chest() -> void:
 	State.pending_relic_chest = false
 	State.pending_relic_reward = true
+
+func _take_skill_envelope() -> void:
+	State.pending_skill_envelope = false
+	State.pending_skill_reward = true
 
 func _show_money(ep: int) -> void:
 	_bag.art.label.text = str(ep)
@@ -242,7 +279,5 @@ func _notification(what: int) -> void:
 
 func _on_button_pressed() -> void:
 	# was nicht in der Tasche liegt, bleibt auf dem Schlachtfeld
-	State.pending_ep = 0
-	State.pending_keys = 0
-	State.pending_relic_chest = false
+	State.clear_pending_loot()
 	get_tree().change_scene_to_file("res://script/scenes/world_map/world_map.tscn")

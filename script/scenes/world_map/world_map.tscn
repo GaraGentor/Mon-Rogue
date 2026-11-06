@@ -26,6 +26,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/icons/parchment.svg" id="22_parch"]
 [ext_resource type="Script" path="res://script/scenes/world_map/map_paper.gd" id="23_paper"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/key.svg" id="24_key"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/coupon.svg" id="24_coupon"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hmv0x"]
 shader = ExtResource("5_23h7f")
@@ -56,7 +57,7 @@ shader_parameter/glow_color = Color(0.4, 0.9, 1, 1)
 shader_parameter/glow_intensity = 1.594
 shader_parameter/glow_speed = 2.76
 
-[node name="WorldMap" type="Control" node_paths=PackedStringArray("scroll_container", "map_layout", "battle_c", "camp_c", "grid_container", "boss_button", "node_container", "node_name", "line_node", "boss_shard_label", "money_label", "key_label", "depth_level", "biome_path_label", "team_bar", "view_container")]
+[node name="WorldMap" type="Control" node_paths=PackedStringArray("scroll_container", "map_layout", "battle_c", "camp_c", "grid_container", "boss_button", "node_container", "node_name", "line_node", "boss_shard_label", "money_label", "key_label", "coupon_label", "depth_level", "biome_path_label", "team_bar", "view_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -77,6 +78,7 @@ line_node = NodePath("Items/UILine")
 boss_shard_label = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow/ShardLabel")
 money_label = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow/MoneyLabel")
 key_label = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow/KeyLabel")
+coupon_label = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow/CouponLabel")
 depth_level = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow/DepthLevel")
 biome_path_label = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow/BiomePath")
 team_bar = NodePath("HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TeamBar")
@@ -232,6 +234,21 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="KeyLabel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
+theme_override_font_sizes/font_size = 22
+text = "0"
+
+[node name="CouponIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+tooltip_text = "COUPON_DESC"
+texture = ExtResource("24_coupon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CouponLabel" type="Label" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)

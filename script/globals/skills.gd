@@ -176,7 +176,7 @@ const TIER_WEIGHTS = {1: 50, 2: 25, 3: 10, 4: 3}
 
 # Liefert eine frische Kopie des Skills mit diesem Namen (aus allen Skill-Listen) oder {}.
 func get_skill(skill_name: String) -> Dictionary:
-	for list in [attack_skills, defensive_skills, buff_skills, passive_skills, area_skills, egg_skills, milestone_skills, bounty_skills]:
+	for list in [attack_skills, defensive_skills, buff_skills, passive_skills, area_skills, egg_skills, milestone_skills, bounty_skills, reward_skills]:
 		for skill in list:
 			if skill.name == skill_name:
 				var copy = skill.duplicate()
@@ -515,6 +515,62 @@ func _effect_skill(skill_name: String, nature: int, value: float, tier: int, dam
 func _with(skill: Dictionary, extra: Dictionary) -> Dictionary:
 	skill.merge(extra, true)
 	return skill
+
+# Einzigartige Skills aus dem Couvert der Bosse: stehen in keiner anderen Liste, also weder im Biom-Pool noch beim
+# Trainer oder als Ei-Attacke. Vorerst pro Basis-Element je einer als Treffer, Flächenschaden, Schutz und Passiv.
+var reward_skills = [
+	_egg_skill("SKILL_QUAKE_HAMMER", Enums.MON_TYPES.EARTH, 70.0, 3, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_reward_area_skill("SKILL_LANDSLIDE", Enums.MON_TYPES.EARTH),
+	_reward_shield_skill("SKILL_BEDROCK_WARD", Enums.MON_TYPES.EARTH, Enums.SKILL_DAMAGE_TYPE.PHYSICAL, "SKILL_SHIELD_PHYSICAL_DESC"),
+	_reward_passive_skill("SKILL_DEEP_ROOTS", Enums.MON_TYPES.EARTH),
+	_egg_skill("SKILL_SUNFORGE_BLOW", Enums.MON_TYPES.FIRE, 70.0, 3, Enums.SKILL_DAMAGE_TYPE.PHYSICAL),
+	_reward_area_skill("SKILL_ASH_RAIN", Enums.MON_TYPES.FIRE),
+	_reward_buff_skill("SKILL_KILN_HIDE", Enums.MON_TYPES.FIRE),
+	_reward_passive_skill("SKILL_HEARTH_SOUL", Enums.MON_TYPES.FIRE),
+	_egg_skill("SKILL_ABYSS_LANCE", Enums.MON_TYPES.WATER, 70.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_reward_area_skill("SKILL_RIPTIDE_WAVE", Enums.MON_TYPES.WATER),
+	_reward_shield_skill("SKILL_PEARL_WARD", Enums.MON_TYPES.WATER, Enums.SKILL_DAMAGE_TYPE.ABILITY, "SKILL_SHIELD_ABILITY_DESC"),
+	_reward_passive_skill("SKILL_WELLSPRING", Enums.MON_TYPES.WATER),
+	_egg_skill("SKILL_SKY_RENDER", Enums.MON_TYPES.AIR, 70.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY),
+	_reward_area_skill("SKILL_GALE_SWEEP", Enums.MON_TYPES.AIR),
+	_reward_buff_skill("SKILL_ZEPHYR_MANTLE", Enums.MON_TYPES.AIR),
+	_reward_passive_skill("SKILL_STORM_HEART", Enums.MON_TYPES.AIR),
+]
+
+func _reward_area_skill(skill_name: String, nature: int) -> Dictionary:
+	return _with(_effect_skill(skill_name, nature, 45.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY, "damage",
+		"SKILL_AREA_ABILITY_DESC", Enums.CARD_TARGETS.TEAM_ENEMY, 3, func(props): deal_damage(props)),
+		{"cost": 2})
+
+func _reward_shield_skill(skill_name: String, nature: int, damage_type: int, description: String) -> Dictionary:
+	return _effect_skill(skill_name, nature, 90.0, 3, damage_type, "shield",
+		description, Enums.CARD_TARGETS.SINGLE_FRIEND, 2, func(props): add_shield(props))
+
+func _reward_buff_skill(skill_name: String, nature: int) -> Dictionary:
+	return _with(_effect_skill(skill_name, nature, 45.0, 3, Enums.SKILL_DAMAGE_TYPE.PHYSICAL, "buff",
+		"SKILL_BUFF_DEF_DESC", Enums.CARD_TARGETS.SINGLE_FRIEND, 2, func(props): add_buff(props)),
+		{"buff_stat": "def", "buff_turns": 3})
+
+func _reward_passive_skill(skill_name: String, nature: int) -> Dictionary:
+	return _with(_effect_skill(skill_name, nature, 25.0, 3, Enums.SKILL_DAMAGE_TYPE.ABILITY, "passive",
+		"SKILL_PASSIVE_HP_DESC", Enums.CARD_TARGETS.TEAM_FRIEND, 0, func(_props): pass),
+		{"cost": 0, "passive_stat": "hp"})
+
+# So viele Skills bietet ein Couvert zur Auswahl.
+const REWARD_SKILL_OFFERS := 3
+
+# Auswahl fürs Couvert: noch von niemandem gelernte einzigartige Skills, mindestens einer davon für das Team sofort einsetzbar,
+# sofern es so einen noch gibt.
+func reward_offers() -> Array:
+	var pool: Array = reward_skills.filter(func(skill): return not State.taught_reward_skills.has(skill.name))
+	pool.shuffle()
+	var offers := pool.slice(0, REWARD_SKILL_OFFERS)
+	var usable := func(skill): return State.mons.any(func(mon): return can_use(mon, skill))
+	if not offers.is_empty() and not offers.any(usable):
+		var fitting := pool.filter(usable)
+		if not fitting.is_empty():
+			offers[0] = fitting[0]
+	return offers.map(func(skill): return get_skill(skill.name))
 
 # Test-Skills für Ei-Attacken (alle Schaden auf ein Ziel), Stufe 1-4 bestimmt die Seltenheit.
 var egg_skills = [

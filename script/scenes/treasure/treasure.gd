@@ -1,79 +1,76 @@
 extends ChestRewardDialog
 
-## Schatz: Monster Essenz oder ein Bonus-Preis, einer davon darf genommen werden.
-## Der Bonus ist meist ein Edelstein, sonst ein Element-Trank oder selten ein gewöhnliches Relic.
-## Edelstein und Trank werden danach einem eigenen Monster gegeben.
-## Die Trank-Karte nutzt auch der Shop.
+## Schatz: die Truhe öffnet sich nur mit einem Schlüssel. Darin liegen Häufchen Monster Essenz,
+## die einzeln in die Tasche gezogen werden. Ohne Schlüssel oder wenn man ihn behalten will, geht man weiter.
+## Die Trank-Karte nutzt der Shop.
 
-const GemField = preload("res://script/scenes/gems/gems.gd")
-const RelicReward = preload("res://script/scenes/relic_reward/relic_reward.gd")
+signal _opened
 
 const ACCENT := Color(0.74, 0.75, 0.29)
 
-## Monster Essenz: Grundbetrag plus Zuschlag pro Biom-Tiefe (State.map_level)
-const GOLD_MIN := 20
-const GOLD_MAX := 50
-const GOLD_PER_DEPTH := 10
-
-## Gewichte für den Bonus-Preis
-const BONUS_WEIGHTS := {"gem": 60, "potion": 30, "relic": 10}
+const PILES_MIN := 2
+const PILES_MAX := 4
+## Essenz pro Häufchen: Grundbetrag plus Zuschlag pro Biom-Tiefe (State.map_level)
+const PILE_GOLD_MIN := 10
+const PILE_GOLD_MAX := 25
+const PILE_GOLD_PER_DEPTH := 5
 
 const ELEMENTS := [Enums.MON_TYPES.EARTH, Enums.MON_TYPES.AIR, Enums.MON_TYPES.WATER, Enums.MON_TYPES.FIRE]
 
 const ESSENCE_ICON = preload("res://assets/ui/icons/monster_essence.svg")
+const KEY_ICON = preload("res://assets/ui/icons/key.svg")
 const FLASK_TEXTURE = preload("res://assets/ui/shop/potion_flask.svg")
 const LIQUID_TEXTURE = preload("res://assets/ui/shop/potion_liquid.svg")
 const PROPS_MATERIAL = preload("res://script/scenes/jailer/jailer_props_material.tres")
 
-var _depth: int
+var _buttons: HBoxContainer
 
 func _ready() -> void:
 	use_chest_layout()
 	set_accent(ACCENT)
-	set_title(tr("TREASURE_CHOOSE"))
-	set_drag_hint("TREASURE_HINT")
-	show_fixed_targets(State.mons, true)
-	show_element_chips()
-	_depth = clampi(State.map_level, 0, GemField.BONUS_BY_DEPTH.size() - 1)
-	var gold := randi_range(GOLD_MIN, GOLD_MAX) + _depth * GOLD_PER_DEPTH
-	add_bag_card(tr("TREASURE_GOLD"), Helper.me_text(gold), texture_icon(ESSENCE_ICON), _on_gold_chosen.bind(gold))
-	_add_bonus_card()
+	set_title(tr("TREASURE_LOCKED"))
+	set_drag_hint("TREASURE_KEY_HINT" if State.keys > 0 else "TREASURE_NO_KEY")
+	show_fixed_targets([], true)
+	for i in randi_range(PILES_MIN, PILES_MAX):
+		var gold := randi_range(PILE_GOLD_MIN, PILE_GOLD_MAX) + State.map_level * PILE_GOLD_PER_DEPTH
+		add_bag_card(tr("TREASURE_GOLD"), Helper.me_text(gold), texture_icon(ESSENCE_ICON), _on_gold_taken.bind(gold))
+	_build_buttons()
 	play_chest_intro()
 
-func _on_gold_chosen(gold: int) -> void:
+func _build_buttons() -> void:
+	_buttons = HBoxContainer.new()
+	_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	_buttons.add_theme_constant_override("separation", 16)
+	var open_button := plate_button(tr("TREASURE_OPEN").format({"keys": State.keys}))
+	open_button.icon = KEY_ICON
+	open_button.add_theme_constant_override("icon_max_width", 28)
+	open_button.disabled = State.keys <= 0
+	open_button.pressed.connect(_open)
+	_buttons.add_child(open_button)
+	var leave_button := plate_button(tr("TREASURE_LEAVE"))
+	leave_button.pressed.connect(close)
+	_buttons.add_child(leave_button)
+	add_footer(_buttons)
+
+func _open() -> void:
+	State.keys -= 1
+	_buttons.queue_free()
+	set_title(tr("TREASURE_CHOOSE"))
+	set_drag_hint("TREASURE_HINT")
+	_opened.emit()
+
+func _wait_before_burst() -> void:
+	await _opened
+
+func _on_gold_taken(gold: int) -> void:
 	State.ep += gold
 
-func _add_bonus_card() -> void:
-	if State.mons.is_empty():
-		return
-	match _roll_bonus():
-		"relic":
-			var commons = Relics.get_unowned(Relics.Rarity.COMMON)
-			if not commons.is_empty():
-				RelicReward.add_relic_card(self, commons.pick_random())
-				return
-		"potion":
-			# nur Elemente, die noch mindestens einem Monster fehlen
-			var elements = ELEMENTS.filter(func(e): return mons_without(e).size() > 0)
-			if not elements.is_empty():
-				add_potion_card(self, elements.pick_random())
-				return
-	# Fallback, falls kein passendes Relic oder Element übrig ist
-	var stat: String = GemField.STATS.keys().pick_random()
-	var bonus: int = GemField.BONUS_BY_DEPTH[_depth]
-	GemField.show_gem_info(self)
-	GemField.add_gem_card(self, stat, bonus)
-
-func _roll_bonus() -> String:
-	var total := 0
-	for w in BONUS_WEIGHTS.values():
-		total += w
-	var roll := randi_range(1, total)
-	for kind in BONUS_WEIGHTS:
-		roll -= BONUS_WEIGHTS[kind]
-		if roll <= 0:
-			return kind
-	return "gem"
+## Der Dialog bleibt offen, bis alle Häufchen in der Tasche sind
+func _taken(card: RewardCard) -> void:
+	_loot.erase(card)
+	card.queue_free()
+	if _loot.is_empty():
+		close()
 
 # ── Element-Trank ─────────────────────────
 

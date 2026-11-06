@@ -37,7 +37,7 @@ content_margin_top = 10.0
 content_margin_right = 16.0
 content_margin_bottom = 10.0
 
-[node name="BossReward" type="Control" node_paths=PackedStringArray("mon_reward", "egg_rect", "shard_amount_label", "more_label", "unlock_label")]
+[node name="BossReward" type="Control" node_paths=PackedStringArray("mon_reward", "egg_rect", "shard_amount_label", "shard_button", "egg_button", "unlock_label")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -48,7 +48,8 @@ script = ExtResource("1_7tagj")
 mon_reward = NodePath("MarginContainer/VBoxContainer/Rewards/EggReward")
 egg_rect = NodePath("MarginContainer/VBoxContainer/Rewards/EggReward/Margin/Box/TextureRect")
 shard_amount_label = NodePath("MarginContainer/VBoxContainer/Rewards/ShardReward/Margin/Box/Amount")
-more_label = NodePath("MarginContainer/VBoxContainer/Label2")
+shard_button = NodePath("MarginContainer/VBoxContainer/Rewards/ShardReward/Margin/Box/Button")
+egg_button = NodePath("MarginContainer/VBoxContainer/Rewards/EggReward/Margin/Box/Button")
 unlock_label = NodePath("MarginContainer/VBoxContainer/UnlockLabel")
 
 [node name="ColorRect" type="TextureRect" parent="."]
@@ -85,14 +86,6 @@ layout_mode = 2
 theme = ExtResource("3_sj5wi")
 theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
 text = "BOSS_REWARD_DEFEATED"
-horizontal_alignment = 1
-
-[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer"]
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
-visible = false
-layout_mode = 2
-theme = ExtResource("3_sj5wi")
 horizontal_alignment = 1
 
 [node name="UnlockLabel" type="Label" parent="MarginContainer/VBoxContainer"]

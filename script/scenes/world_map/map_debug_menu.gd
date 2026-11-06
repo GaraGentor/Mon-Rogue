@@ -88,6 +88,7 @@ func _build_main() -> void:
 		["JUDGEMENT ...", func(): _show_page(_picker)],
 		["LEVEL-UP", _open_level_up],
 		["RELIC-AUSWAHL", _open_relic_reward],
+		["FÄHIGKEITEN-AUSWAHL", _open_skill_reward],
 		["BOSS-BELOHNUNG", _open_boss_reward],
 		["RUN-ENDE SIEG", _end_run.bind(true)],
 		["RUN-ENDE NIEDERL.", _end_run.bind(false)],
@@ -102,6 +103,7 @@ func _build_main() -> void:
 		["+%d ESSENZ" % DEBUG_ESSENCE, _add_essence],
 		["+%d BOSS TRÄNEN" % DEBUG_SHARDS, _add_shards],
 		["+%d SCHLÜSSEL" % DEBUG_KEYS, _add_keys],
+		["+1 GUTSCHEIN", _add_coupon],
 	])
 	_rotten_eggs_button = _make_button(_rotten_eggs_text(), _toggle_rotten_eggs)
 	extras.add_child(_rotten_eggs_button)
@@ -268,7 +270,10 @@ func _open_level_up() -> void:
 	State.killed_monsters = LEVEL_UP_KILLS
 	State.pending_ep = DEBUG_ESSENCE
 	State.pending_keys = 1
+	State.pending_gems = 1
+	State.pending_coupons = 1
 	State.pending_relic_chest = not Relics.get_unowned().is_empty()
+	State.pending_skill_envelope = not Skills.reward_offers().is_empty()
 	_change_scene(LEVEL_UP_PATH)
 
 func _open_relic_reward() -> void:
@@ -277,6 +282,15 @@ func _open_relic_reward() -> void:
 		return
 	close()
 	map.view_container.add_child(RELIC_REWARD_SCENE.instantiate())
+
+func _open_skill_reward() -> void:
+	if Skills.reward_offers().is_empty():
+		Helper.show_unlock_message("Alle einzigartigen Skills sind schon gelernt")
+		return
+	close()
+	var dialog: Control = map.skill_reward_dialog()
+	map.view_container.add_child(dialog)
+	dialog.visible = true
 
 ## Wie nach einem Biom-Boss: die Belohnung führt ins nächste Biom, nach dem letzten endet der Run
 func _open_boss_reward() -> void:
@@ -307,6 +321,10 @@ func _add_shards() -> void:
 func _add_keys() -> void:
 	State.keys += DEBUG_KEYS
 	Helper.show_unlock_message("+%d Schlüssel" % DEBUG_KEYS)
+
+func _add_coupon() -> void:
+	State.coupons += 1
+	Helper.show_unlock_message("+1 Gutschein")
 
 func _rotten_eggs_text() -> String:
 	return "FAULE EIER: " + ("AN" if SaveManager.has_full_reroll_charges() else "AUS")
