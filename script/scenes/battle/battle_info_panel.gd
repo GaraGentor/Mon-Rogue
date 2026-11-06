@@ -44,7 +44,10 @@ func refresh() -> void:
 	if rarity_chip:
 		var rarity := Monmap.rarity_of(monster._name)
 		rarity_chip._init_with_element({"label": Monmap.RARITY_LABELS[rarity], "color": Monmap.RARITY_COLORS[rarity]})
-	if moves_badge:
+	if moves_badge and SaveManager.is_three_actions():
+		# Aktionen sind für alle gleich, die Zahl zeigt hier die Stufe der Passive
+		moves_badge.set_passive_level(int(monster._upgrades), Passives.tooltip(monster._name, int(monster._upgrades)))
+	elif moves_badge:
 		# Grundzug plus beim Kerkermeister gesprengte Ketten, von maximal möglichen
 		var max_moves: int = Monster.BASE_MOVES + Monmap.mon_metainfos_by_name(monster._name).get("max_upgrades", 0)
 		moves_badge.set_moves(Monster.BASE_MOVES + monster._upgrades, max_moves)

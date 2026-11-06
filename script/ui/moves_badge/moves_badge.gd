@@ -10,10 +10,17 @@ func _ready() -> void:
 	_center()
 
 func set_moves(moves: int, max_moves: int) -> void:
-	label.text = str(moves)
-	tooltip_text = "%s %d/%d" % [tr("BATTLE_MON_MOVES"), moves, max_moves]
+	_show_value(moves, "%s %d/%d" % [tr("BATTLE_MON_MOVES"), moves, max_moves])
+
+## Modus "3 Aktionen": Stufe der Passive statt Aktionen
+func set_passive_level(level: int, description: String) -> void:
+	_show_value(level, description)
+
+func _show_value(value: int, description: String) -> void:
+	label.text = str(value)
+	tooltip_text = description
 	particles.restart()
-	particles.emitting = moves > 0
+	particles.emitting = value > 0
 	pivot_offset = size / 2
 	scale = Vector2.ONE * 1.6
 	modulate = Color(2, 2, 2)

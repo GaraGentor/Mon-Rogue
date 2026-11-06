@@ -39,7 +39,7 @@ func catch_chance(mon: Monster) -> float:
 	var hp_factor = 1.0 - CATCH_HP_WEIGHT * hp_left
 	var level_factor = clampf(1.0 - CATCH_LEVEL_STEP * (mon._level - _team_level()),
 		CATCH_LEVEL_FACTOR_RANGE[0], CATCH_LEVEL_FACTOR_RANGE[1])
-	var chance = Relics.modify("catch_chance", CATCH_RARITY_BASE[rarity] * hp_factor * level_factor, mon)
+	var chance = Relics.modify("catch_chance", CATCH_RARITY_BASE[rarity] * hp_factor * level_factor * Passives.catch_factor(), mon)
 	if _is_last_stand(mon):
 		chance += CATCH_LAST_STAND_BONUS
 	return clampf(chance,
@@ -130,18 +130,26 @@ func add_biome_element(mon: Monster) -> void:
 		mon._type |= element
 
 const WILD_SKILL_COUNT := 3
+# Modus "3 Aktionen": Skills der wilden Monster pro Biom-Tiefe, spätere Gegner haben mehr Auswahl für ihre Aktionen
+const THREE_ACTIONS_WILD_SKILL_COUNTS := [3, 3, 4, 4, 5]
+
+func _wild_skill_count() -> int:
+	if not SaveManager.is_three_actions():
+		return WILD_SKILL_COUNT
+	return THREE_ACTIONS_WILD_SKILL_COUNTS[clampi(State.map_level, 0, THREE_ACTIONS_WILD_SKILL_COUNTS.size() - 1)]
 
 # Wilde Monster: ein Skill ihrer Art, der Rest aus dem Pool des aktuellen Bioms (tiefere Biome -> stärkere Skills).
 # Gezogen werden nur Skills, die das Monster mit seinem Typ auch einsetzen kann.
 func roll_wild_skills(mon: Monster, mon_meta_data: Dictionary) -> void:
+	var skill_count := _wild_skill_count()
 	var usable = func(skill_name): return Skills.can_use_name(mon, skill_name)
 	var species_pool = mon_meta_data.default_egg_skills.filter(usable)
 	var skill_names = [Skills.pick_weighted(species_pool)]
 	var not_picked = func(skill_name): return not skill_names.has(skill_name)
 	var biome_pool = Skills.get_biome_skills(State.current_biome()).filter(usable).filter(not_picked)
-	skill_names.append_array(Skills.pick_weighted_unique(biome_pool, WILD_SKILL_COUNT - skill_names.size(), State.map_level))
+	skill_names.append_array(Skills.pick_weighted_unique(biome_pool, skill_count - skill_names.size(), State.map_level))
 	# zu wenig passende Biom-Skills: mit den Skills der Art auffüllen
-	skill_names.append_array(Skills.pick_weighted_unique(species_pool.filter(not_picked), WILD_SKILL_COUNT - skill_names.size()))
+	skill_names.append_array(Skills.pick_weighted_unique(species_pool.filter(not_picked), skill_count - skill_names.size()))
 	for skill_name in skill_names:
 		mon._skills.append(Skills.get_skill(skill_name))
 

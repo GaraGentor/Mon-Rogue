@@ -1,7 +1,7 @@
 extends RewardDialog
 
 ## Kerkermeister: rechts steht er selbst, davor bis zu drei Monster-Arten in Vogelkäfigen, angekettet.
-## Jede Kette ist eine fehlende Verbesserung (+1 Aktion pro Zug). Erst stellt er die Gefangenen vor
+## Jede Kette ist eine fehlende Verbesserung (klassisch +1 Aktion pro Zug, im Modus "3 Aktionen" eine Stufe der Passive der Art, siehe Passives). Erst stellt er die Gefangenen vor
 ## (Klick springt zum nächsten Satz). Danach zieht man eine Boss Träne aus der Tasche oben links
 ## zu ihm und wählt den Käfig. Ist die letzte Kette weg, verschwindet der Käfig samt Platz; die anderen
 ## rücken nicht nach, die Lücke bleibt bis zum Neuwürfeln (oben rechts, kostet ME).
@@ -231,7 +231,11 @@ class CageSlot extends VBoxContainer:
 		var moves: int = BASE_MOVES + level
 		_cost_label.text = tr("JAILER_PRICE").format({"cost": jailer.tear_count_text(jailer.upgrade_cost(mon_name))})
 		_cost_label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR if jailer.affordable(mon_name) else TOO_EXPENSIVE_COLOR)
-		_effect_label.text = tr("JAILER_EFFECT").format({"now": moves, "next": moves + 1})
+		if SaveManager.is_three_actions():
+			_effect_label.text = Passives.effect_text(mon_name, level + 1)
+			tooltip_text = Passives.tooltip(mon_name, level)
+		else:
+			_effect_label.text = tr("JAILER_EFFECT").format({"now": moves, "next": moves + 1})
 
 	## Monster und Schild erscheinen, sobald der Kerkermeister sie vorstellt
 	func reveal() -> void:
@@ -531,6 +535,8 @@ func cage_clicked(slot: CageSlot) -> void:
 	var display_name := Helper.mon_display_name(mon_name)
 	if slot.freed:
 		_bubble.say(tr("JAILER_SAY_FREED").format({"mon": display_name}))
+	elif SaveManager.is_three_actions():
+		_bubble.say(tr("JAILER_SAY_CHAIN_PASSIVE").format({"mon": display_name, "passive": Passives.passive_name(mon_name), "effect": Passives.effect_text(mon_name, upgrade_level(mon_name))}))
 	else:
 		_bubble.say(tr("JAILER_SAY_CHAIN").format({"mon": display_name, "moves": BASE_MOVES + upgrade_level(mon_name)}))
 

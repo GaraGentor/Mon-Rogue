@@ -37,6 +37,7 @@ func _ready() -> void:
 	# Schilde, Buffs und Abklingzeiten gelten nur für einen Kampf
 	for mon in State.mons + State.enemy_mons:
 		mon.reset_battle_state()
+		Passives.on_battle_start(mon)
 	# Gegner zeigen ihren ersten Zug schon vor Kampfbeginn
 	for emon in State.enemy_mons:
 		_plan_intent(emon)
@@ -62,6 +63,7 @@ func _is_own_turn() -> bool:
 func _on_turn_for(mon: Monster) -> void:
 	active_mon = mon
 	mon.start_turn()
+	Passives.on_turn_start(mon)
 	var own_index = State.mons.find(mon)
 	if own_index > -1:
 		# Skillpunkte zu Beginn des eigenen Zuges auffüllen
@@ -146,7 +148,8 @@ func _catch_mouse_event(event) -> void:
 		var isOk = subract_skill_points(event.skill, active_mon)
 		print("deal damage" + str(isOk))
 		if isOk:
-			catch_button.disabled = true
+			# klassisch nur vor dem ersten Skill; mit 3 Aktionen, solange noch Aktionen übrig sind
+			catch_button.disabled = not SaveManager.is_three_actions() or active_mon._computed_moves <= 0
 			_use_skill(active_mon, event.skill, target)
 			Events.call_skill_card.emit(event.skill)
 			mouse_action = Enums.MOUSE_ACTION.NONE
@@ -184,6 +187,7 @@ func _use_skill(from: Monster, skill: Dictionary, target: Monster) -> void:
 		if not Skills.targets_friends(skill):
 			Events.monster_hit_monster.emit(_scene_for(from), _scene_for(mon))
 		skill.handle.call({"from": from, "skill": skill, "mon": mon})
+	from._skills_played_this_turn += 1
 	Skills.start_cooldown(skill)
 	Events.monster_status_changed.emit(from)
 	# Treffer decken Werte auf (Skills.reveal_stats_by_hit)
@@ -210,6 +214,8 @@ func _refresh_skill_points() -> void:
 ## - moves: Gewichte für 1/2/3 Aktionen pro Zug, je Gegner gewürfelt [am Anfang, am Ende].
 ##   Eigene Monster kommen nur über den Kerkermeister auf mehr Aktionen, teure Skills (Kosten 2-3)
 ##   und die späten Biome verlangen daher gefangene, stärkere Monster und Verbesserungen.
+##   Im Modus "3 Aktionen" gilt moves nicht: Dort haben alle 3 Aktionen, gesteigert wird über Stufe, Anzahl
+##   und stärkere Skills (Helper.THREE_ACTIONS_WILD_SKILL_COUNTS, Skills.THREE_ACTIONS_DEPTH_TIER_BONUS).
 ## Ein Team, das jeden Kampf ausfechtet (2 K.O.s = +1 Stufe), liegt etwa gleichauf;
 ## wer lieber alles fängt, levelt nicht und fällt zurück.
 const ENCOUNTERS := [
@@ -279,7 +285,7 @@ func _generate_battle():
 		mon._level = maxi(State.INITIAL_LEVEL, level + randi_range(encounter.offset[0], encounter.offset[1]))
 		if mon._bounty != "":
 			mon._level += Skills.get_bounty(mon._bounty).level_bonus
-		mon._initial_moves = maxi(_roll_weighted(encounter.moves, t), min_moves)
+		mon._initial_moves = Monster.default_moves() if SaveManager.is_three_actions() else maxi(_roll_weighted(encounter.moves, t), min_moves)
 		State.record_sighting(mon, depth)
 	print("encounter depth ", depth, " fight ", State.biome_fight_index, ": ", count, "x level ", level)
 	State.enemy_mons = ms
@@ -446,4 +452,9 @@ func _on_catch_pressed() -> void:
 	print(State.enemy_mons)
 	var already_catched = State.catched_mons.find(currently_selected_enemy_mon)
 	if currently_selected_enemy_mon and currently_selected_enemy_mon.is_alive() and already_catched == -1:
+		# mit 3 Aktionen kostet Fangen alle übrigen Aktionen
+		if SaveManager.is_three_actions() and _is_own_turn():
+			active_mon._computed_moves = 0
+			catch_button.disabled = true
+			card_hand.refresh_playable()
 		catch_anim._catch_animation(currently_selected_enemy_mon)

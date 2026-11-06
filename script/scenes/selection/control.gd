@@ -24,6 +24,7 @@ var selected_egg: int = 0
 func _ready() -> void:
 	load_eggs()
 	biome_path.show_path(Map.load_biome_path())
+	add_child(SaveSlotBar.new())
 	# display_mons()
 	Events.select_initial_mon.connect(select_egg)
 	# Events.select_initial_mon.emit(0)
@@ -95,13 +96,15 @@ func _on_pick_egg_button_pressed() -> void:
 		drop_egg(egg_picked_index - 1)
 	if egg_picked_index == 3:
 		title_label.text = tr("SELECTION_TIME_TO_GO")
-		reroll_button.visible = SaveManager.has_full_reroll_charges()
+		reroll_button.visible = SaveManager.has_full_reroll_charges() or DebugSettings.rotten_eggs
 	if egg_picked_index == 4:
 		title_label.text = tr("SELECTION_NO_MORE_EGGS")
 	egg_picked_index += 1
 
 func _on_reroll_button_pressed() -> void:
-	SaveManager.save_data["eggs_rerolled"] = true
+	# über den Debug-Schalter gewürfelt: die echten Ladungen bleiben unberührt
+	if not DebugSettings.rotten_eggs:
+		SaveManager.save_data["eggs_rerolled"] = true
 	roll_eggs()
 	for i in mons.size():
 		drop_egg(i)

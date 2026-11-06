@@ -11,6 +11,9 @@ extends Node
 ## - "moves": Skillpunkte (Züge) eines Monsters zu Beginn seines Zuges, kontext = Monster
 ## - "catch_chance": Fangchance 0..1 vor dem Begrenzen, kontext = gegnerisches Monster
 ## - "battle_ep": EP für einen gewonnenen Kampf, kontext = null
+## - "damage": Faktor auf den Schaden eines Monsters, kontext = Monster
+##
+## "only_mode": Relic gibt es nur in diesem Kampfmodus (SaveManager.MODE_*)
 ##
 ## Für reaktive Effekte ("wenn X passiert, tu Y") kann ein Relic später zusätzlich
 ## "on_<event>" Einträge bekommen, die in _ready() an die Signale aus Events gehängt werden.
@@ -27,9 +30,21 @@ var RELICS := {
 		"description": "RELIC_EXTRA_MOVE_DESC",
 		"icon": "res://assets/ui/icons/sword.svg",
 		"rarity": Rarity.RARE,
+		"only_mode": "classic",
 		"hooks": {
 			# nur eigene Monster profitieren
 			"moves": func(value: int, mon: Monster) -> int: return value + 1 if State.mons.has(mon) else value,
+		},
+	},
+	# Gegenstück zur Kriegstrommel im Modus "3 Aktionen", dort bleibt es immer bei 3 Aktionen
+	"whetstone": {
+		"name": "RELIC_WHETSTONE",
+		"description": "RELIC_WHETSTONE_DESC",
+		"icon": "res://assets/ui/icons/fist.svg",
+		"rarity": Rarity.RARE,
+		"only_mode": "three_actions",
+		"hooks": {
+			"damage": func(value: float, mon: Monster) -> float: return value * 1.15 if State.mons.has(mon) else value,
 		},
 	},
 	"lucky_charm": {
@@ -60,7 +75,10 @@ func has_relic(id: String) -> bool:
 
 ## Relics, die in diesem Run noch nicht gesammelt wurden, optional nur einer Seltenheit
 func get_unowned(rarity: int = -1) -> Array:
-	return RELICS.keys().filter(func(id): return not has_relic(id) and (rarity < 0 or RELICS[id].rarity == rarity))
+	return RELICS.keys().filter(func(id): return not has_relic(id) and _in_current_mode(id) and (rarity < 0 or RELICS[id].rarity == rarity))
+
+func _in_current_mode(id: String) -> bool:
+	return RELICS[id].get("only_mode", SaveManager.combat_mode()) == SaveManager.combat_mode()
 
 func add_relic(id: String) -> void:
 	if not RELICS.has(id) or has_relic(id):

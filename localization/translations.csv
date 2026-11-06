@@ -524,3 +524,43 @@ EGG_CATEGORY_PASSIVE,Passive,Passiv
 BOSS_REWARD_SHARD_AMOUNT,+{amount} Boss Tear,+{amount} Boss Träne
 JAILER_TEAR_COUNT_ONE,{amount} Boss Tear,{amount} Boss Träne
 JAILER_TEAR_COUNT_MANY,{amount} Boss Tears,{amount} Boss Tränen
+SAVE_SLOT,Slot {slot}: {content},Slot {slot}: {content}
+SAVE_SLOT_EMPTY,empty,leer
+SAVE_MODE_CLASSIC,Classic,Klassisch
+SAVE_MODE_THREE_ACTIONS,3 Actions,3 Aktionen
+RELIC_WHETSTONE,Whetstone,Wetzstein
+RELIC_WHETSTONE_DESC,Your monsters deal +15% damage.,Deine Monster verursachen +15 % Schaden.
+JAILER_SAY_CHAIN_PASSIVE,"Clank! One chain less for {mon}. {passive}: {effect}. But the cage stays shut.","Klirr! Eine Kette weniger für {mon}. {passive}: {effect}. Aber der Käfig bleibt zu."
+MAP_NODE_JAILER_DESC_PASSIVE,"The jailer keeps up to three monster species in chains. Every chain is a missing level of the species' passive. Hand him a boss tear to break a chain, permanently, also for future runs. Showing other prisoners costs Monster Essence.","Der Kerkermeister hält bis zu drei Monster-Arten in Ketten. Jede Kette ist eine fehlende Stufe der Passive dieser Art. Gib ihm eine Boss Träne, um eine Kette zu sprengen, dauerhaft, auch für spätere Runs. Andere Gefangene zeigen kostet Monster Essenz."
+PASSIVE_TOOLTIP,"{name} ({level}/{max}): {effect}","{name} ({level}/{max}): {effect}"
+PASSIVE_EFFECT_STAT,+{value}% {stat},+{value} % {stat}
+PASSIVE_EFFECT_TURN_SHIELD_PHYSICAL,Each turn: shield {value}% DEF,Jeden Zug: Schild {value} % VER
+PASSIVE_EFFECT_TURN_SHIELD_MAGICAL,Each turn: shield {value}% SpD,Jeden Zug: Schild {value} % SVE
+PASSIVE_EFFECT_BATTLE_SHIELD_PHYSICAL,Battle start: shield {value}% DEF,Kampfstart: Schild {value} % VER
+PASSIVE_EFFECT_BATTLE_SHIELD_MAGICAL,Battle start: shield {value}% SpD,Kampfstart: Schild {value} % SVE
+PASSIVE_EFFECT_FIRST_SKILL,First skill: +{value}% damage,Erster Skill: +{value} % Schaden
+PASSIVE_EFFECT_FULL_HP,Unhurt target: +{value}% damage,Unverletztes Ziel: +{value} % Schaden
+PASSIVE_EFFECT_LOW_HP,At half HP: +{value}% damage,Ab halben KP: +{value} % Schaden
+PASSIVE_EFFECT_CATCH,Catch chance +{value}%,Fangchance +{value} %
+PASSIVE_STAT_HP,HP,KP
+PASSIVE_STAT_ATK,Attack,Angriff
+PASSIVE_STAT_DEF,Defense,Verteidigung
+PASSIVE_STAT_S_ATK,Sp. Attack,Sp. Angriff
+PASSIVE_STAT_S_DEF,Sp. Defense,Sp. Verteidigung
+PASSIVE_STAT_SPEED,Speed,Initiative
+PASSIVE_1,Storm Call,Sturmruf
+PASSIVE_2,Beacon Shell,Leuchtpanzer
+PASSIVE_3,Shadow Flight,Schattenflug
+PASSIVE_4,Scale Fury,Schuppenwut
+PASSIVE_5,Keen Eyes,Scharfblick
+PASSIVE_6,Rune Axes,Runenäxte
+PASSIVE_7,Grove Blessing,Hainsegen
+PASSIVE_8,Ember Core,Glutkern
+PASSIVE_9,Jelly Body,Gallertleib
+PASSIVE_10,Molten Armor,Lavapanzer
+PASSIVE_11,Luring Call,Lockruf
+PASSIVE_12,Lightning Dive,Blitzsturz
+PASSIVE_13,Crystal Hide,Kristallhaut
+PASSIVE_14,Frost Hunt,Frostjagd
+PASSIVE_15,Mist Body,Nebelleib
+PASSIVE_16,Charged Quills,Geladene Stacheln

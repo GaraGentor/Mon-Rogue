@@ -15,6 +15,10 @@ const MON_ICON_SIZE := 72
 const UNPICKED_COLOR := Color(0.65, 0.65, 0.65)
 const EGG_LABEL_WIDTH := 170
 const EGG_BUTTON_SIZE := Vector2(300, 44)
+const STAT_NAMES := {"hp": "KP", "atk": "Angriff", "def": "Verteidigung", "s_atk": "Sp. Angriff", "s_def": "Sp. Verteidigung", "speed": "Initiative"}
+const STAT_VALUE_WIDTH := 70
+const STAT_STEP_SIZE := Vector2(60, 40)
+const STATS_EXAMPLE_BST := 200
 const DEBUG_ESSENCE := 500
 const DEBUG_SHARDS := 5
 ## So viel Edelstein-Bonus trägt das gefallene Test-Monster, damit Edelsteine vererbt werden können
@@ -44,6 +48,10 @@ var _egg_page: VBoxContainer
 var _egg_rows: VBoxContainer
 ## Art, deren Ei-Attacken gerade angezeigt werden
 var _egg_species: String
+var _stats_page: VBoxContainer
+var _stats_summary: Label
+## Wert -> Label mit dem reservierten Anteil
+var _stat_values := {}
 
 func _ready() -> void:
 	set_accent(ACCENT)
@@ -53,6 +61,7 @@ func _ready() -> void:
 	_build_main()
 	_build_picker()
 	_build_egg_page()
+	_build_stats_page()
 	_show_page(_main)
 
 func _build_main() -> void:
@@ -95,6 +104,7 @@ func _build_main() -> void:
 	_rotten_eggs_button = _make_button(_rotten_eggs_text(), _toggle_rotten_eggs)
 	extras.add_child(_rotten_eggs_button)
 	extras.add_child(_make_button("EI-ATTACKEN ...", func(): _show_page(_egg_page)))
+	extras.add_child(_make_button("WERTE-VERTEILUNG ...", func(): _show_page(_stats_page)))
 
 	var close_button := _make_button("SCHLIESSEN", close)
 	close_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -175,7 +185,7 @@ func _build_egg_page() -> void:
 	first.button_pressed = true
 
 func _show_page(page: VBoxContainer) -> void:
-	for other in [_main, _picker, _egg_page]:
+	for other in [_main, _picker, _egg_page, _stats_page]:
 		other.visible = other == page
 
 func _refresh_start() -> void:
@@ -290,12 +300,66 @@ func _add_shards() -> void:
 	Helper.show_unlock_message("+%d Boss Tränen" % DEBUG_SHARDS)
 
 func _rotten_eggs_text() -> String:
-	return "FAULE EIER: " + ("AN" if SaveManager.has_full_reroll_charges() else "AUS")
+	return "FAULE EIER: " + ("AN" if DebugSettings.rotten_eggs else "AUS")
 
-## Volle Ladungen zeigen in der nächsten Ei-Auswahl den Button "Faule Eier", AUS leert sie
+## Zeigt in der nächsten Ei-Auswahl den Button "Faule Eier". Steht in den Debug-Einstellungen, die Ladungen im Spielstand bleiben unberührt.
 func _toggle_rotten_eggs() -> void:
-	SaveManager.set_reroll_charges(0 if SaveManager.has_full_reroll_charges() else SaveManager.REROLL_CHARGES_NEEDED)
+	DebugSettings.set_rotten_eggs(not DebugSettings.rotten_eggs)
 	_rotten_eggs_button.text = _rotten_eggs_text()
+
+# ─────────────────────────
+# Werte-Verteilung
+
+## Reserve pro Wert, gilt für den Kampfmodus des aktiven Slots
+func _build_stats_page() -> void:
+	_stats_page = VBoxContainer.new()
+	_stats_page.add_theme_constant_override("separation", 10)
+	add_footer(_stats_page)
+
+	var mode_name := "3 Aktionen" if SaveManager.is_three_actions() else "Klassisch"
+	_stats_page.add_child(_make_header("Werte-Verteilung (Slot %d, Modus %s): fester Anteil der BST pro Wert" % [SaveManager.active_slot, mode_name]))
+	for stat in DebugSettings.STATS:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		var label := _make_header(STAT_NAMES[stat])
+		label.custom_minimum_size.x = EGG_LABEL_WIDTH
+		row.add_child(label)
+		for step in [-5, -1]:
+			row.add_child(_make_step_button(stat, step))
+		var value := _make_header("")
+		value.custom_minimum_size.x = STAT_VALUE_WIDTH
+		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		row.add_child(value)
+		_stat_values[stat] = value
+		for step in [1, 5]:
+			row.add_child(_make_step_button(stat, step))
+		_stats_page.add_child(row)
+	_stats_summary = _make_header("")
+	_stats_page.add_child(_stats_summary)
+
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	row.add_child(_make_button("ZURÜCK", _show_page.bind(_main)))
+	row.add_child(_make_button("STANDARD", func():
+		DebugSettings.reset_reserved()
+		_refresh_stats_page()))
+	_stats_page.add_child(row)
+	_refresh_stats_page()
+
+func _make_step_button(stat: String, step: int) -> Button:
+	var button := _make_button("%+d" % step, func():
+		DebugSettings.set_reserved(stat, DebugSettings.reserved(stat) + step)
+		_refresh_stats_page())
+	button.custom_minimum_size = STAT_STEP_SIZE
+	return button
+
+func _refresh_stats_page() -> void:
+	for stat in DebugSettings.STATS:
+		_stat_values[stat].text = "%d %%" % DebugSettings.reserved(stat)
+	var total := DebugSettings.reserved_total()
+	_stats_summary.text = "Reserviert: %d %%, üblicher Weg: %d %%. Bei %d BST: %d fest, %d werden wie gewohnt verteilt. Gilt sofort, auch im laufenden Run." % [
+		total, 100 - total, STATS_EXAMPLE_BST, STATS_EXAMPLE_BST * total / 100, STATS_EXAMPLE_BST * (100 - total) / 100]
 
 # ─────────────────────────
 # Ei-Attacken
@@ -362,7 +426,7 @@ func _start_judgement() -> void:
 	for mon_species in _picked:
 		# wie beim Fangen (catch_anim.gd)
 		var mon := _wild_mon(mon_species, level)
-		mon._initial_moves = Monster.BASE_MOVES
+		mon._initial_moves = Monster.default_moves()
 		State.catched_mons.append(mon)
 		State.mark_mon_caught(mon_species)
 	if _fallen_check.button_pressed:
