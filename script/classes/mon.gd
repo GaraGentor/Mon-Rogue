@@ -44,6 +44,8 @@ var _computed_moves: int = BASE_MOVES:
 
 # Edelstein-Boni für diesen Run: Stat-Key aus STATS in gems.gd -> feste Punkte obendrauf (vor Buffs)
 var _gems: Dictionary = {}
+# Wie viele Steine dahinterstecken: gleicher Stat-Key -> Anzahl (ein Stein gibt je nach Tiefe unterschiedlich viele Punkte)
+var _gem_counts: Dictionary = {}
 # Elemente, die der Spieler im Run vergeben hat (Trank, Erbe), als Maske. Nur die lassen sich vererben, Art- und Biom-Elemente nicht.
 var _gained_elements: int = 0
 # Jedes Monster kann pro Run nur einmal wiederbelebt werden (judgement.gd)
@@ -195,8 +197,13 @@ func _base_stat(stat: String) -> float:
 func gem_bonus(stat: String) -> int:
 	return _gems.get(stat, 0)
 
-func add_gem(stat: String, bonus: int) -> void:
+func gem_count(stat: String) -> int:
+	return _gem_counts.get(stat, 0)
+
+## count > 1: mehrere Steine auf einmal (Erbe eines gefallenen Monsters)
+func add_gem(stat: String, bonus: int, count := 1) -> void:
 	_gems[stat] = _gems.get(stat, 0) + bonus
+	_gem_counts[stat] = gem_count(stat) + count
 
 func gain_element(element: int) -> void:
 	_type = ColorMap.add_element(_type, element)

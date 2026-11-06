@@ -36,6 +36,12 @@ class PlateMon extends RewardDialog.DropTarget:
 		_tween = create_tween()
 		_tween.tween_property(self, "scale", SELECTED_SCALE if selected else Vector2.ONE, SELECT_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
+## Tasche oben links, zeigt die Essenz (wie die Boss Tränen beim Kerkermeister), nur zur Anzeige
+const BAG_SIZE := Vector2(104, 98)
+const ESSENCE_SIZE := Vector2(34, 34)
+const BAG_FONT_SIZE := 18
+## so viel Essenz steht für ein sichtbares Stück in der Tasche
+const ESSENCE_PER_ITEM := 25
 const TRAINER_CARD_SIZE := Vector2(210, 0)
 const TRAINER_TEXT_FONT_SIZE := 14
 ## Karte am Mauszeiger: kleiner als auf dem Tisch und leicht durchscheinend
@@ -96,17 +102,44 @@ var _plates: Array[PlateMon] = []
 var _bubble: SpeechBubble
 var _open_plate: PlateMon
 var _modal: MonSkillsModal
+var _bag: OpenBag
 
 func _ready() -> void:
 	use_scene_layout(background)
-	set_title(tr("TRAINER_TITLE"))
+	_title.visible = false
 	_build_sides()
 	set_drag_hint("TRAINER_HINT")
 	set_card_layout(CARD_COLUMNS, TRAINER_CARD_SIZE, true)
 	for skill in _pick_offers():
 		_add_skill_card(skill)
-	add_money_bar("SHOP_FINISH")
+	_build_top_bar()
 	_first_layout()
+
+## Oben links die Tasche mit der Essenz, oben rechts der Verlassen-Button.
+## Erst aufrufen, wenn alle Karten einen Preis haben
+func _build_top_bar() -> void:
+	var bar := HBoxContainer.new()
+	bar.mouse_filter = MOUSE_FILTER_IGNORE
+	_content.add_child(bar)
+	_content.move_child(bar, 0)
+	_bag = OpenBag.new(BAG_SIZE, ESSENCE_ICON, ESSENCE_SIZE, BAG_FONT_SIZE)
+	bar.add_child(_bag)
+	var gap := Control.new()
+	gap.size_flags_horizontal = SIZE_EXPAND_FILL
+	gap.mouse_filter = MOUSE_FILTER_IGNORE
+	bar.add_child(gap)
+	var exit_button := icon_button(EXIT_ICON)
+	exit_button.tooltip_text = tr("SHOP_FINISH")
+	exit_button.size_flags_vertical = SIZE_SHRINK_BEGIN
+	exit_button.pressed.connect(close)
+	bar.add_child(exit_button)
+	_money_label = _bag.label
+	_money_suffix = ""
+	_watch_money()
+
+func _money_changed(new_val) -> void:
+	super(new_val)
+	_bag.show_items(ceili(State.ep / float(ESSENCE_PER_ITEM)))
 
 ## Ersetzt die beiden Standard-Spalten: links Kartentisch, rechts der Trainer, je die halbe Breite
 func _build_sides() -> void:

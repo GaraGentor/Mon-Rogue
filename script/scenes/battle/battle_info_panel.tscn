@@ -99,7 +99,7 @@ theme_override_constants/h_separation = 3
 columns = 14
 script = ExtResource("4_stats")
 label = NodePath("Label")
-horizontal = true
+stacked = true
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsGrid"]
 visible = false

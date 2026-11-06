@@ -21,13 +21,18 @@ const BONUS_WEIGHTS := {"gem": 60, "potion": 30, "relic": 10}
 const ELEMENTS := [Enums.MON_TYPES.EARTH, Enums.MON_TYPES.AIR, Enums.MON_TYPES.WATER, Enums.MON_TYPES.FIRE]
 
 const ESSENCE_ICON = preload("res://assets/ui/icons/monster_essence.svg")
-const ELEMENT_PILL = preload("res://script/scenes/shop/element_pill.tscn")
+const FLASK_TEXTURE = preload("res://assets/ui/shop/potion_flask.svg")
+const LIQUID_TEXTURE = preload("res://assets/ui/shop/potion_liquid.svg")
+const PROPS_MATERIAL = preload("res://script/scenes/jailer/jailer_props_material.tres")
 
 var _depth: int
 
 func _ready() -> void:
+	use_map_layout()
 	set_accent(ACCENT)
 	set_title(tr("TREASURE_CHOOSE"))
+	set_drag_hint("TREASURE_HINT")
+	show_fixed_targets(State.mons, true)
 	_depth = clampi(State.map_level, 0, GemField.BONUS_BY_DEPTH.size() - 1)
 	var gold := randi_range(GOLD_MIN, GOLD_MAX) + _depth * GOLD_PER_DEPTH
 	add_bag_card(tr("TREASURE_GOLD"), Helper.me_text(gold), texture_icon(ESSENCE_ICON), _on_gold_chosen.bind(gold))
@@ -81,21 +86,19 @@ static func add_potion_card(dialog: RewardDialog, element: int) -> RewardDialog.
 	var tooltip := func(mon: Monster) -> String:
 		var new_type = ColorMap.add_element(mon._type, element)
 		return "%s\n%s %s" % [dialog.tr(ColorMap.get_combo(mon._type).label), dialog.tr("SHOP_CHANGES_TO"), dialog.tr(ColorMap.get_combo(new_type).label)]
-	return dialog.add_mon_card(potion_title, text, _potion_icon(element), dialog.tr("TREASURE_POTION_CHOOSE_MON"), func(): return mons_without(element), give, tooltip)
+	return dialog.add_mon_card(potion_title, text, potion_art(element), dialog.tr("TREASURE_POTION_CHOOSE_MON"), func(): return mons_without(element), give, tooltip)
 
 static func mons_without(element: int) -> Array:
 	return State.mons.filter(func(mon): return not ColorMap.has_element(mon._type, element))
 
-## Trank-Kugel aus dem Shop, ohne Preis, nicht ziehbar und rund (quadratisch eingepasst)
-static func _potion_icon(type: int) -> Control:
-	var pill = ELEMENT_PILL.instantiate()
-	pill._init_pill(type)
-	pill.money_label.visible = false
-	pill.element_label.visible = false
-	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for child in pill.find_children("*", "Control", true, false):
-		child.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var square := AspectRatioContainer.new()
-	square.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	square.add_child(pill)
-	return square
+## Flasche im Pixel-Look, die Flüssigkeit hat die Farbe des Elements. Glas und Korken bleiben ungefärbt.
+static func potion_art(element: int) -> Control:
+	var liquid := texture_icon(LIQUID_TEXTURE)
+	liquid.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var liquid_material: ShaderMaterial = PROPS_MATERIAL.duplicate()
+	liquid_material.set_shader_parameter("tint_color", Helper.color_by_type(element))
+	liquid.material = liquid_material
+	var flask := texture_icon(FLASK_TEXTURE)
+	flask.material = PROPS_MATERIAL
+	flask.add_child(liquid)
+	return flask

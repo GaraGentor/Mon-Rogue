@@ -8,8 +8,11 @@ const ACCENT := Color(0.55, 0.32, 0.75)
 
 func _ready() -> void:
 	State.pending_relic_reward = false
+	use_map_layout()
 	set_accent(ACCENT)
 	set_title(tr("RELIC_REWARD_CHOOSE"))
+	set_drag_hint("RELIC_REWARD_HINT")
+	show_fixed_targets([], true)
 	var offered = Relics.get_unowned()
 	offered.shuffle()
 	for id in offered.slice(0, RELIC_CHOICES):

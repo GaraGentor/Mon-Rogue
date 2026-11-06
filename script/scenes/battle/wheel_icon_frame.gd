@@ -1,38 +1,22 @@
-extends Control
+extends ColorRect
 
-## Verzierter Rahmen eines Monster-Icons auf dem Rad: eine geflochtene Kordel.
-## Ruhig, solange das Monster nicht am Zug ist, sonst pulsiert der Rahmen deutlich.
+## Rahmen eines Monster-Icons auf dem Rad: pixeliger Ring, ruhig solange das Monster nicht am Zug ist.
 
-const TwinedLine := preload("res://script/scenes/battle/twined_line.gd")
-
-## Gerade Zahl, damit das Über und Unter der Kordel am Kreis aufgeht.
-const LOBES := 10
-const PULSE_SPEED := 2.2
-const IDLE_GLOW_MAX := 0.08
-const ACTIVE_GLOW_MIN := 0.25
-const ACTIVE_GLOW_MAX := 1.0
+const SHADER := preload("res://script/scenes/battle/wheel_icon_frame.gdshader")
 
 ## 0 = nicht am Zug, 1 = am Zug. Wird vom TurnWheel getweent.
-var active_amount := 0.0
+var active_amount := 0.0:
+	set(value):
+		active_amount = value
+		_frame_material.set_shader_parameter("active_amount", value)
 
-var _line := TwinedLine.new()
-var _pulse_phase := 0.0
+var _frame_material := ShaderMaterial.new()
 
-func setup(color: Color, pulse_color: Color) -> void:
-	_line.width = 2.5
-	_line.amplitude = 3.0
-	_line.outline = 0.7
-	_line.wobble = 0.3
-	_line.color = color
-	_line.pulse_color = pulse_color
+func _init() -> void:
+	_frame_material.shader = SHADER
+	material = _frame_material
+	resized.connect(func(): _frame_material.set_shader_parameter("rect_size", size))
 
-func _process(delta: float) -> void:
-	_pulse_phase = wrapf(_pulse_phase + PULSE_SPEED * delta, 0.0, TAU)
-	queue_redraw()
-
-func _draw() -> void:
-	draw_set_transform(size / 2)
-	var r := minf(size.x, size.y) / 2.0
-	var glow_min := lerpf(0.0, ACTIVE_GLOW_MIN, active_amount)
-	var glow_max := lerpf(IDLE_GLOW_MAX, ACTIVE_GLOW_MAX, active_amount)
-	_line.draw_braid(self, r, 0.0, TAU, LOBES / 2.0, _pulse_phase, glow_min, glow_max)
+func setup(frame_color: Color, pulse_color: Color) -> void:
+	_frame_material.set_shader_parameter("frame_color", frame_color)
+	_frame_material.set_shader_parameter("pulse_color", pulse_color)

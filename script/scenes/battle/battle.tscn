@@ -8,10 +8,11 @@
 [ext_resource type="PackedScene" uid="uid://dp31mv1lmyood" path="res://script/scenes/battle/monster_scene.tscn" id="5_wskai"]
 [ext_resource type="PackedScene" path="res://script/scenes/battle/battle_info_panel.tscn" id="6_5lcde"]
 [ext_resource type="Theme" uid="uid://b5pomesyumr6n" path="res://script/scenes/battle/flat_button_theme.tres" id="7_uo6ii"]
-[ext_resource type="Texture2D" uid="uid://ck33hdad7oy4q" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 3. Nov. 2025, 18_18_01.png" id="11_uycmc"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/battle/hypnosis_button.svg" id="11_uycmc"]
+[ext_resource type="Material" path="res://script/scenes/jailer/jailer_props_material.tres" id="11_props"]
 [ext_resource type="Shader" uid="uid://b072tfwp8m2f" path="res://script/scenes/battle/catch_anim.gdshader" id="13_3plyr"]
 [ext_resource type="Script" uid="uid://dgw3mowp6ys8c" path="res://script/scenes/battle/catch_anim.gd" id="13_lgcwj"]
-[ext_resource type="Texture2D" uid="uid://b2qv7gtjjlj7u" path="res://assets/ui/types/game-buttons/x256/ChatGPT Image 3. Nov. 2025, 18_19_58.png" id="13_lhy1u"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/battle/end_turn_button.svg" id="13_lhy1u"]
 [ext_resource type="PackedScene" path="res://script/scenes/battle/card_hand.tscn" id="14_hand"]
 [ext_resource type="Theme" path="res://script/ui/materials/pixel_font_theme.tres" id="99_font_theme"]
 
@@ -211,6 +212,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="TextureRect" type="TextureRect" parent="UI/HBoxContainer" unique_id=781254773]
+material = ExtResource("11_props")
 layout_mode = 2
 size_flags_horizontal = 3
 texture = ExtResource("11_uycmc")
@@ -232,6 +234,7 @@ icon = SubResource("ImageTexture_quuqv")
 flat = true
 
 [node name="TextureRect3" type="TextureRect" parent="UI/HBoxContainer" unique_id=1984233202]
+material = ExtResource("11_props")
 layout_mode = 2
 size_flags_horizontal = 3
 texture = ExtResource("13_lhy1u")
@@ -304,7 +307,6 @@ offset_right = 265.5
 offset_bottom = 88.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 64
-text = "BATTLE_CATCH_CALL"
 horizontal_alignment = 1
 
 [node name="Label2" type="Label" parent="Catch_anim/TextureRect" unique_id=903598385]

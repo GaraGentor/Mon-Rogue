@@ -10,10 +10,10 @@ signal end_round()
 
 const IconFrame := preload("res://script/scenes/battle/wheel_icon_frame.gd")
 
-const OWN_COLOR := Color("#2f7a45")
-const OWN_PULSE_COLOR := Color("#52ad6d")
-const ENEMY_COLOR := Color("#8a1650")
-const ENEMY_PULSE_COLOR := Color("#b02468")
+const OWN_COLOR := Color("#1f5a33")
+const OWN_PULSE_COLOR := Color("#5fcf80")
+const ENEMY_COLOR := Color("#6b1030")
+const ENEMY_PULSE_COLOR := Color("#e0304f")
 const ROTATE_DURATION := 0.45
 const ACTIVE_SCALE := 1.35
 const INACTIVE_ALPHA := 0.7
@@ -130,7 +130,7 @@ func _create_icon(mon: Monster) -> Control:
 	icon.size = Vector2(wheel.icon_size, wheel.icon_size)
 	icon.pivot_offset = icon.size / 2
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.55)
+	style.bg_color = Color(0.03, 0.01, 0.02, 0.92)
 	style.set_corner_radius_all(int(wheel.icon_size / 2))
 	icon.add_theme_stylebox_override("panel", style)
 

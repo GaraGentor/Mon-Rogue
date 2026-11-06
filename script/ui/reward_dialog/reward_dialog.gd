@@ -3,8 +3,8 @@ extends Control
 
 ## Gemeinsamer Belohnungs-Dialog über der Karte (Schatz, Edelstein-Feld, Relic-Belohnung, Shop,
 ## Trainer, Jailer):
-## abgedunkelter Hintergrund, mittiges Panel mit Überschrift. Links stehen die Preise,
-## rechts erscheinen beim Ziehen eines Preises die Ziele: eigene Monster oder die Tasche.
+## Panel mit Überschrift, darunter die Anleitung. Links stehen die Preise, rechts die Ziele: eigene
+## Monster oder die Tasche. Sie sind immer zu sehen, aber abgedunkelt, bis ein passender Preis gezogen wird.
 ## Ablegen auf einem Ziel bestätigt die Wahl, Fallenlassen woanders bricht ab.
 ## Standardmäßig schließt der Dialog nach der ersten Wahl, Unterklassen (Shop) können das über
 ## _taken() und _drag_blocked() ändern.
@@ -16,12 +16,10 @@ const ICON_SIZE := Vector2(90, 90)
 const VERTICAL_ICON_SIZE := Vector2(72, 72)
 const VERTICAL_TITLE_FONT_SIZE := 22
 const TARGET_SIZE := Vector2(120, 150)
-## so viele Monster passen ins Team (judgement.gd MAX_TEAM)
-const TARGET_COLUMNS := 2
-## Tasche im Szenen-Layout (use_scene_layout)
-const BAG_FILL_SIZE := Vector2(220, 260)
-## Monster im Szenen-Layout: feste Größe, zwei passen untereinander
-const MON_FILL_SIZE := Vector2(220, 225)
+## Höhe des Karten-Headers (world_map.tscn): darunter beginnt die Kartenfläche
+const MAP_HEADER_HEIGHT := 184.0
+## Bild des Preises am Mauszeiger
+const DRAG_ICON_SIZE := Vector2(84, 84)
 ## so weit darf sich die Maus bei einem Klick auf eine Karte bewegen, sonst ist es ein Ziehen
 const CLICK_MAX_MOVE := 10.0
 const FONT_THEME = preload("res://script/ui/materials/pixel_font_theme.tres")
@@ -44,6 +42,8 @@ const CHIP_PADDING := Vector2(16, 8)
 class RewardCard extends PanelContainer:
 	var dialog: RewardDialog
 	var drag: Dictionary
+	## Bild des Preises, fliegt beim Ziehen mit
+	var icon: Control
 	## Icon und Text, nebeneinander oder (vertikale Karten) untereinander
 	var row: BoxContainer
 	## Titel und Beschreibung, Unterklassen können dazwischen etwas einfügen (insert_detail)
@@ -83,8 +83,10 @@ class DropTarget extends PanelContainer:
 	var mon: Variant
 	## gesperrt (drag.can_drop), z. B. zu teuer: ausgegraut, Ablegen nicht möglich
 	var locked := false
-	## Hintergrund der Standard-Ziele, im Szenen-Layout ausgeblendet
-	var plate: IronPlate
+	## Bild, Name und was Unterklassen ergänzen (Edelsteine: Werte)
+	var box: VBoxContainer
+	## optional: Werte des Monsters, zeigen beim Drüberziehen die Änderung durch den Edelstein
+	var stats: StatsGrid
 
 	func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 		return not locked and dialog._dragged != null and is_same(data, dialog._dragged.drag)
@@ -115,12 +117,12 @@ var _tooltip: PanelContainer
 var _tooltip_label: Label
 ## gerade gezogene Karte, null wenn nichts gezogen wird
 var _dragged: RewardCard
-var _drag_hint := "REWARD_DRAG_HINT"
+## dauerhaft sichtbare Ziele (show_fixed_targets)
+var _fixed_targets: Array[DropTarget] = []
+var _drag_hint := ""
 var _card_size := CARD_SIZE
 ## Bild oben, Text darunter statt Bild links (Shop)
 var _vertical_cards := false
-## Szenen-Layout (Shop): Ziele füllen die ganze rechte Seite statt fester Kästchen
-var _fill_targets := false
 
 func _init() -> void:
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
@@ -153,20 +155,23 @@ func _init() -> void:
 	_columns.add_child(_card_groups)
 	new_card_group()
 
-	# Breite für TARGET_COLUMNS Ziele freihalten, damit das Panel beim Ziehen nicht springt
 	_target_side = VBoxContainer.new()
 	_target_side.add_theme_constant_override("separation", 12)
-	_target_side.custom_minimum_size.x = TARGET_COLUMNS * TARGET_SIZE.x + (TARGET_COLUMNS - 1) * 12
+	_target_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_columns.add_child(_target_side)
+	# Anleitung direkt unter dem Titel, beim Ziehen steht hier, wohin der Preis soll
 	_target_header = Label.new()
 	_target_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_target_header.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_target_header.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
-	_target_side.add_child(_target_header)
+	_content.add_child(_target_header)
+	_content.move_child(_target_header, 1)
+	_target_header.visible = false
 	_target_grid = GridContainer.new()
 	_target_grid.add_theme_constant_override("h_separation", 12)
 	_target_grid.add_theme_constant_override("v_separation", 12)
-	_target_grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_target_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_target_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_target_side.add_child(_target_grid)
 
 	# eigener Tooltip, weil Godot während eines Drags keine Tooltips zeigt
@@ -215,8 +220,34 @@ func use_scene_layout(background: Control) -> void:
 	_panel.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	_panel_plate.visible = false
 	_columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_target_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_fill_targets = true
+
+## Kleine Events: das Panel füllt die ganze Kartenfläche, nur der Header der Karte bleibt sichtbar
+func use_map_layout() -> void:
+	offset_top = MAP_HEADER_HEIGHT
+	_dim.queue_free()
+	_center.remove_child(_panel)
+	_center.queue_free()
+	add_child(_panel)
+	move_child(_panel, 0)
+	_panel.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	_content.add_theme_constant_override("separation", 12)
+	_columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_target_header.visible = true
+
+## Ziele sind ab jetzt immer da und abgedunkelt: die Monster nebeneinander, die Tasche unter dem ersten
+func show_fixed_targets(mons: Array, with_bag: bool) -> void:
+	_target_grid.columns = maxi(mons.size(), 1)
+	for mon in mons:
+		_add_target(Helper.mon_display_name(mon_name(mon)), mon_icon(mon), mon)
+	if with_bag:
+		var bag := texture_icon(BAG_ICON)
+		bag.material = ICON_BUTTON_MATERIAL
+		_add_target(tr("REWARD_BAG"), bag, null)
+		for i in _target_grid.columns - 1:
+			var gap := Control.new()
+			gap.mouse_filter = MOUSE_FILTER_IGNORE
+			_target_grid.add_child(gap)
+	_lock_targets()
 
 ## Eigener Inhalt unter den Zielen, z. B. die Auswahl, welcher Skill vergessen wird (Trainer)
 func add_side_content(control: Control) -> void:
@@ -259,15 +290,15 @@ func _taken(_card: RewardCard) -> void:
 func _drag_blocked(_card: RewardCard) -> String:
 	return ""
 
-## Was beim Ziehen am Mauszeiger hängt: standardmäßig der Titel der Karte
+## Was beim Ziehen am Mauszeiger hängt: standardmäßig das Bild des Preises
 func _make_drag_preview(card: RewardCard) -> Control:
-	var preview := PanelContainer.new()
-	var label := Label.new()
-	label.theme = LABEL_THEME
-	label.text = card.drag.title
-	label.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
-	IronPlate.frame(preview, label, 12, 8)
-	return preview
+	var art: Control = card.icon.duplicate(0)
+	art.custom_minimum_size = DRAG_ICON_SIZE
+	art.size = DRAG_ICON_SIZE
+	art.position = -DRAG_ICON_SIZE / 2
+	var holder := Control.new()
+	holder.add_child(art)
+	return holder
 
 ## Zeigt, warum die Karte nicht gezogen werden darf
 func _show_blocked(reason: String) -> void:
@@ -365,6 +396,7 @@ func add_mon_card(card_title: String, text: String, icon: Control, header: Strin
 func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary) -> RewardCard:
 	var card := RewardCard.new()
 	card.dialog = self
+	card.icon = icon
 	drag.title = card_title
 	card.drag = drag
 	card.custom_minimum_size = _card_size
@@ -405,27 +437,28 @@ func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary
 func _place_card(card: RewardCard) -> void:
 	_card_grid.add_child(card)
 
-func _add_target(target_title: String, icon: Control, mon: Variant, locked := false) -> void:
+func _add_target(target_title: String, icon: Control, mon: Variant) -> void:
 	var target := DropTarget.new()
 	target.dialog = self
 	target.mon = mon
-	target.locked = locked
-	target.modulate = LOCKED_COLOR if locked else Color.WHITE
 	target.custom_minimum_size = TARGET_SIZE
+	target.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	target.size_flags_vertical = Control.SIZE_EXPAND_FILL
 
-	var box := VBoxContainer.new()
-	target.plate = IronPlate.frame(target, box, 8, 8)
+	target.box = VBoxContainer.new()
+	IronPlate.frame(target, target.box, 8, 8)
 	icon.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	box.add_child(icon)
+	target.box.add_child(icon)
 	var label := Label.new()
 	label.text = target_title
 	label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD
-	box.add_child(label)
+	target.box.add_child(label)
 
 	ignore_mouse_below(target)
 	_target_grid.add_child(target)
+	_fixed_targets.append(target)
 
 ## Kinder sollen weder Drag noch Drop abfangen, das macht die Karte bzw. das Ziel selbst
 static func ignore_mouse_below(control: Control) -> void:
@@ -438,47 +471,36 @@ func _show_targets(card: RewardCard) -> void:
 	_target_header.text = card.drag.header
 	_build_targets(card)
 
-## Ziele der Karte anlegen: die Tasche oder die Monster aus drag.mons
+## Nur die Ziele freigeben, die den gezogenen Preis nehmen können: die Tasche oder die Monster aus drag.mons
 func _build_targets(card: RewardCard) -> void:
-	_clear_targets()
-	if _fill_targets:
-		# Ziele mittig im Platz unter der Überschrift, nicht gestreckt
-		_target_grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		_target_grid.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
-	if card.drag.get("bag", false):
-		_target_grid.columns = 1
-		_add_target(tr("REWARD_BAG"), texture_icon(BAG_ICON), null)
-		if _fill_targets:
-			_target_grid.get_child(0).custom_minimum_size = BAG_FILL_SIZE
-		return
-	var mons: Array = card.drag.mons.call() if card.drag.mons is Callable else card.drag.mons
-	if mons.is_empty():
-		_target_header.text = card.drag.get("no_target", tr("REWARD_NO_TARGET"))
-		return
-	_target_grid.columns = 1 if _fill_targets else mini(mons.size(), TARGET_COLUMNS)
-	var title_of: Callable = card.drag.get("target_title", Callable())
+	var into_bag: bool = card.drag.get("bag", false)
+	var mons: Array = []
+	if not into_bag:
+		mons = card.drag.mons.call() if card.drag.mons is Callable else card.drag.mons
+		if mons.is_empty():
+			_target_header.text = card.drag.get("no_target", tr("REWARD_NO_TARGET"))
 	var can_drop: Callable = card.drag.get("can_drop", Callable())
-	for mon in mons:
-		var target_title: String = title_of.call(mon) if title_of.is_valid() else Helper.mon_display_name(mon_name(mon))
-		_add_target(target_title, mon_icon(mon), mon, can_drop.is_valid() and not can_drop.call(mon))
-	if _fill_targets:
-		# Monster untereinander in fester Größe und ohne Box, egal ob eins oder zwei da sind
-		for target: DropTarget in _target_grid.get_children():
-			target.custom_minimum_size = MON_FILL_SIZE
-			target.plate.visible = false
+	for target in _fixed_targets:
+		if target.mon == null:
+			target.locked = not into_bag
+		else:
+			target.locked = not mons.has(target.mon) or (can_drop.is_valid() and not can_drop.call(target.mon))
+		target.modulate = LOCKED_COLOR if target.locked else Color.WHITE
+
+func _lock_targets() -> void:
+	for target in _fixed_targets:
+		target.locked = true
+		target.modulate = LOCKED_COLOR
+		if target.stats:
+			target.stats.show_gem_preview(target.mon)
 
 func _hide_targets() -> void:
-	_clear_targets()
+	_lock_targets()
 	_target_header.text = tr(_drag_hint)
 	_tooltip.visible = false
 	if _dragged:
 		_dragged.modulate.a = SOLD_ALPHA if _dragged.sold else 1.0
 		_dragged = null
-
-func _clear_targets() -> void:
-	for child in _target_grid.get_children():
-		_target_grid.remove_child(child)
-		child.queue_free()
 
 func _notification(what: int) -> void:
 	# Drop auf ein Ziel oder Fallenlassen woanders (= Abbruch)
@@ -487,7 +509,7 @@ func _notification(what: int) -> void:
 
 ## Ziele, die beim Ziehen hervorgehoben werden
 func _drop_targets() -> Array:
-	return _target_grid.get_children()
+	return _fixed_targets
 
 ## Bereich, unter dem der Tooltip eines Ziels erscheint
 func _tooltip_anchor(target: DropTarget) -> Rect2:
@@ -507,8 +529,12 @@ func _process(_delta: float) -> void:
 			target.modulate = HOVER_COLOR if over else Color.WHITE
 		if over:
 			hovered = target
+		if target.stats:
+			target.stats.show_gem_preview(target.mon, _dragged.drag.get("stat", "") if over and not target.locked else "", _dragged.drag.get("bonus", 0))
 	var tooltip: Callable = _dragged.drag.get("tooltip", Callable())
-	var text: String = tooltip.call(hovered.mon) if hovered != null and hovered.mon != null and tooltip.is_valid() else ""
+	# zeigt das Ziel die Änderung selbst an, braucht es keinen Tooltip
+	var wants_tooltip: bool = hovered != null and hovered.mon != null and hovered.stats == null and tooltip.is_valid()
+	var text: String = tooltip.call(hovered.mon) if wants_tooltip else ""
 	_tooltip.visible = text != ""
 	if _tooltip.visible:
 		_tooltip_label.text = text

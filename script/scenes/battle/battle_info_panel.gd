@@ -151,6 +151,11 @@ func _show_egg_category_info(category: Dictionary, entry: Dictionary) -> void:
 		var group_box := VBoxContainer.new()
 		group_box.add_theme_constant_override("separation", 4)
 		_egg_skill_list.add_child(group_box)
+		var divider := ColorRect.new()
+		divider.color = IronPlate.RIM
+		divider.custom_minimum_size.y = EGG_DIVIDER_HEIGHT
+		divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		group_box.add_child(divider)
 		var group_label := _label(tr(group[0]), EGG_SKILL_COLOR)
 		group_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		group_label.add_theme_font_size_override("font_size", 15)
@@ -182,6 +187,7 @@ func _show_egg_category_info(category: Dictionary, entry: Dictionary) -> void:
 
 const EGG_CATEGORY_FONT_SIZE := 20
 const EGG_GROUP_SEPARATION := 20
+const EGG_DIVIDER_HEIGHT := 2.0
 const SKILL_FONT_SIZE := 18
 
 var _egg_skill_list: VBoxContainer

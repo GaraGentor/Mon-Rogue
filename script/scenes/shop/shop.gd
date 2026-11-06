@@ -13,8 +13,6 @@ const RelicReward = preload("res://script/scenes/relic_reward/relic_reward.gd")
 const Treasure = preload("res://script/scenes/treasure/treasure.gd")
 
 const SHELF_TEXTURE = preload("res://assets/ui/shop/shelf.svg")
-const FLASK_TEXTURE = preload("res://assets/ui/shop/potion_flask.svg")
-const LIQUID_TEXTURE = preload("res://assets/ui/shop/potion_liquid.svg")
 const BAG_BACK_TEXTURE = preload("res://assets/ui/jailer/bag_back.svg")
 const BAG_FRONT_TEXTURE = preload("res://assets/ui/jailer/bag_front.svg")
 const PROPS_MATERIAL = preload("res://script/scenes/jailer/jailer_props_material.tres")
@@ -519,7 +517,6 @@ func _fill_shelves() -> void:
 		_filling_shelf = SHELF_POTIONS_LEFT if i < elements.size() / 2 else SHELF_POTIONS_RIGHT
 		var card := Treasure.add_potion_card(self, elements[i])
 		card.drag.element = elements[i]
-		card.set_art(_potion_art(elements[i]))
 		set_price(card, ELEMENT_PRICE, true)
 	_filling_shelf = SHELF_GEMS
 	_add_gem_offers()
@@ -528,17 +525,6 @@ func _fill_shelves() -> void:
 	# die Bühne kennt ihre Größe erst nach dem ersten Layout
 	await get_tree().process_frame
 	_layout_stage()
-
-## Flasche im Pixel-Look, die Flüssigkeit hat die Farbe des Elements. Glas und Korken bleiben ungefärbt.
-func _potion_art(element: int) -> Control:
-	var liquid := texture_icon(LIQUID_TEXTURE)
-	liquid.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	var liquid_material: ShaderMaterial = PROPS_MATERIAL.duplicate()
-	liquid_material.set_shader_parameter("tint_color", Helper.color_by_type(element))
-	liquid.material = liquid_material
-	var flask := texture_icon(FLASK_TEXTURE)
-	flask.add_child(liquid)
-	return flask
 
 func _depth() -> int:
 	return clampi(State.map_level, 0, GEM_PRICES.size() - 1)
@@ -549,8 +535,6 @@ func _add_gem_offers() -> void:
 	stats.shuffle()
 	for stat in stats.slice(0, GEM_OFFERS):
 		var card: ShelfItem = GemField.add_gem_card(self, stat, bonus)
-		card.drag.stat = stat
-		card.drag.bonus = bonus
 		card.set_art(texture_icon(GemField.GEM_ICON))
 		card.set_tint(GemField.STATS[stat].color)
 		set_price(card, GEM_PRICES[_depth()])
@@ -664,6 +648,11 @@ func _jump_for_joy() -> void:
 		_jump.parallel().tween_property(checkout_image, "rotation_degrees", 0.0, JUMP_SECONDS)
 
 # ── Kaufen ─────────────────────────
+
+## Verkaufte Einzelstücke verschwinden aus dem Regal, die übrige Ware bleibt an ihrem Platz
+func mark_sold(card: RewardCard) -> void:
+	super(card)
+	card.visible = false
 
 ## Gekauft, sobald die Ware auf einem Ziel liegt
 func _taken(card: RewardCard) -> void:

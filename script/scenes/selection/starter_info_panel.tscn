@@ -108,7 +108,7 @@ theme_override_constants/h_separation = 3
 columns = 14
 script = ExtResource("4_stats")
 label = NodePath("Label")
-horizontal = true
+stacked = true
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsGrid"]
 visible = false
@@ -146,10 +146,10 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
 
 [node name="SkillGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/SkillPanel/ScrollContainer/MarginContainer"]
 layout_mode = 2

@@ -9,7 +9,6 @@ SELECTION_TIME_TO_GO,... it's time to go ...,... es ist Zeit aufzubrechen ...
 SELECTION_NO_MORE_EGGS,... no more eggs... Go! ...,... keine Eier mehr... Los! ...
 SELECTION_REROLL_EGGS,Rotten Eggs,Faule Eier
 BIOME_DEPTH,Depth {depth},Tiefe {depth}
-CONFIGURATOR_TITLE,Choose 3 egg moves for your journey,Wähle 3 Ei-Attacken für deine Reise
 CONFIGURATOR_GO,Set off...,Aufbrechen...
 CONFIGURATOR_COUNTER,{count}/{max} selected,{count}/{max} gewählt
 CONFIGURATOR_SKILL_STATS,Cost {cost} · CD {cooldown} ·,Kosten {cost} · CD {cooldown} ·
@@ -41,7 +40,6 @@ BATTLE_END_TURN,"
 End Turn","
 
 Zugende"
-BATTLE_CATCH_CALL,Come... Join me...,Komm... Schließ dich mir an...
 BATTLE_CATCH_NOT_ON_SIDE,is not on your side!,ist nicht auf deiner Seite!
 BATTLE_CATCH_SUCCESS,Will now fight for you!,Kämpft jetzt für dich!
 BATTLE_CATCH_FAILED,Hypnosis failed!,Hypnose fehlgeschlagen!
@@ -61,7 +59,6 @@ BOSS_REWARD_EGG_DESC,Choose one of your current monsters to appear as eggs in a 
 BOSS_REWARD_CHOOSE_ONE,Choose wisely one of two rewards,Wähle weise eine von zwei Belohnungen
 BOSS_REWARD_THANKS,Thanks for playing,Danke fürs Spielen
 BOSS_REWARD_NEW_RUN,Start a new run!,Neuen Lauf starten!
-HEAL_CAMP_DESC,Your team feels refreshed and heals 50% of their health!,Dein Team fühlt sich erfrischt und heilt 50% seiner Lebenspunkte!
 JAILER_REROLL,Other prisoners for {cost} ME ({money}),Andere Gefangene für {cost} ME ({money})
 JAILER_FINISH,Finish,Fertig
 JAILER_BUY,Buy for Boss Tears,Für Boss Tränen kaufen
@@ -137,7 +134,6 @@ JUDGEMENT_REPLACE,Forget {skill},{skill} vergessen
 BATTLE_UNKNOWN_SKILL,? (Tier {tier}),? (Stufe {tier})
 BATTLE_UNKNOWN_SKILL_HINT,Element and tier are known. The details are revealed once the enemy uses this move or you catch it.,"Element und Stufe sind bekannt. Die Details zeigen sich, sobald der Gegner die Attacke einsetzt oder du ihn fängst."
 LEVEL_UP_TITLE,Level Up!,Level Up!
-LEVEL_UP_KILLED,Killed Monsters: {count},Besiegte Monster: {count}
 SHOP_CHANGES_TO,Changes to,Wird zu
 SHOP_DRAG_HINT,"Drag an Element Potion
 or a Gem onto
@@ -387,7 +383,6 @@ GEM_CHOOSE,Choose a gem,Wähle einen Edelstein
 GEM_CHOOSE_MON,Which monster gets the gem?,Welches Monster bekommt den Edelstein?
 GEM_DESC,{stat} +{value} for the rest of the run,{stat} +{value} für den restlichen Lauf
 GEM_CURRENT,Gems so far: +{value},Bisherige Edelsteine: +{value}
-REWARD_DRAG_HINT,Drag a prize over here.,Zieh einen Preis hier herüber.
 REWARD_BAG,Bag,Tasche
 REWARD_BAG_HEADER,Into the bag!,Ab in die Tasche!
 GEM_HP,Ruby of Life,Rubin des Lebens
@@ -422,7 +417,6 @@ BATTLE_INTENT_BUFF,Buff -> {target},Buff -> {target}
 BATTLE_INTENT_SELF,itself,sich selbst
 BATTLE_INCOMING,Incoming: {full},Eingehend: {full}
 BATTLE_INCOMING_BLOCKED,Incoming: {full} -> {after} after shield,Eingehend: {full} -> {after} nach Schild
-TRAINER_TITLE,Trainer,Trainer
 TRAINER_HINT,Drag a skill onto a monster to teach it.,"Zieh einen Skill auf ein Monster, um ihn ihm beizubringen."
 TRAINER_CHOOSE_MON,Who should learn it?,Wer soll ihn lernen?
 TRAINER_ELEMENT,Element: {element},Element: {element}
@@ -489,7 +483,6 @@ EVENT_WHEEL_SPIN,Spin!,Drehen!
 EVENT_WHEEL_WIN,You win {amount} ME!,Du gewinnst {amount} ME!
 EVENT_WHEEL_LOSE,You lose {amount} ME...,Du verlierst {amount} ME...
 MAP_HEADER_BIOME,{biome} · Depth {depth},{biome} · Tiefe {depth}
-MAP_HEADER_TEAM,Team:,Team:
 MAP_HEADER_NO_RELICS,No relics yet,Noch keine Relikte
 MAP_TEAM_ENTRY,{name}  Lv {level},{name}  Lv {level}
 MAP_TEAM_HP,{hp} / {max} HP,{hp} / {max} KP
@@ -524,3 +517,9 @@ EGG_CATEGORY_PASSIVE,Passive,Passiv
 BOSS_REWARD_SHARD_AMOUNT,+{amount} Boss Tear,+{amount} Boss Träne
 JAILER_TEAR_COUNT_ONE,{amount} Boss Tear,{amount} Boss Träne
 JAILER_TEAR_COUNT_MANY,{amount} Boss Tears,{amount} Boss Tränen
+TREASURE_HINT,Drag a prize onto a monster or into the bag.,Zieh einen Preis auf ein Monster oder in die Tasche.
+GEM_HINT,Drag a gem onto one of your monsters.,Zieh einen Edelstein auf eines deiner Monster.
+RELIC_REWARD_HINT,Drag a relic into the bag.,Zieh ein Relikt in die Tasche.
+BATTLE_CATCH_CALL_1,Come...,Komm...
+BATTLE_CATCH_CALL_2,Follow me...,Folge mir...
+MONSTER_INFO_BACK,Back,Zurück

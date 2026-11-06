@@ -89,6 +89,7 @@ func _ready() -> void:
 	shown_biome = State.current_biome()
 	# nach Lager, Shop & Co. haben sich KP oder Elemente des Teams evtl. geändert
 	view_container.child_exiting_tree.connect(func(_child): team_bar.refresh.call_deferred())
+	team_bar.dialog_parent = view_container
 
 	await get_tree().process_frame
 	if State.killed_monsters >= 1:

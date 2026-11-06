@@ -330,7 +330,7 @@ func _inherit(fallen: Monster, result: Dictionary) -> void:
 	match result.gift.kind:
 		"gems":
 			for stat in fallen._gems:
-				heir.add_gem(stat, fallen._gems[stat])
+				heir.add_gem(stat, fallen._gems[stat], fallen.gem_count(stat))
 		"element":
 			heir.gain_element(result.gift.element)
 		"skill":

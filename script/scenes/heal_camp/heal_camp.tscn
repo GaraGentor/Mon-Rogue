@@ -2,8 +2,6 @@
 
 [ext_resource type="Script" path="res://script/scenes/heal_camp/heal_camp.gd" id="1_t64m8"]
 [ext_resource type="Shader" path="res://script/scenes/world_map/map_background.gdshader" id="2_0ig3j"]
-[ext_resource type="Theme" uid="uid://bqwc2gott07le" path="res://script/ui/materials/battle_labels.tres" id="2_ae7ly"]
-[ext_resource type="Script" path="res://script/ui/shader/iron_plate.gd" id="3_plate"]
 [ext_resource type="PackedScene" path="res://script/scenes/heal_camp/camp_fire.tscn" id="4_fire"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_5bmje"]
@@ -28,7 +26,7 @@ shader_parameter/dither_fps = 10.0
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_nfe6y"]
 
-[node name="HealCamp" type="Control" node_paths=PackedStringArray("left_slot", "right_slot", "content")]
+[node name="HealCamp" type="Control" node_paths=PackedStringArray("left_slot", "right_slot", "fire")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -38,7 +36,7 @@ grow_vertical = 2
 script = ExtResource("1_t64m8")
 left_slot = NodePath("MarginContainer/VBoxContainer/MonsterRow/LeftSlot")
 right_slot = NodePath("MarginContainer/VBoxContainer/MonsterRow/RightSlot")
-content = NodePath("MarginContainer/VBoxContainer")
+fire = NodePath("MarginContainer/VBoxContainer/MonsterRow/CampFire")
 
 [node name="ColorRect" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_5bmje")
@@ -67,30 +65,6 @@ theme_override_constants/margin_bottom = 24
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 20
-
-[node name="TitlePanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-
-[node name="Plate" type="ColorRect" parent="MarginContainer/VBoxContainer/TitlePanel"]
-layout_mode = 2
-script = ExtResource("3_plate")
-
-[node name="Margin" type="MarginContainer" parent="MarginContainer/VBoxContainer/TitlePanel"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 12
-
-[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/TitlePanel/Margin"]
-layout_mode = 2
-theme = ExtResource("2_ae7ly")
-theme_override_colors/font_color = Color(0.858824, 0.717647, 0.45098, 1)
-theme_override_font_sizes/font_size = 22
-text = "HEAL_CAMP_DESC"
-horizontal_alignment = 1
 
 [node name="MonsterRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2

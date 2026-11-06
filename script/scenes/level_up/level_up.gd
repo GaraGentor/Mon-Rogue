@@ -6,8 +6,6 @@ var debug_mons=2
 @export var monster_scene1: Control
 @export var monster_scene2: Control
 
-@export var killed_monsters_label: Label
-
 @export var go_button: Button
 
 # Called when the node enters the scene tree for the first time.
@@ -25,7 +23,6 @@ func _ready() -> void:
 	if State.mons.size() == 2:
 		monster_scene2.init_with_mon(State.mons[1])
 		monster_scene2.visible = true
-	killed_monsters_label.text = tr("LEVEL_UP_KILLED").format({"count": State.killed_monsters})
 	_start()
 
 func _start() -> void:

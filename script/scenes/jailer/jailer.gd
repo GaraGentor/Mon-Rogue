@@ -11,8 +11,6 @@ const CHAIN_BROKEN_TEXTURE = preload("res://assets/ui/jailer/chain_broken.svg")
 const CAGE_BACK_TEXTURE = preload("res://assets/ui/jailer/birdcage_back.svg")
 const CAGE_FRONT_TEXTURE = preload("res://assets/ui/jailer/birdcage_front.svg")
 const PEDESTAL_TEXTURE = preload("res://assets/ui/jailer/pedestal.svg")
-const BAG_BACK_TEXTURE = preload("res://assets/ui/jailer/bag_back.svg")
-const BAG_FRONT_TEXTURE = preload("res://assets/ui/jailer/bag_front.svg")
 const SHARD_TEXTURE = preload("res://assets/ui/jailer/boss_tear.svg")
 const REROLL_TEXTURE = preload("res://assets/ui/jailer/icon_reroll.svg")
 const EXIT_TEXTURE = preload("res://assets/ui/jailer/icon_exit.svg")
@@ -49,12 +47,9 @@ const INTRO_SECONDS_PER_CHAR := 0.035
 class ShardBag extends RewardDialog.RewardCard:
 	const BAG_SIZE := Vector2(150, 142)
 	const SHARD_SIZE := Vector2(40, 60)
-	## sichtbare Tränen: Mitte als Anteil der Taschengröße und Neigung in Grad, hinten zuerst
-	const SPOTS := [[0.5, 0.2, 0.0], [0.27, 0.25, -18.0], [0.73, 0.25, 18.0], [0.38, 0.32, -7.0], [0.63, 0.32, 8.0]]
-	const PLAQUE_CENTER := Vector2(0.5, 0.73)
+	const FONT_SIZE := 22
 
-	var _shards: Control
-	var _count: Label
+	var _bag: OpenBag
 
 	func _init() -> void:
 		custom_minimum_size = BAG_SIZE
@@ -62,40 +57,14 @@ class ShardBag extends RewardDialog.RewardCard:
 		mouse_default_cursor_shape = Control.CURSOR_DRAG
 		add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 		var holder := Control.new()
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(holder)
-		holder.add_child(_layer(BAG_BACK_TEXTURE))
-		_shards = Control.new()
-		holder.add_child(_shards)
-		holder.add_child(_layer(BAG_FRONT_TEXTURE))
-		_count = Label.new()
-		_count.theme = RewardDialog.LABEL_THEME
-		_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_count.size = Vector2(44, 44)
-		_count.position = BAG_SIZE * PLAQUE_CENTER - _count.size / 2
-		holder.add_child(_count)
-		RewardDialog.ignore_mouse_below(self)
-
-	func _layer(texture: Texture2D) -> TextureRect:
-		var layer := RewardDialog.texture_icon(texture) as TextureRect
-		layer.size = BAG_SIZE
-		layer.material = PROPS_MATERIAL
-		return layer
+		_bag = OpenBag.new(BAG_SIZE, SHARD_TEXTURE, SHARD_SIZE, FONT_SIZE)
+		holder.add_child(_bag)
 
 	func show_count(count: int) -> void:
-		_count.text = str(count)
-		for shard in _shards.get_children():
-			_shards.remove_child(shard)
-			shard.queue_free()
-		for spot in SPOTS.slice(0, mini(count, SPOTS.size())):
-			var shard := RewardDialog.texture_icon(SHARD_TEXTURE)
-			shard.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			shard.material = PROPS_MATERIAL
-			shard.size = SHARD_SIZE
-			shard.pivot_offset = SHARD_SIZE / 2
-			shard.position = Vector2(spot[0], spot[1]) * BAG_SIZE - SHARD_SIZE / 2
-			shard.rotation_degrees = spot[2]
-			_shards.add_child(shard)
+		_bag.label.text = str(count)
+		_bag.show_items(count)
 
 ## Ein Kettenstück, gesprengte Ketten sind offen und rostig
 class ChainLink extends TextureRect:

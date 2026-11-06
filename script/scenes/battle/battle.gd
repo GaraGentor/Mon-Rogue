@@ -2,6 +2,7 @@ extends Control
 
 const ENEMY_THINK_TIME := 0.6
 const ENEMY_ACTION_TIME := 0.9
+const NOISE_SHADER := preload("res://script/scenes/world_map/map_noise.gdshader")
 
 @export var catch_anim: Control
 @export var catch_button: Button
@@ -30,6 +31,7 @@ func _enter_tree() -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	_add_ambient()
 	Events.mouse_event.connect(_catch_mouse_event)
 	Events.monster_faints.connect(_check_game_over)
 	Events.finish_catching.connect(_finish_catching)
@@ -55,6 +57,20 @@ func _ready() -> void:
 	turn_wheel.turn_for.connect(_on_turn_for)
 	card_hand.show_mon(State.mons[0])
 	turn_wheel.start()
+
+## Im schwarzen Infobereich zieht das Wetter des aktuellen Bioms durch, im selben Pixel-Look wie auf der Karte
+func _add_ambient() -> void:
+	var ui_background: Control = $UI/ColorRect
+	var weather := MapWeather.new()
+	ui_background.add_sibling(weather)
+	weather.apply_look(MapBiomeTheme.get_look(State.current_biome()))
+	var noise_material := ShaderMaterial.new()
+	noise_material.shader = NOISE_SHADER
+	var noise := ColorRect.new()
+	noise.material = noise_material
+	noise.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	weather.add_sibling(noise)
+	noise.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 func _is_own_turn() -> bool:
 	return active_mon != null and State.mons.has(active_mon)

@@ -9,27 +9,20 @@ const SHOP_SCENE = preload("res://script/scenes/shop/shop.tscn")
 const TRAINER_SCENE = preload("res://script/scenes/trainer/trainer.tscn")
 
 const ACCENT := Color(0.35, 0.65, 0.3)
-const STATION_SIZE := Vector2(220, 230)
-const STATION_ICON_SIZE := 110
+const STATION_ICON_SIZE := 220
 const STATION_FONT_SIZE := 22
 const DONE_MODULATE := Color(0.5, 0.5, 0.5)
 
 func _ready() -> void:
+	use_map_layout()
 	set_accent(ACCENT)
 	set_title(tr("HUB_TITLE"))
+	set_drag_hint("HUB_DESC")
 	# keine Preise und Ziele, nur die Stationen
 	_columns.visible = false
 
-	var description := Label.new()
-	description.text = tr("HUB_DESC")
-	description.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
-	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	description.custom_minimum_size.x = 3 * STATION_SIZE.x + 2 * 20
-	add_footer(description)
-
 	var stations := HBoxContainer.new()
-	stations.alignment = BoxContainer.ALIGNMENT_CENTER
+	stations.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	stations.add_theme_constant_override("separation", 20)
 	stations.theme = LABEL_THEME
 	stations.add_child(_station("HUB_REST", Map.ICONS[Map.PATH_TYPE.CAMP], HEAL_CAMP_SCENE))
@@ -50,7 +43,7 @@ func _station(label: String, icon: Texture2D, scene: PackedScene) -> Button:
 	button.expand_icon = true
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-	button.custom_minimum_size = STATION_SIZE
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_constant_override("icon_max_width", STATION_ICON_SIZE)
 	button.add_theme_font_size_override("font_size", STATION_FONT_SIZE)
 	button.pressed.connect(_open_station.bind(button, scene))

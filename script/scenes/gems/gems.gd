@@ -20,17 +20,53 @@ const STATS := {
 const BONUS_BY_DEPTH := [15, 20, 25, 30, 35]
 
 const GEM_ICON = preload("res://assets/ui/shop/gem.svg")
+const COUNT_ICON_SIZE := Vector2(20, 20)
+const COUNT_FONT_SIZE := 16
+## noch nicht gesammelte Steine treten zurück
+const NO_GEM_ALPHA := 0.35
 
 var _bonus: int
 
 func _ready() -> void:
+	use_map_layout()
 	set_accent(ACCENT)
 	set_title(tr("GEM_CHOOSE"))
+	set_drag_hint("GEM_HINT")
+	show_fixed_targets(State.mons, false)
+	for target in _fixed_targets:
+		target.box.add_child(gem_counts(target.mon))
+		target.stats = StatsGrid.stacked_for(target.mon)
+		target.box.add_child(target.stats)
+		ignore_mouse_below(target)
 	_bonus = BONUS_BY_DEPTH[clampi(State.map_level, 0, BONUS_BY_DEPTH.size() - 1)]
 	var stats = STATS.keys()
 	stats.shuffle()
 	for stat in stats.slice(0, GEM_CHOICES):
 		add_gem_card(self, stat, _bonus)
+
+## Eine Zeile mit allen Steinarten und wie viele davon das Monster schon hat
+static func gem_counts(mon: Monster) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 10)
+	for stat in STATS:
+		var count := mon.gem_count(stat)
+		var entry := HBoxContainer.new()
+		entry.add_theme_constant_override("separation", 3)
+		entry.tooltip_text = TranslationServer.translate(STATS[stat].name)
+		if count == 0:
+			entry.modulate.a = NO_GEM_ALPHA
+		var icon := texture_icon(GEM_ICON, STATS[stat].color)
+		icon.custom_minimum_size = COUNT_ICON_SIZE
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		entry.add_child(icon)
+		var label := Label.new()
+		label.text = str(count)
+		label.add_theme_font_size_override("font_size", COUNT_FONT_SIZE)
+		label.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
+		entry.add_child(label)
+		row.add_child(entry)
+	return row
 
 ## Edelstein-Karte, auch von Schatz und Shop genutzt: wird auf ein Monster gezogen.
 ## Beim Drüberziehen zeigt der Tooltip, wie viel Bonus das Monster schon hat.
@@ -42,4 +78,4 @@ static func add_gem_card(dialog: RewardDialog, stat: String, bonus: int) -> Rewa
 		mon.add_gem(stat, bonus)
 	var tooltip := func(mon: Monster) -> String:
 		return "%s +%d\n%s" % [stat_name, bonus, dialog.tr("GEM_CURRENT").format({"value": mon.gem_bonus(stat)})]
-	return dialog.add_mon_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, tooltip)
+	return dialog.add_mon_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, tooltip, {"stat": stat, "bonus": bonus})
