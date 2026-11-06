@@ -1,4 +1,4 @@
-extends RewardDialog
+extends ChestRewardDialog
 
 ## Schatz: Monster Essenz oder ein Bonus-Preis, einer davon darf genommen werden.
 ## Der Bonus ist meist ein Edelstein, sonst ein Element-Trank oder selten ein gewöhnliches Relic.
@@ -28,7 +28,7 @@ const PROPS_MATERIAL = preload("res://script/scenes/jailer/jailer_props_material
 var _depth: int
 
 func _ready() -> void:
-	use_map_layout()
+	use_chest_layout()
 	set_accent(ACCENT)
 	set_title(tr("TREASURE_CHOOSE"))
 	set_drag_hint("TREASURE_HINT")
@@ -38,6 +38,7 @@ func _ready() -> void:
 	var gold := randi_range(GOLD_MIN, GOLD_MAX) + _depth * GOLD_PER_DEPTH
 	add_bag_card(tr("TREASURE_GOLD"), Helper.me_text(gold), texture_icon(ESSENCE_ICON), _on_gold_chosen.bind(gold))
 	_add_bonus_card()
+	play_chest_intro()
 
 func _on_gold_chosen(gold: int) -> void:
 	State.ep += gold

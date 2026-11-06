@@ -249,6 +249,14 @@ func use_map_layout() -> void:
 	_columns.add_child(_card_scroll)
 	_columns.move_child(_card_scroll, 0)
 
+## Eigene Fläche statt der Kartenspalte (nach use_map_layout), die Preise legt dann _place_card darauf
+func use_card_stage(stage: Control) -> void:
+	_columns.remove_child(_card_scroll)
+	_card_scroll.queue_free()
+	_card_scroll = null
+	_columns.add_child(stage)
+	_columns.move_child(stage, 0)
+
 ## Panel eines Dialogs auf der Kartenfläche: mit Abstand zum Rand, die Karte bleibt ringsum sichtbar
 static func fit_to_map_area(panel: Control) -> void:
 	panel.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
@@ -320,7 +328,7 @@ func close() -> void:
 ## schließt den Dialog und liefert die Titel der vergebenen Preise
 func take_all() -> PackedStringArray:
 	var titles := PackedStringArray()
-	for card: RewardCard in _card_grid.get_children():
+	for card: RewardCard in _takeable_cards():
 		if card.drag.get("bag", false):
 			card.drag.on_drop.call()
 		else:
@@ -331,6 +339,10 @@ func take_all() -> PackedStringArray:
 		titles.append(card.drag.title)
 	close()
 	return titles
+
+## Alle Preise, die take_all vergibt
+func _takeable_cards() -> Array:
+	return _card_grid.get_children()
 
 ## Nach einer Wahl: standardmäßig ist der Dialog damit fertig
 func _taken(_card: RewardCard) -> void:
@@ -449,12 +461,19 @@ func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary
 	card.icon = icon
 	drag.title = card_title
 	card.drag = drag
-	card.custom_minimum_size = _card_size
 	card.mouse_default_cursor_shape = Control.CURSOR_DRAG
 	# das Mausrad soll auch über den Karten scrollen, Ziehen klappt trotzdem
 	if _card_scroll:
 		card.mouse_filter = Control.MOUSE_FILTER_PASS
+	_build_card(card, card_title, text)
+	ignore_mouse_below(card)
+	_place_card(card)
+	return card
 
+## Aussehen der Karte: Bild und Text auf einer Eisenplatte. Unterklassen können es ersetzen (Edelsteine)
+func _build_card(card: RewardCard, card_title: String, text: String) -> void:
+	var icon := card.icon
+	card.custom_minimum_size = _card_size
 	card.row = VBoxContainer.new() if _vertical_cards else HBoxContainer.new()
 	card.row.add_theme_constant_override("separation", 8 if _vertical_cards else 12)
 	IronPlate.frame(card, card.row, 12, 12)
@@ -481,10 +500,6 @@ func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.add_theme_font_size_override("font_size", VERTICAL_TITLE_FONT_SIZE)
 		description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-
-	ignore_mouse_below(card)
-	_place_card(card)
-	return card
 
 ## Karte ins Layout setzen, Unterklassen können sie selbst anordnen (Trainer)
 func _place_card(card: RewardCard) -> void:

@@ -1,4 +1,4 @@
-extends RewardDialog
+extends ChestRewardDialog
 
 ## Edelstein-Feld: drei Edelsteine zur Wahl, der gewählte erhöht einen Wert eines eigenen
 ## Monsters um feste Punkte für den restlichen Run. Pro Biom-Tiefe werden die Steine stärker.
@@ -28,7 +28,7 @@ const NO_GEM_ALPHA := 0.35
 var _bonus: int
 
 func _ready() -> void:
-	use_map_layout()
+	use_chest_layout()
 	set_accent(ACCENT)
 	set_title(tr("GEM_CHOOSE"))
 	set_drag_hint("GEM_HINT")
@@ -39,6 +39,7 @@ func _ready() -> void:
 	stats.shuffle()
 	for stat in stats.slice(0, GEM_CHOICES):
 		add_gem_card(self, stat, _bonus)
+	play_chest_intro()
 
 ## Monster-Ziele zeigen ihre gesammelten Steine und ihre Werte, beim Ziehen auch die Änderung durch den Stein
 static func show_gem_info(dialog: RewardDialog) -> void:

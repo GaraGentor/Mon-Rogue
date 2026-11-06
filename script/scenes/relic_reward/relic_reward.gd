@@ -1,4 +1,4 @@
-extends RewardDialog
+extends ChestRewardDialog
 
 ## Relic-Auswahl nach einem Boss-Sieg (Boss-Feld oder Biom-Boss): bis zu RELIC_CHOICES
 ## noch nicht gesammelte Relics, eins davon darf genommen werden.
@@ -8,7 +8,7 @@ const ACCENT := Color(0.55, 0.32, 0.75)
 
 func _ready() -> void:
 	State.pending_relic_reward = false
-	use_map_layout()
+	use_chest_layout()
 	set_accent(ACCENT)
 	set_title(tr("RELIC_REWARD_CHOOSE"))
 	set_drag_hint("RELIC_REWARD_HINT")
@@ -17,6 +17,7 @@ func _ready() -> void:
 	offered.shuffle()
 	for id in offered.slice(0, RELIC_CHOICES):
 		add_relic_card(self, id)
+	play_chest_intro()
 
 ## Relic-Karte, auch von Schatz und Shop genutzt: wird in die Tasche gezogen
 static func add_relic_card(dialog: RewardDialog, id: String) -> RewardDialog.RewardCard:
