@@ -30,3 +30,5 @@ Tasks:
 	> Status Effekte
 
 	> Relics
+		> Key finder 50% increased.
+		> 

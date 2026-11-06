@@ -16,6 +16,7 @@ extends Control
 
 @export var boss_shard_label: Label
 @export var money_label: Label
+@export var key_label: Label
 @export var depth_level: Label
 @export var biome_path_label: RichTextLabel
 @export var team_bar: HBoxContainer
@@ -77,10 +78,12 @@ func _ready() -> void:
 	map_ui.modulate.a = 0.0
 	State.ep_changed.connect(change_ep_text)
 	State.boss_shards_changed.connect(monster_shard_changed)
+	State.keys_changed.connect(change_key_text)
 	State.pos_changed.connect(change_position)
 
 	show_biome()
 	monster_shard_changed(State.boss_shards)
+	change_key_text(State.keys)
 	weather = MapWeather.new()
 	weather.scroll_container = scroll_container
 	weather.z_index = -1
@@ -92,7 +95,7 @@ func _ready() -> void:
 	team_bar.dialog_parent = view_container
 
 	await get_tree().process_frame
-	if State.killed_monsters >= 1 or State.pending_ep > 0:
+	if State.killed_monsters >= 1 or State.pending_ep > 0 or State.pending_keys > 0:
 		get_tree().change_scene_to_file("res://script/scenes/level_up/level_up.tscn")
 		return 
 	if State.is_boss_fight:
@@ -137,6 +140,7 @@ func add_debug_button() -> void:
 func _exit_tree() -> void:
 	State.ep_changed.disconnect(change_ep_text)
 	State.boss_shards_changed.disconnect(monster_shard_changed)
+	State.keys_changed.disconnect(change_key_text)
 	State.pos_changed.disconnect(change_position)
 
 func set_map():
@@ -405,6 +409,9 @@ func monster_shard_changed(amount) -> void:
 
 func change_ep_text(ep) -> void:
 	money_label.text = str(ep)
+
+func change_key_text(keys) -> void:
+	key_label.text = str(keys)
 
 # Name des aktuellen Bioms in seiner Farbe, dazu die Tiefe
 func show_biome(mask := State.current_biome()) -> void:

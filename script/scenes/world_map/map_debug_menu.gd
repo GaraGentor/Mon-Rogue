@@ -21,6 +21,7 @@ const STAT_STEP_SIZE := Vector2(60, 40)
 const STATS_EXAMPLE_BST := 200
 const DEBUG_ESSENCE := 500
 const DEBUG_SHARDS := 5
+const DEBUG_KEYS := 5
 ## So viel Edelstein-Bonus trägt das gefallene Test-Monster, damit Edelsteine vererbt werden können
 const FALLEN_GEM_BONUS := 20
 ## Mit so vielen K.O.s startet der Level-Up-Bildschirm (2 K.O.s = +1 Stufe)
@@ -100,6 +101,7 @@ func _build_main() -> void:
 	var extras := _add_section(_main, "Ressourcen und nächster Run", [
 		["+%d ESSENZ" % DEBUG_ESSENCE, _add_essence],
 		["+%d BOSS TRÄNEN" % DEBUG_SHARDS, _add_shards],
+		["+%d SCHLÜSSEL" % DEBUG_KEYS, _add_keys],
 	])
 	_rotten_eggs_button = _make_button(_rotten_eggs_text(), _toggle_rotten_eggs)
 	extras.add_child(_rotten_eggs_button)
@@ -265,6 +267,7 @@ func _collect_treasure() -> void:
 func _open_level_up() -> void:
 	State.killed_monsters = LEVEL_UP_KILLS
 	State.pending_ep = DEBUG_ESSENCE
+	State.pending_keys = 1
 	_change_scene(LEVEL_UP_PATH)
 
 func _open_relic_reward() -> void:
@@ -299,6 +302,10 @@ func _add_shards() -> void:
 	SaveManager.add_boss_shard(DEBUG_SHARDS)
 	State.boss_shards += DEBUG_SHARDS
 	Helper.show_unlock_message("+%d Boss Tränen" % DEBUG_SHARDS)
+
+func _add_keys() -> void:
+	State.keys += DEBUG_KEYS
+	Helper.show_unlock_message("+%d Schlüssel" % DEBUG_KEYS)
 
 func _rotten_eggs_text() -> String:
 	return "FAULE EIER: " + ("AN" if SaveManager.has_full_reroll_charges() else "AUS")

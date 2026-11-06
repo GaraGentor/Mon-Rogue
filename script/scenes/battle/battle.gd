@@ -2,6 +2,8 @@ extends Control
 
 const ENEMY_THINK_TIME := 0.6
 const ENEMY_ACTION_TIME := 0.9
+## Chance auf einen Schlüssel als Beute pro gewonnenem Kampf
+const KEY_LOOT_CHANCE := 0.25
 const NOISE_SHADER := preload("res://script/scenes/world_map/map_noise.gdshader")
 
 @export var catch_anim: Control
@@ -369,6 +371,8 @@ func _check_game_over(last_fainted:Monster) -> void:
 			State.pending_relic_reward = true
 		State.pending_ep += Relics.modify("battle_ep", State.enemy_mons.map(func(mon): return mon._ep).reduce(func(a, b): return a + b, 0))
 		print("state pending ep", State.pending_ep)
+		if randf() < KEY_LOOT_CHANCE:
+			State.pending_keys += 1
 		# clear dead monsters.
 		# open stats.
 		var fallen = _clear_fainted_mons()

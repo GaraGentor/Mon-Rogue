@@ -64,10 +64,19 @@ var boss_shards: int = 0:
 		boss_shards = val
 		boss_shards_changed.emit(boss_shards)
 
+# Schlüssel des aktuellen Runs, ihr Zweck kommt später
+signal keys_changed(keys)
+var keys: int = 0:
+	set(val):
+		keys = val
+		keys_changed.emit(keys)
+
 
 var killed_monsters: int = 0
 # im Kampf verdiente Monster Essenz: liegt auf dem Schlachtfeld, bis sie im Level-Up-Screen in die Tasche gezogen wird
 var pending_ep: int = 0
+# im Kampf gefundene Schlüssel, liegen genauso auf dem Schlachtfeld wie die Essenz
+var pending_keys: int = 0
 
 # Run-Statistik für den Endbildschirm (run_end.gd). killed_monsters wird beim Level-Up verbraucht, daher eigene Zähler.
 var run_won := false
@@ -97,6 +106,8 @@ func _ready() -> void:
 
 func reset() -> void:
 	ep = 0
+	keys = 0
+	pending_keys = 0
 	map_level = 0
 	biome_fight_index = 0
 	biome_path = []

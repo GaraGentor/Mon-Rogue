@@ -135,6 +135,9 @@ BATTLE_UNKNOWN_SKILL,? (Tier {tier}),? (Stufe {tier})
 BATTLE_UNKNOWN_SKILL_HINT,Element and tier are known. The details are revealed once the enemy uses this move or you catch it.,"Element und Stufe sind bekannt. Die Details zeigen sich, sobald der Gegner die Attacke einsetzt oder du ihn fängst."
 LEVEL_UP_TITLE,Level Up!,Level Up!
 LEVEL_UP_LOOT_HINT,"Drag your loot into the bag, or it stays behind.","Zieh die Beute in die Tasche, sonst bleibt sie liegen."
+KEY_NAME,Key,Schlüssel
+KEY_DESC,An old key. Somewhere there is a lock for it.,Ein alter Schlüssel. Irgendwo gibt es ein Schloss dafür.
+KEY_LOOT_AMOUNT,+{amount} Key,+{amount} Schlüssel
 SHOP_CHANGES_TO,Changes to,Wird zu
 SHOP_DRAG_HINT,"Drag an Element Potion
 or a Gem onto
@@ -396,7 +399,7 @@ SHOP_BOUGHT,{item} bought!,{item} gekauft!
 SHOP_SAY_WELCOME,Welcome to self-checkout! There are no staff here. You serve yourself.,Willkommen an der Selbstzahler-Kasse! Personal gibt es hier nicht. Sie bedienen sich selbst.
 SHOP_SAY_POTIONS,"Potions are on the top shelves. Drag one onto a monster: it gains the element and can use more skills.","Tränke stehen oben im Regal. Auf ein Monster gezogen, bekommt es das Element dazu und kann mehr Skills einsetzen."
 SHOP_SAY_GEMS,Gems are on the lower left. Drag one onto a monster to raise a stat for the rest of the run.,"Edelsteine liegen links unten. Auf ein Monster gezogen, erhöhen sie einen Wert für den restlichen Lauf."
-SHOP_SAY_RELICS,Relics are on the lower right. Please place them in the bag below.,Relikte finden Sie rechts unten. Legen Sie diese bitte in die Tasche unter mir.
+SHOP_SAY_RELICS,Relics and keys are on the lower right. Please place them in the bag below.,Relikte und Schlüssel finden Sie rechts unten. Legen Sie diese bitte in die Tasche unter mir.
 SHOP_SAY_CLICK,Click an item for details. Payment is automatic once you put it down.,"Klicken Sie eine Ware für Details an. Bezahlt wird automatisch, sobald Sie sie ablegen."
 SHOP_SAY_THANKS_0,Thank you for your purchase! Enjoy your {item}.,Vielen Dank für Ihren Einkauf! Viel Freude mit: {item}.
 SHOP_SAY_THANKS_1,Beep! {item} scanned successfully. Thank you!,Piep! {item} erfolgreich gescannt. Danke!

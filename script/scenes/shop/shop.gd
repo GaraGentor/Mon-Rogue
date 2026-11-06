@@ -3,8 +3,8 @@ extends ShopDialog
 ## Laden als freie Bühne im Stil des Kerkermeisters: in der Mitte die Selbstzahler-Kasse mit Sprechblase,
 ## links und rechts Regale mit der Ware und Schildern, unten links die eigenen Monster von hinten
 ## samt Typ und Werten in gleich großen Feldern, unter der Kasse die Tasche mit dem Geld.
-## Tränke und Edelsteine zieht man auf ein Monster, Relikte in die Tasche; abgelegt ist die Ware gekauft.
-## Tränke gibt es beliebig oft, Edelsteine und Relikte nur einmal. Beim Ziehen und bei angeklickter Ware
+## Tränke und Edelsteine zieht man auf ein Monster, Relikte und Schlüssel in die Tasche; abgelegt ist die Ware gekauft.
+## Tränke gibt es beliebig oft, alles andere nur einmal. Beim Ziehen und bei angeklickter Ware
 ## zeigen die Monster, was sich ändern würde. Ein Klick auf eine Ware öffnet ihre Beschreibung,
 ## die Ware bleibt dann golden umrandet, bis man sie nochmal anklickt.
 
@@ -12,6 +12,7 @@ const GemField = preload("res://script/scenes/gems/gems.gd")
 const RelicReward = preload("res://script/scenes/relic_reward/relic_reward.gd")
 const Treasure = preload("res://script/scenes/treasure/treasure.gd")
 
+const KEY_ICON = preload("res://assets/ui/icons/key.svg")
 const SHELF_TEXTURE = preload("res://assets/ui/shop/shelf.svg")
 const PROPS_MATERIAL = preload("res://script/scenes/jailer/jailer_props_material.tres")
 const PIXEL_FONT = preload("res://script/ui/fonts/pxelfont/PixelifySans-VariableFont_wght.ttf")
@@ -25,6 +26,8 @@ const ELEMENT_PRICE := 45
 ## pro Biom-Tiefe (State.map_level)
 const GEM_PRICES := [50, 65, 80, 100, 120]
 const RELIC_PRICES := [150, 175, 200, 225, 250]
+## vorläufig, bis feststeht, was ein Schlüssel öffnet
+const KEY_PRICE := 75
 const GEM_OFFERS := 2
 const RELIC_OFFERS := 1
 
@@ -278,7 +281,7 @@ class MonField extends RewardDialog.DropTarget:
 		_pop.tween_interval(0.5)
 		_pop.tween_callback(func(): _image.material = Monmap.LIVING_MATERIAL)
 
-## Offene Tasche in der Mitte, auf der Plakette steht das Geld. Ablegeziel für Relikte.
+## Offene Tasche in der Mitte, auf der Plakette steht das Geld. Ablegeziel für Relikte und Schlüssel.
 class ShopBag extends RewardDialog.DropTarget:
 	const BAG_SIZE := Vector2(208, 196)
 	const FONT_SIZE := 19
@@ -305,7 +308,7 @@ class ShopBag extends RewardDialog.DropTarget:
 	func covers(global_point: Vector2) -> bool:
 		return get_global_rect().has_point(global_point)
 
-	## Golden, solange ein Relikt gezogen wird oder angeklickt ist
+	## Golden, solange Ware für die Tasche gezogen wird oder angeklickt ist
 	func set_gold(gold: bool) -> void:
 		_art.set_gold(gold)
 
@@ -498,6 +501,7 @@ func _fill_shelves() -> void:
 	_add_gem_offers()
 	_filling_shelf = SHELF_RELICS
 	_add_relic_offers()
+	_add_key_offer()
 	# die Bühne kennt ihre Größe erst nach dem ersten Layout
 	await get_tree().process_frame
 	_layout_stage()
@@ -521,7 +525,11 @@ func _add_relic_offers() -> void:
 	for id in unowned.slice(0, RELIC_OFFERS):
 		set_price(RelicReward.add_relic_card(self, id), RELIC_PRICES[_depth()])
 
-## Karten der gemeinsamen Helfer (Trank, Edelstein, Relikt) landen als Ware im aktuellen Regal
+func _add_key_offer() -> void:
+	var take := func(): State.keys += 1
+	set_price(add_bag_card(tr("KEY_NAME"), tr("KEY_DESC"), texture_icon(KEY_ICON), take), KEY_PRICE)
+
+## Karten der gemeinsamen Helfer (Trank, Edelstein, Relikt, Schlüssel) landen als Ware im aktuellen Regal
 func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary) -> RewardCard:
 	var item := ShelfItem.new(self, card_title, text, icon, drag)
 	item.on_click = _toggle_item.bind(item)
