@@ -31,6 +31,7 @@ extends Control
 
 const RELIC_REWARD_SCENE := preload("res://script/scenes/relic_reward/relic_reward.tscn")
 const GEM_SCENE := preload("res://script/scenes/gems/gems.tscn")
+const SKILL_REWARD_SCENE := preload("res://script/scenes/skill_reward/skill_reward.tscn")
 const WHEEL_EVENT := preload("res://script/scenes/wheel_event/wheel_event.gd")
 const HUB_CAMP := preload("res://script/scenes/hub_camp/hub_camp.gd")
 const DEBUG_MENU := preload("res://script/scenes/world_map/map_debug_menu.gd")
@@ -483,16 +484,10 @@ func _next_pending_reward() -> Control:
 	if State.pending_skill_reward:
 		State.pending_skill_reward = false
 		if not Skills.reward_offers().is_empty():
-			return skill_reward_dialog()
+			return SKILL_REWARD_SCENE.instantiate()
 	if State.pending_gem_rewards > 0:
 		State.pending_gem_rewards -= 1
 		var gem := GEM_SCENE.instantiate()
 		gem.gem_choices = 1
 		return gem
 	return null
-
-# Skill-Auswahl aus dem Couvert: die Ansicht des Trainers, nur mit den einzigartigen Skills und ohne Preise
-func skill_reward_dialog() -> Control:
-	var dialog := trainer_scene.instantiate()
-	dialog.reward_mode = true
-	return dialog

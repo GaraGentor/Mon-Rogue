@@ -36,6 +36,8 @@ var _counter_label: Label
 var _go_button: Button
 ## Spielkarte der zuletzt angeklickten Attacke, wie sie im Kampf aussieht
 var _detail_card: Control
+## Unter der Karte: wie die verfügbare Attacke freigeschaltet wurde
+var _detail_source: Label
 ## Hinweis unter der Karte: wie man sie freischaltet oder welche Elemente fehlen
 var _detail_note: Label
 
@@ -122,6 +124,11 @@ func _build() -> void:
 	_detail_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_detail_card.visible = false
 	left.add_child(_detail_card)
+	_detail_source = _label("", 14, GOLD)
+	_detail_source.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_detail_source.custom_minimum_size = Vector2(300, 0)
+	_detail_source.visible = false
+	left.add_child(_detail_source)
 	_detail_note = _label(tr("CONFIGURATOR_PICK_HINT"), 14, TEXT_COLOR)
 	_detail_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_detail_note.custom_minimum_size = Vector2(300, 0)
@@ -221,6 +228,10 @@ func _show_detail(skill: Dictionary, note: String, note_color: Color, locked: bo
 	_detail_card.skill = skill
 	_detail_card.modulate = Color(0.6, 0.6, 0.6) if locked else Color.WHITE
 	_detail_card.visible = true
+	var source := [] if locked else Skills.get_egg_skill_source(_mon._name, skill.name)
+	_detail_source.visible = not source.is_empty()
+	if _detail_source.visible:
+		_detail_source.text = tr(source[0]) + "\n" + tr(source[1])
 	_detail_note.text = note
 	_detail_note.add_theme_color_override("font_color", note_color)
 

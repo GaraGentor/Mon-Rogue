@@ -4,6 +4,8 @@ extends HBoxContainer
 
 const ICON_SIZE := Vector2(40, 40)
 const ICON_MARGIN := 6
+## Im Debug-Menü ausgeschaltete Relics bleiben sichtbar, aber blass
+const INACTIVE_COLOR := Color(1, 1, 1, 0.35)
 const INSET_BOX := preload("res://script/ui/materials/iron_inset_box.tres")
 const FONT_THEME := preload("res://script/ui/materials/pixel_font_theme.tres")
 
@@ -50,6 +52,8 @@ func refresh() -> void:
 		button.mouse_entered.connect(plate.set_rim.bind(SkillDetailPopup.GOLD))
 		button.mouse_exited.connect(plate.set_rim.bind(IronPlate.RIM))
 		button.pressed.connect(_show_info.bind(button, relic))
+		if not Relics.is_active(id):
+			button.modulate = INACTIVE_COLOR
 		add_child(button)
 
 func _show_info(button: Button, relic: Dictionary) -> void:

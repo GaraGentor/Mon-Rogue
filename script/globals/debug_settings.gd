@@ -12,6 +12,9 @@ const MODE := "classic"
 ## Kampfmodus -> Wert -> Prozent der BST, die fest diesem Wert gehören
 var _reserved := {MODE: {}}
 
+## IDs der Relics, die im Debug-Menü ausgeschaltet wurden (siehe Relics.is_active)
+var _disabled_relics := []
+
 ## Im Debug-Menü gewählte Gegnerzahl für den nächsten Kampf, 0 = wie im normalen Spiel. Wird nicht gespeichert.
 var next_enemy_count := 0
 
@@ -21,11 +24,21 @@ func _ready() -> void:
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(PATH))
 	if parsed is Dictionary:
 		_reserved.merge(parsed.get("reserved_stats", {}), true)
+		_disabled_relics = parsed.get("disabled_relics", [])
 
 func save() -> void:
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
 	if file:
-		file.store_string(JSON.stringify({"reserved_stats": _reserved}))
+		file.store_string(JSON.stringify({"reserved_stats": _reserved, "disabled_relics": _disabled_relics}))
+
+func is_relic_disabled(id: String) -> bool:
+	return _disabled_relics.has(id)
+
+func set_relic_disabled(id: String, disabled: bool) -> void:
+	_disabled_relics.erase(id)
+	if disabled:
+		_disabled_relics.append(id)
+	save()
 
 ## Gewählte Gegnerzahl, sonst usual_count. Die Wahl gilt nur für einen Kampf.
 func take_enemy_count(usual_count: int) -> int:

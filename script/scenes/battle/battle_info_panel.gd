@@ -196,7 +196,7 @@ var _egg_skill_list: VBoxContainer
 var _detail_popup: SkillDetailPopup
 
 func _show_egg_skill_detail(skill: Dictionary, lock_hint: Array) -> void:
-	_popup().show_skill(skill, monster, self, lock_hint)
+	_popup().show_skill(skill, monster, self, lock_hint, Skills.get_egg_skill_source(monster._name, skill.name))
 
 func _popup() -> SkillDetailPopup:
 	if _detail_popup == null:

@@ -25,6 +25,13 @@ const MAP_DIALOG_MARGIN := 8.0
 const PREVIEW_ARROW := ">"
 ## Bild des Preises am Mauszeiger
 const DRAG_ICON_SIZE := Vector2(84, 84)
+## Skill-Karte am Mauszeiger: kleiner als auf dem Tisch und leicht durchscheinend
+const DRAG_PREVIEW_SCALE := 0.8
+const DRAG_PREVIEW_ALPHA := 0.8
+## Bilder auf der Skill-Karte: Monster fehlen Elemente / kennt den Skill schon
+const PORTRAIT_SIZE := Vector2(48, 48)
+const UNUSABLE_MODULATE := Color(0.3, 0.3, 0.3)
+const KNOWN_MODULATE := Color(1, 1, 1, 0.25)
 ## so weit darf sich die Maus bei einem Klick auf eine Karte bewegen, sonst ist es ein Ziehen
 const CLICK_MAX_MOVE := 10.0
 const FONT_THEME = preload("res://script/ui/materials/pixel_font_theme.tres")
@@ -132,6 +139,8 @@ var _drag_hint := ""
 var _card_size := CARD_SIZE
 ## Bild oben, Text darunter statt Bild links (Shop)
 var _vertical_cards := false
+## gerade offene Auswahl, welcher Skill vergessen wird (null = keine)
+var _replace_picker: SkillReplacePicker
 
 func _init() -> void:
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
@@ -350,16 +359,34 @@ func _taken(_card: RewardCard) -> void:
 
 ## Grund, warum die Karte gerade nicht gezogen werden darf ("" = darf gezogen werden)
 func _drag_blocked(_card: RewardCard) -> String:
-	return ""
+	return tr("TRAINER_FINISH_CHOICE") if _replace_picker else ""
 
-## Was beim Ziehen am Mauszeiger hängt: standardmäßig das Bild des Preises
+## Was beim Ziehen am Mauszeiger hängt: standardmäßig das Bild des Preises, bei Skills die ganze Karte
 func _make_drag_preview(card: RewardCard) -> Control:
+	if card.drag.has("skill"):
+		return _skill_card_preview(card)
 	var art: Control = card.icon.duplicate(0)
 	art.custom_minimum_size = DRAG_ICON_SIZE
 	art.size = DRAG_ICON_SIZE
 	art.position = -DRAG_ICON_SIZE / 2
 	var holder := Control.new()
 	holder.add_child(art)
+	return holder
+
+## Die Karte selbst fliegt mit dem Mauszeiger mit (Kopie ohne Skripte, nur zum Anschauen)
+func _skill_card_preview(card: RewardCard) -> Control:
+	var preview: Control = card.duplicate(0)
+	preview.size = card.size
+	preview.rotation = 0.0
+	preview.pivot_offset = Vector2.ZERO
+	preview.scale = card.scale * DRAG_PREVIEW_SCALE
+	preview.modulate.a = DRAG_PREVIEW_ALPHA
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# hängt mittig unter dem Mauszeiger
+	preview.position = -preview.size * preview.scale / 2
+	var holder := Control.new()
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_child(preview)
 	return holder
 
 ## Zeigt, warum die Karte nicht gezogen werden darf
@@ -454,6 +481,91 @@ func add_mon_card(card_title: String, text: String, icon: Control, header: Strin
 	var drag := {"header": header, "mons": mons, "on_drop": on_given, "tooltip": tooltip}
 	drag.merge(extra)
 	return _add_card(card_title, text, icon, drag)
+
+## Skill auf Kartenpapier (Trainer, Couvert), wird auf ein Monster gezogen, das ihn noch nicht kennt.
+## on_given(mon) bringt ihn bei, die Bilder auf der Karte zeigen, wer ihn einsetzen kann.
+func add_skill_card(skill: Dictionary, on_given: Callable) -> RewardCard:
+	var element_name = tr(ColorMap.get_combo(skill.nature).label)
+	var stats := "%s · %s" % [tr("CONFIGURATOR_TIER").format({"tier": skill.get("tier", 1)}),
+		tr("CONFIGURATOR_SKILL_STATS").format({"cost": skill.cost, "cooldown": skill.cooldown}).trim_suffix(" ·")]
+	var text = Helper.skill_description(skill) + "\n" + tr("TRAINER_ELEMENT").format({"element": element_name}) + "\n" + stats
+	var learners := func(): return State.mons.filter(func(mon): return not Skills.knows_skill(mon, skill.name))
+	var card := add_mon_card(tr(skill.name), text, _skill_portraits(skill), tr("TRAINER_CHOOSE_MON"), learners,
+		on_given, _skill_target_tooltip.bind(skill), {"no_target": tr("TRAINER_ALL_KNOW"), "skill": skill})
+	# Titel in der Farbe des Elements
+	card.info.get_child(0).add_theme_color_override("font_color", SkillCardPaper.readable_color(Helper.color_by_type(skill.nature)))
+	SkillCardPaper.attach(card, skill)
+	card.tooltip_text = _skill_fits_text(skill)
+	return card
+
+## Bilder der eigenen Monster: hell = kann den Skill einsetzen, dunkel = Elemente fehlen,
+## durchscheinend = kennt ihn schon
+func _skill_portraits(skill: Dictionary) -> Control:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	for mon: Monster in State.mons:
+		var portrait := mon_icon(mon)
+		portrait.custom_minimum_size = PORTRAIT_SIZE
+		if Skills.knows_skill(mon, skill.name):
+			portrait.modulate = KNOWN_MODULATE
+		elif not Skills.can_use(mon, skill):
+			portrait.modulate = UNUSABLE_MODULATE
+		row.add_child(portrait)
+	return row
+
+## "Passt zu: ..." mit den Monstern, die den Skill lernen und sofort einsetzen können
+func _skill_fits_text(skill: Dictionary) -> String:
+	var fits = State.mons.filter(func(mon): return Skills.can_use(mon, skill) and not Skills.knows_skill(mon, skill.name))
+	if fits.is_empty():
+		return tr("TRAINER_FITS_NONE")
+	var names = fits.map(func(mon): return Helper.mon_display_name(mon._name))
+	return tr("TRAINER_FITS").format({"mons": ", ".join(PackedStringArray(names))})
+
+## Beim Drüberziehen: kennt es den Skill schon, kann es ihn einsetzen, muss es dafür einen vergessen?
+func _skill_target_tooltip(mon: Monster, skill: Dictionary) -> String:
+	if Skills.knows_skill(mon, skill.name):
+		return tr("TRAINER_ALREADY_KNOWS")
+	var lines := PackedStringArray()
+	if Skills.can_use(mon, skill):
+		lines.append(tr("TRAINER_CAN_USE"))
+	if mon._skills.size() >= Skills.MAX_SKILLS:
+		lines.append(tr("TRAINER_REPLACES"))
+	return "\n".join(lines)
+
+## Bringt mon den Skill bei. Hat es keinen freien Slot, wählt man mittig über picker_parent, welcher vergessen wird.
+## Liefert false, wenn das abgebrochen wurde.
+func learn_skill(skill: Dictionary, mon: Monster, picker_parent: Control) -> bool:
+	var learned := Skills.learnable_copy(skill)
+	if mon._skills.size() < Skills.MAX_SKILLS:
+		mon._skills.append(learned)
+		return true
+	_replace_picker = SkillReplacePicker.new(mon)
+	var picker_box := _picker_box(tr(skill.name), picker_parent)
+	var index: int = await _replace_picker.picked
+	picker_box.queue_free()
+	_replace_picker = null
+	if index == -1:
+		return false
+	mon._skills[index] = learned
+	return true
+
+func _picker_box(skill_title: String, parent: Control) -> Control:
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var panel := PanelContainer.new()
+	center.add_child(panel)
+	var box := VBoxContainer.new()
+	IronPlate.frame(panel, box, 20, 20)
+	var title := Label.new()
+	title.theme = LABEL_THEME
+	title.text = skill_title
+	title.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	box.add_child(_replace_picker)
+	parent.add_child(center)
+	return center
 
 func _add_card(card_title: String, text: String, icon: Control, drag: Dictionary) -> RewardCard:
 	var card := RewardCard.new()
@@ -605,8 +717,9 @@ func _process(_delta: float) -> void:
 		if target.stats:
 			target.stats.show_gem_preview(target.mon, _dragged.drag.get("stat", "") if over and not target.locked else "", _dragged.drag.get("bonus", 0))
 	var tooltip: Callable = _dragged.drag.get("tooltip", Callable())
-	# zeigt das Ziel die Änderung selbst an, braucht es keinen Tooltip
-	var wants_tooltip: bool = hovered != null and hovered.mon != null and hovered.stats == null and hovered.type_row == null and tooltip.is_valid()
+	# zeigt das Ziel die Änderung selbst an, braucht es keinen Tooltip (Skills ändern weder Werte noch Typ)
+	var shows_change: bool = hovered != null and (hovered.stats != null or hovered.type_row != null) and not _dragged.drag.has("skill")
+	var wants_tooltip: bool = hovered != null and hovered.mon != null and not shows_change and tooltip.is_valid()
 	var text: String = tooltip.call(hovered.mon) if wants_tooltip else ""
 	_tooltip.visible = text != ""
 	if _tooltip.visible:

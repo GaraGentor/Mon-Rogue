@@ -2,7 +2,7 @@ class_name SkillDetailPopup
 extends PanelContainer
 
 ## Detail-Popup eines Skills: fliegt neben einem Anker-Control (z. B. Infobereich) ein und zeigt die Karte wie im Kampf,
-## Stufe, Kosten, Abklingzeit, Element, fehlende Elemente und bei gesperrten Ei-Attacken, wie man sie freischaltet.
+## Stufe, Kosten, Abklingzeit, Element, fehlende Elemente und bei Ei-Attacken, wie man sie freischaltet bzw. freigeschaltet hat.
 ## Liegt per top_level frei über der Szene, der Host hängt es nur als Kind an.
 
 const BATTLE_CARD := preload("res://script/scenes/battle/battle_card.tscn")
@@ -55,7 +55,8 @@ func _init() -> void:
 
 ## mon: Monster, für das fehlende Elemente geprüft werden (null = keine Prüfung).
 ## lock_hint: [Sperr-Label, Freischalt-Hinweis] für gesperrte Ei-Attacken, sonst leer.
-func show_skill(skill: Dictionary, mon: Monster, anchor: Control, lock_hint: Array = []) -> void:
+## source_hint: [Label, Beschreibung], wie eine verfügbare Ei-Attacke freigeschaltet wurde, sonst leer.
+func show_skill(skill: Dictionary, mon: Monster, anchor: Control, lock_hint: Array = [], source_hint: Array = []) -> void:
 	_anchor = anchor
 	_card.skill = skill
 	_card.modulate = Color(0.6, 0.6, 0.6) if not lock_hint.is_empty() else Color.WHITE
@@ -65,9 +66,10 @@ func show_skill(skill: Dictionary, mon: Monster, anchor: Control, lock_hint: Arr
 	_element.add_theme_color_override("font_color", Helper.color_by_type(skill.nature))
 	_missing.text = Skills.missing_elements_text(mon, skill) if mon else ""
 	_missing.visible = not _missing.text.is_empty()
-	_lock.visible = not lock_hint.is_empty()
+	var hint := lock_hint if not lock_hint.is_empty() else source_hint
+	_lock.visible = not hint.is_empty()
 	if _lock.visible:
-		_lock.text = tr(lock_hint[0]) + "\n" + tr(lock_hint[1])
+		_lock.text = tr(hint[0]) + "\n" + tr(hint[1])
 
 	visible = true
 	_fit()

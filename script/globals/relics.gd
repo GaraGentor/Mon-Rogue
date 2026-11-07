@@ -58,9 +58,17 @@ func get_relic(id: String) -> Dictionary:
 func has_relic(id: String) -> bool:
 	return State.relics.has(id)
 
-## Relics, die in diesem Run noch nicht gesammelt wurden, optional nur einer Seltenheit
+## Im Debug-Menü ausgeschaltete Relics wirken nicht und werden nirgends angeboten
+func is_active(id: String) -> bool:
+	return not DebugSettings.is_relic_disabled(id)
+
+func set_active(id: String, active: bool) -> void:
+	DebugSettings.set_relic_disabled(id, not active)
+	relics_changed.emit()
+
+## Aktive Relics, die in diesem Run noch nicht gesammelt wurden, optional nur einer Seltenheit
 func get_unowned(rarity: int = -1) -> Array:
-	return RELICS.keys().filter(func(id): return not has_relic(id) and (rarity < 0 or RELICS[id].rarity == rarity))
+	return RELICS.keys().filter(func(id): return is_active(id) and not has_relic(id) and (rarity < 0 or RELICS[id].rarity == rarity))
 
 func add_relic(id: String) -> void:
 	if not RELICS.has(id) or has_relic(id):
@@ -68,9 +76,17 @@ func add_relic(id: String) -> void:
 	State.relics.append(id)
 	relics_changed.emit()
 
-## Wendet die Hooks aller gesammelten Relics nacheinander auf value an.
+func remove_relic(id: String) -> void:
+	if not has_relic(id):
+		return
+	State.relics.erase(id)
+	relics_changed.emit()
+
+## Wendet die Hooks aller gesammelten, aktiven Relics nacheinander auf value an.
 func modify(hook: String, value, context = null):
 	for id in State.relics:
+		if not is_active(id):
+			continue
 		var fn = get_relic(id).get("hooks", {}).get(hook)
 		if fn:
 			value = fn.call(value, context)

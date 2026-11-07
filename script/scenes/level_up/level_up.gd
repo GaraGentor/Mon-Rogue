@@ -7,7 +7,7 @@ const ESSENCE_ICON = preload("res://assets/ui/icons/monster_essence.svg")
 const KEY_ICON = preload("res://assets/ui/icons/key.svg")
 const BOX_ICON = preload("res://assets/ui/rewards/box.png")
 const ENVELOPE_ICON = preload("res://assets/ui/rewards/envelop.png")
-const GEM_ICON = preload("res://assets/ui/shop/gem.svg")
+const GEM_BAG_ICON = preload("res://assets/ui/rewards/bag.png")
 const COUPON_ICON = preload("res://assets/ui/icons/coupon.svg")
 const BOSS_SHARD_ICON = preload("res://assets/ui/jailer/boss_tear.svg")
 const EGG_ICON = preload("res://assets/ui/eggs/common_1.png")
@@ -176,7 +176,7 @@ func _build_battlefield() -> void:
 	if State.pending_keys > 0:
 		_add_loot(KEY_ICON, tr("KEY_LOOT_AMOUNT").format({"amount": State.pending_keys}), _take_keys)
 	if State.pending_gems > 0:
-		_add_loot(GEM_ICON, tr("GEM_LOOT_AMOUNT").format({"amount": State.pending_gems}), _take_gems)
+		_add_loot(GEM_BAG_ICON, tr("GEM_LOOT_AMOUNT").format({"amount": State.pending_gems}), _take_gems)
 	if State.pending_coupons > 0:
 		_add_loot(COUPON_ICON, tr("COUPON_LOOT_AMOUNT").format({"amount": State.pending_coupons}), _take_coupons)
 	if State.pending_relic_chest:

@@ -27,6 +27,7 @@
 [ext_resource type="Script" path="res://script/scenes/world_map/map_paper.gd" id="23_paper"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/key.svg" id="24_key"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/coupon.svg" id="24_coupon"]
+[ext_resource type="Material" uid="uid://blo3dbj5wps64" path="res://script/ui/shader/living_pixels_material.tres" id="25_living"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hmv0x"]
 shader = ExtResource("5_23h7f")
@@ -197,6 +198,7 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="EssenceIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+material = ExtResource("25_living")
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 texture = ExtResource("18_essence")
@@ -211,6 +213,7 @@ theme_override_font_sizes/font_size = 22
 text = "0"
 
 [node name="ShardIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+material = ExtResource("25_living")
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 tooltip_text = "BOSS_REWARD_SHARD_DESC"
@@ -226,6 +229,7 @@ theme_override_font_sizes/font_size = 22
 text = "0"
 
 [node name="KeyIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+material = ExtResource("25_living")
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 tooltip_text = "KEY_DESC"
@@ -241,6 +245,7 @@ theme_override_font_sizes/font_size = 22
 text = "0"
 
 [node name="CouponIcon" type="TextureRect" parent="HBoxContainer/Panel/MarginContainer/Header/Panel/MarginContainer/VBoxContainer/TopRow"]
+material = ExtResource("25_living")
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 tooltip_text = "COUPON_DESC"

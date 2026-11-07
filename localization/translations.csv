@@ -518,6 +518,7 @@ CAMP_FEED_HINT,"Drag essence into the fire before you rest: 1 ME = {hp} HP for e
 CAMP_FEED_BONUS,"The fire burns brighter: +{hp} HP for each monster.","Das Feuer brennt heller: +{hp} KP für jedes Monster."
 CAMP_FEED_POOR,"You don't have enough essence for that.","Dafür hast du nicht genug Essenz."
 CAMP_FEED_FULL,"Resting will already heal your monsters completely.","Ausruhen heilt deine Monster schon vollständig."
+SKILL_REWARD_CHOOSE,Choose a skill,Wähle einen Skill
 SKILL_REWARD_HINT,Drag a skill onto a monster to teach it. Only one!,"Zieh einen Skill auf ein Monster, um ihn ihm beizubringen. Nur einen!"
 SKILL_REWARD_SKIP,Take no skill,Keinen Skill nehmen
 SKILL_QUAKE_HAMMER,Quake Hammer,Bebenhammer
@@ -551,6 +552,18 @@ EGG_CATEGORY_MAGIC,Magical,Magisch
 EGG_CATEGORY_SHIELD,Shield,Schild
 EGG_CATEGORY_BUFF,Buff,Buff
 EGG_CATEGORY_PASSIVE,Passive,Passiv
+EGG_SOURCE_DEFAULT,Unlocked (from the start),Freigeschaltet (von Anfang an)
+EGG_SOURCE_DEFAULT_HINT,"Standard egg move: this species knows it from the start","Standard-Ei-Attacke: Diese Art beherrscht sie von Anfang an"
+EGG_SOURCE_SACRIFICE,Unlocked (caught & sacrificed),Freigeschaltet (gefangen & geopfert)
+EGG_SOURCE_SACRIFICE_HINT,"Egg move: you caught this monster and sacrificed it","Ei-Attacke: Du hast dieses Monster gefangen und geopfert"
+EGG_SOURCE_MILESTONE,Unlocked (milestone),Freigeschaltet (Meilenstein)
+EGG_SOURCE_BOUNTY,Unlocked (bounty hunter),Freigeschaltet (Bounty Hunter)
+MILESTONE_SOURCE_BOSS_1,"Milestone egg move: you defeated a biome boss with this monster as your starter","Meilenstein-Ei-Attacke: Du hast einen Biom-Boss mit diesem Monster als Start-Monster besiegt"
+MILESTONE_SOURCE_BOSS_5,"Milestone egg move: you defeated 5 biome bosses with this monster as your starter","Meilenstein-Ei-Attacke: Du hast 5 Biom-Bosse mit diesem Monster als Start-Monster besiegt"
+MILESTONE_SOURCE_GAME_WIN,"Milestone egg move: you finished the game with this monster as your starter","Meilenstein-Ei-Attacke: Du hast das Spiel mit diesem Monster als Start-Monster beendet"
+BOUNTY_SOURCE_ALPHA_1,"Bounty hunter: you defeated Alpha Gustmane with this monster (last hit)","Bounty Hunter: Du hast Alpha Böenmähne mit diesem Monster besiegt (letzter Treffer)"
+BOUNTY_SOURCE_ALPHA_2,"Bounty hunter: you defeated Alpha Beaconclaw with this monster (last hit)","Bounty Hunter: Du hast Alpha Leuchtkrabbe mit diesem Monster besiegt (letzter Treffer)"
+BOUNTY_SOURCE_NORTHERN_WARDEN,"Bounty hunter: you defeated the Northern Warden with this monster (last hit)","Bounty Hunter: Du hast den Nordwächter mit diesem Monster besiegt (letzter Treffer)"
 JAILER_TEAR_COUNT_ONE,{amount} Boss Tear,{amount} Boss Träne
 JAILER_TEAR_COUNT_MANY,{amount} Boss Tears,{amount} Boss Tränen
 TREASURE_HINT,Drag all the essence into the bag.,Zieh die ganze Essenz in die Tasche.

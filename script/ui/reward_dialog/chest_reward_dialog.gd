@@ -1,7 +1,7 @@
 class_name ChestRewardDialog
 extends RewardDialog
 
-## Belohnungs-Dialog mit Behälter (Edelstein-Feld: Beutel, Schatz: Truhe, Relic-Auswahl: Kiste): statt der
+## Belohnungs-Dialog mit Behälter (Edelstein-Feld: Beutel, Schatz: Truhe, Relic-Auswahl: Kiste, Skill-Auswahl: Couvert): statt der
 ## Kartenspalte springt links der Behälter auf, die Preise fliegen heraus, er verschwindet, ein Teppich kommt
 ## von unten und die Preise fallen darauf. Von dort werden sie wie gewohnt auf die Ziele gezogen.
 ## Ablauf im _ready() der Unterklasse: erst use_chest_layout(), zuletzt play_chest_intro().
@@ -9,7 +9,10 @@ extends RewardDialog
 const CHEST_TEXTURE = preload("res://assets/ui/rewards/reward_chest.png")
 const BAG_TEXTURE = preload("res://assets/ui/rewards/bag.png")
 const BOX_TEXTURE = preload("res://assets/ui/rewards/box.png")
+const ENVELOPE_TEXTURE = preload("res://assets/ui/rewards/envelop.png")
 const RUG_TEXTURE = preload("res://assets/ui/rewards/rug.png")
+## eigenes Material für Behälter und Teppich, unabhängig von Monmap.LIVING_MATERIAL
+const STAGE_MATERIAL = preload("res://script/ui/reward_dialog/reward_stage_material.tres")
 ## abgedunkelt, damit der goldene Text darauf lesbar bleibt
 const RUG_TINT := Color(0.55, 0.55, 0.55)
 const STAGE_WIDTH := 400.0
@@ -55,7 +58,7 @@ func use_chest_layout(container_texture: Texture2D = CHEST_TEXTURE) -> void:
 
 func _stage_image(texture: Texture2D) -> TextureRect:
 	var image := texture_icon(texture) as TextureRect
-	image.material = Monmap.LIVING_MATERIAL
+	image.material = STAGE_MATERIAL
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_stage.add_child(image)
 	return image
@@ -125,7 +128,7 @@ func _pop_chest(stage_size: Vector2) -> void:
 	_chest.position = Vector2((stage_size.x - chest_size.x) / 2, stage_size.y - chest_size.y)
 	await pop_container(_chest).finished
 
-## Behälter springt von unten auf und wackelt, bevor er aufplatzt; auch für das Couvert beim Trainer
+## Behälter springt von unten auf und wackelt, bevor er aufplatzt
 static func pop_container(image: Control) -> Tween:
 	image.pivot_offset = Vector2(image.size.x / 2, image.size.y)
 	image.scale = Vector2.ZERO
@@ -159,8 +162,12 @@ func _swap_chest_for_rug(stage_size: Vector2) -> void:
 	tween.tween_property(_rug, "position:y", 0.0, 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	await tween.finished
 
+## Liegeplätze der Preise, Unterklassen mit größeren Preisen können eigene wählen
+func _loot_spots(count: int) -> Array:
+	return LOOT_SPOTS[count].duplicate()
+
 func _drop_loot(stage_size: Vector2) -> void:
-	var spots: Array = LOOT_SPOTS[_loot.size()].duplicate()
+	var spots := _loot_spots(_loot.size())
 	spots.shuffle()
 	var tween := create_tween().set_parallel()
 	for i in _loot.size():

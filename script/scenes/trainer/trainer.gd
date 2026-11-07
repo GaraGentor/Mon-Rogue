@@ -8,9 +8,6 @@ extends ShopDialog
 ## Links liegen die Karten geneigt und überlappend in zwei Reihen. Ein Klick richtet eine Karte auf
 ## und schiebt die anderen ihrer Reihe zur Seite. Rechts hält der Trainer die eigenen Monster auf
 ## seinen Platten; ein Klick auf ein Monster öffnet dessen Skills über den Karten.
-##
-## Mit reward_mode ist das die Skill-Auswahl aus dem Couvert der Bosse: drei einzigartige Skills ohne Preis,
-## erst öffnet sich das Couvert, nach dem ersten gelernten Skill ist der Dialog vorbei.
 
 ## Monster auf der Platte: Ablegeziel für Karten, per Klick auswählbar
 class PlateMon extends RewardDialog.DropTarget:
@@ -39,10 +36,6 @@ class PlateMon extends RewardDialog.DropTarget:
 		_tween = create_tween()
 		_tween.tween_property(self, "scale", SELECTED_SCALE if selected else Vector2.ONE, SELECT_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
-const ENVELOPE_TEXTURE = preload("res://assets/ui/rewards/envelop.png")
-## Couvert im Anteil der kleineren Seite des Kartentischs
-const ENVELOPE_SIZE := 0.7
-const ENVELOPE_VANISH_SECONDS := 0.3
 ## Tasche oben links, zeigt die Essenz (wie die Boss Tränen beim Kerkermeister), nur zur Anzeige
 const BAG_SIZE := Vector2(104, 98)
 const ESSENCE_SIZE := Vector2(34, 34)
@@ -51,9 +44,6 @@ const BAG_FONT_SIZE := 18
 const ESSENCE_PER_ITEM := 25
 const TRAINER_CARD_SIZE := Vector2(210, 0)
 const TRAINER_TEXT_FONT_SIZE := 14
-## Karte am Mauszeiger: kleiner als auf dem Tisch und leicht durchscheinend
-const DRAG_PREVIEW_SCALE := 0.8
-const DRAG_PREVIEW_ALPHA := 0.8
 ## Chips unter den Monstern: Abstand zum Monster, Zeilenhöhe
 const CHIPS_GAP := 8.0
 const CHIPS_HEIGHT := 36.0
@@ -63,10 +53,6 @@ const SINGLE_ELEMENT_OFFERS := 2
 const MULTI_ELEMENT_OFFERS := 2
 ## zusätzliche Skills in der zweiten Reihe, müssen zu keinem Monster passen
 const EXTRA_OFFERS := 4
-const PORTRAIT_SIZE := Vector2(48, 48)
-## Bilder auf der Karte: Monster fehlen Elemente / kennt den Skill schon
-const UNUSABLE_MODULATE := Color(0.3, 0.3, 0.3)
-const KNOWN_MODULATE := Color(1, 1, 1, 0.25)
 
 const CARD_TILT := deg_to_rad(-4.0)
 ## Anteil der Kartenbreite bzw. -höhe, der von der Nachbarkarte verdeckt wird
@@ -97,10 +83,6 @@ const BUBBLE_TAIL := 18.0
 ## Trainerbild aus der Szene, dort lassen sich auch die Shader-Werte einstellen
 @export var trainer_image: TextureRect
 
-## Skill-Auswahl aus dem Couvert statt Verkauf, vor dem Hinzufügen zum Baum setzen
-var reward_mode := false
-## gerade offene Auswahl, welcher Skill vergessen wird (null = keine)
-var _picker: SkillReplacePicker
 var _left_side: Control
 var _card_layer: Control
 var _cards: Array[RewardCard] = []
@@ -117,9 +99,9 @@ func _ready() -> void:
 	use_scene_layout(background)
 	_title.visible = false
 	_build_sides()
-	set_drag_hint("SKILL_REWARD_HINT" if reward_mode else "TRAINER_HINT")
-	set_card_layout(Skills.REWARD_SKILL_OFFERS if reward_mode else CARD_COLUMNS, TRAINER_CARD_SIZE, true)
-	for skill in Skills.reward_offers() if reward_mode else _pick_offers():
+	set_drag_hint("TRAINER_HINT")
+	set_card_layout(CARD_COLUMNS, TRAINER_CARD_SIZE, true)
+	for skill in _pick_offers():
 		_add_skill_card(skill)
 	_build_top_bar()
 	_first_layout()
@@ -138,17 +120,15 @@ func _build_top_bar() -> void:
 	gap.mouse_filter = MOUSE_FILTER_IGNORE
 	bar.add_child(gap)
 	var exit_button := icon_button(EXIT_ICON)
-	exit_button.tooltip_text = tr("SKILL_REWARD_SKIP" if reward_mode else "SHOP_FINISH")
+	exit_button.tooltip_text = tr("SHOP_FINISH")
 	exit_button.size_flags_vertical = SIZE_SHRINK_BEGIN
 	exit_button.pressed.connect(close)
 	bar.add_child(exit_button)
 	_money_label = _bag.label
 	_money_suffix = ""
 	_watch_money()
-	# im Couvert kostet nichts, da gibt es auch keinen Rabatt
-	if not reward_mode:
-		add_coupons(bar, trainer_image)
-		bar.move_child(_coupon_stack, _bag.get_index() + 1)
+	add_coupons(bar, trainer_image)
+	bar.move_child(_coupon_stack, _bag.get_index() + 1)
 
 func _coupon_applied() -> void:
 	_bubble.say(tr("TRAINER_SAY_COUPON"))
@@ -207,29 +187,7 @@ func _first_layout() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_layout_cards()
-	if reward_mode:
-		await _open_envelope()
 	create_tween().tween_property(_card_layer, "modulate:a", 1.0, 0.15)
-
-## Wie die Behälter der anderen Belohnungen: das Couvert springt auf, wackelt und verschwindet, dann liegen die Karten da.
-## Die Fläche darunter fängt solange die Maus ab, damit noch nichts gezogen werden kann.
-func _open_envelope() -> void:
-	var cover := Control.new()
-	cover.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	_left_side.add_child(cover)
-	var area := _left_side.size
-	var envelope := texture_icon(ENVELOPE_TEXTURE)
-	envelope.material = Monmap.LIVING_MATERIAL
-	envelope.mouse_filter = MOUSE_FILTER_IGNORE
-	envelope.size = Vector2.ONE * minf(area.x, area.y) * ENVELOPE_SIZE
-	envelope.position = (area - envelope.size) / 2
-	cover.add_child(envelope)
-	await ChestRewardDialog.pop_container(envelope).finished
-	var vanish := create_tween().set_parallel()
-	vanish.tween_property(envelope, "modulate:a", 0.0, ENVELOPE_VANISH_SECONDS)
-	vanish.tween_property(envelope, "scale", Vector2(0.8, 0.8), ENVELOPE_VANISH_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	await vanish.finished
-	cover.queue_free()
 
 func _layout_stage() -> void:
 	var texture_size := trainer_image.texture.get_size()
@@ -355,34 +313,14 @@ func _show_missing_elements(card: RewardCard) -> void:
 func _tooltip_anchor(target: DropTarget) -> Rect2:
 	return target.get_global_rect().merge((target as PlateMon).chips.get_global_rect())
 
-## Die Karte selbst fliegt mit dem Mauszeiger mit (Kopie ohne Skripte, nur zum Anschauen)
-func _make_drag_preview(card: RewardCard) -> Control:
-	var preview: Control = card.duplicate(0)
-	preview.size = card.size
-	preview.rotation = 0.0
-	preview.pivot_offset = Vector2.ZERO
-	preview.scale = card.scale * DRAG_PREVIEW_SCALE
-	preview.modulate.a = DRAG_PREVIEW_ALPHA
-	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# hängt mittig unter dem Mauszeiger
-	preview.position = -preview.size * preview.scale / 2
-	var holder := Control.new()
-	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	holder.add_child(preview)
-	return holder
-
 ## Gekaufte Karte verschwindet, die übrigen rücken zusammen
 func pay(card: RewardCard) -> void:
-	var skill_name: String = card.drag.skill.name
 	super(card)
 	_price_labels.erase(card)
 	_cards.erase(card)
 	_card_layer.remove_child(card)
 	card.queue_free()
 	_set_focus(null)
-	if reward_mode:
-		State.taught_reward_skills.append(skill_name)
-		close()
 
 func _on_table_input(event: InputEvent) -> void:
 	if _focused_card and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -390,7 +328,7 @@ func _on_table_input(event: InputEvent) -> void:
 
 ## Klick auf ein Monster: Übersicht öffnen, wechseln oder wieder schließen
 func _toggle_mon(plate: PlateMon) -> void:
-	if _picker:
+	if _replace_picker:
 		_bubble.say(tr("TRAINER_FINISH_CHOICE"))
 		return
 	var was_open := plate == _open_plate
@@ -459,105 +397,24 @@ func _pick_offers() -> Array:
 	return names.map(func(skill_name): return Skills.get_skill(skill_name))
 
 func _add_skill_card(skill: Dictionary) -> void:
-	var element_name = tr(ColorMap.get_combo(skill.nature).label)
-	var stats := "%s · %s" % [tr("CONFIGURATOR_TIER").format({"tier": skill.get("tier", 1)}),
-		tr("CONFIGURATOR_SKILL_STATS").format({"cost": skill.cost, "cooldown": skill.cooldown}).trim_suffix(" ·")]
-	var text = Helper.skill_description(skill) + "\n" + tr("TRAINER_ELEMENT").format({"element": element_name}) + "\n" + stats
-	var learners := func(): return State.mons.filter(func(mon): return not Skills.knows_skill(mon, skill.name))
-	var card := add_mon_card(tr(skill.name), text, _portraits(skill), tr("TRAINER_CHOOSE_MON"), learners,
-		func(mon: Monster): _learn(_dragged, mon), _target_tooltip.bind(skill), {"no_target": tr("TRAINER_ALL_KNOW")})
-	card.drag.skill = skill
+	var card := add_skill_card(skill, func(mon: Monster): _learn(_dragged, mon))
 	card.on_click = _toggle_focus.bind(card)
-	# Titel in der Farbe des Elements
-	card.info.get_child(0).add_theme_color_override("font_color", SkillCardPaper.readable_color(Helper.color_by_type(skill.nature)))
 	# in der Pixel-Schrift passt die Stats-Zeile sonst nicht in die Kartenbreite
 	card.info.get_child(1).add_theme_font_size_override("font_size", TRAINER_TEXT_FONT_SIZE)
-	SkillCardPaper.attach(card, skill)
 	# Text nicht auf den Papierrahmen setzen
 	card.row.get_parent().add_theme_constant_override("margin_bottom", 14)
-	if reward_mode:
-		card.drag.price = 0
-		card.drag.repeatable = false
-	else:
-		set_price(card, randi_range(skill.shop_cost.min, skill.shop_cost.max))
-	card.tooltip_text = _fits_text(skill)
+	set_price(card, randi_range(skill.shop_cost.min, skill.shop_cost.max))
 	ignore_mouse_below(card)
 
-## Bilder der eigenen Monster: hell = kann den Skill einsetzen, dunkel = Elemente fehlen,
-## durchscheinend = kennt ihn schon
-func _portraits(skill: Dictionary) -> Control:
-	var row := HBoxContainer.new()
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	for mon: Monster in State.mons:
-		var portrait := mon_icon(mon)
-		portrait.custom_minimum_size = PORTRAIT_SIZE
-		if Skills.knows_skill(mon, skill.name):
-			portrait.modulate = KNOWN_MODULATE
-		elif not Skills.can_use(mon, skill):
-			portrait.modulate = UNUSABLE_MODULATE
-		row.add_child(portrait)
-	return row
-
-## "Passt zu: ..." mit den Monstern, die den Skill lernen und sofort einsetzen können
-func _fits_text(skill: Dictionary) -> String:
-	var fits = State.mons.filter(func(mon): return Skills.can_use(mon, skill) and not Skills.knows_skill(mon, skill.name))
-	if fits.is_empty():
-		return tr("TRAINER_FITS_NONE")
-	var names = fits.map(func(mon): return Helper.mon_display_name(mon._name))
-	return tr("TRAINER_FITS").format({"mons": ", ".join(PackedStringArray(names))})
-
-## Beim Drüberziehen: kennt es den Skill schon, kann es ihn einsetzen, muss es dafür einen vergessen?
-## Fehlende Elemente stehen schon als Chips unter dem Monster.
-func _target_tooltip(mon: Monster, skill: Dictionary) -> String:
-	if Skills.knows_skill(mon, skill.name):
-		return tr("TRAINER_ALREADY_KNOWS")
-	var lines := PackedStringArray()
-	if Skills.can_use(mon, skill):
-		lines.append(tr("TRAINER_CAN_USE"))
-	if mon._skills.size() >= Skills.MAX_SKILLS:
-		lines.append(tr("TRAINER_REPLACES"))
-	return "\n".join(lines)
-
 func _learn(card: RewardCard, mon: Monster) -> void:
-	var learned := Skills.learnable_copy(card.drag.skill)
-	if mon._skills.size() < Skills.MAX_SKILLS:
-		mon._skills.append(learned)
+	if await learn_skill(card.drag.skill, mon, _left_side):
 		pay(card)
-		return
-	_picker = SkillReplacePicker.new(mon)
-	var picker_box := _picker_box(card.drag.title)
-	var index: int = await _picker.picked
-	picker_box.queue_free()
-	_picker = null
-	if index == -1:
-		return
-	mon._skills[index] = learned
-	pay(card)
-
-## Auswahl, welcher Skill vergessen wird, mittig über den Karten
-func _picker_box(skill_title: String) -> Control:
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var panel := PanelContainer.new()
-	center.add_child(panel)
-	var box := VBoxContainer.new()
-	IronPlate.frame(panel, box, 20, 20)
-	var title := Label.new()
-	title.theme = LABEL_THEME
-	title.text = skill_title
-	title.add_theme_color_override("font_color", SkillDetailPopup.GOLD)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(title)
-	box.add_child(_picker)
-	_left_side.add_child(center)
-	return center
 
 ## Bezahlt wird in _learn, erst wenn der Skill wirklich gelernt ist
 func _taken(_card: RewardCard) -> void:
 	pass
 
 func _drag_blocked(card: RewardCard) -> String:
-	if _picker:
+	if _replace_picker:
 		return tr("TRAINER_FINISH_CHOICE")
 	return super(card)

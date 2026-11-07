@@ -19,6 +19,9 @@ const STAT_NAMES := {"hp": "KP", "atk": "Angriff", "def": "Verteidigung", "s_atk
 const STAT_VALUE_WIDTH := 70
 const STAT_STEP_SIZE := Vector2(60, 40)
 const STATS_EXAMPLE_BST := 200
+const RELIC_ICON_SIZE := Vector2(44, 44)
+const RELIC_NAME_WIDTH := 200
+const RELIC_DESC_WIDTH := 420
 const DEBUG_ESSENCE := 500
 const DEBUG_SHARDS := 5
 const DEBUG_KEYS := 5
@@ -57,6 +60,8 @@ var _stats_page: VBoxContainer
 var _stats_summary: Label
 ## Wert -> Label mit dem reservierten Anteil
 var _stat_values := {}
+var _relic_page: VBoxContainer
+var _relic_rows: VBoxContainer
 
 func _ready() -> void:
 	set_accent(ACCENT)
@@ -68,6 +73,7 @@ func _ready() -> void:
 	_build_picker()
 	_build_egg_page()
 	_build_stats_page()
+	_build_relic_page()
 	_show_page(_main)
 
 func _build_main() -> void:
@@ -113,6 +119,7 @@ func _build_main() -> void:
 	extras.add_child(_rotten_eggs_button)
 	extras.add_child(_make_button("EI-ATTACKEN ...", func(): _show_page(_egg_page)))
 	extras.add_child(_make_button("WERTE-VERTEILUNG ...", func(): _show_page(_stats_page)))
+	extras.add_child(_make_button("RELIKTE ...", func(): _show_page(_relic_page)))
 
 	var close_button := _make_button("SCHLIESSEN", close)
 	close_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -208,7 +215,7 @@ func _build_egg_page() -> void:
 	first.button_pressed = true
 
 func _show_page(page: VBoxContainer) -> void:
-	for other in [_main, _fight_page, _picker, _egg_page, _stats_page]:
+	for other in [_main, _fight_page, _picker, _egg_page, _stats_page, _relic_page]:
 		other.visible = other == page
 
 func _refresh_start() -> void:
@@ -306,7 +313,7 @@ func _open_level_up() -> void:
 
 func _open_relic_reward() -> void:
 	if Relics.get_unowned().is_empty():
-		Helper.show_unlock_message("Alle Relics sind schon gesammelt")
+		Helper.show_unlock_message("Alle Relics sind schon gesammelt oder ausgeschaltet")
 		return
 	close()
 	map.view_container.add_child(RELIC_REWARD_SCENE.instantiate())
@@ -316,9 +323,7 @@ func _open_skill_reward() -> void:
 		Helper.show_unlock_message("Alle einzigartigen Skills sind schon gelernt")
 		return
 	close()
-	var dialog: Control = map.skill_reward_dialog()
-	map.view_container.add_child(dialog)
-	dialog.visible = true
+	map.view_container.add_child(map.SKILL_REWARD_SCENE.instantiate())
 
 func _end_run(won: bool) -> void:
 	State.end_run(won)
@@ -409,6 +414,90 @@ func _refresh_stats_page() -> void:
 	var total := DebugSettings.reserved_total()
 	_stats_summary.text = "Reserviert: %d %%, üblicher Weg: %d %%. Bei %d BST: %d fest, %d werden wie gewohnt verteilt. Gilt sofort, auch im laufenden Run." % [
 		total, 100 - total, STATS_EXAMPLE_BST, STATS_EXAMPLE_BST * total / 100, STATS_EXAMPLE_BST * (100 - total) / 100]
+
+# ─────────────────────────
+# Relikte
+
+## Pro Relikt zwei Schalter: BESITZ gibt es direkt oder nimmt es wieder weg, AKTIV schaltet es ganz ab
+func _build_relic_page() -> void:
+	_relic_page = VBoxContainer.new()
+	_relic_page.add_theme_constant_override("separation", 12)
+	add_footer(_relic_page)
+
+	_relic_page.add_child(_make_header("Relikte: BESITZ gilt für diesen Run, AKTIV: NEIN (keine Wirkung, kein Angebot) bleibt gespeichert"))
+	_relic_rows = VBoxContainer.new()
+	_relic_rows.add_theme_constant_override("separation", 8)
+	_relic_page.add_child(_relic_rows)
+
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	row.add_child(_make_button("ZURÜCK", _show_page.bind(_main)))
+	row.add_child(_make_button("ALLE BEKOMMEN", _for_all_relics.bind(Relics.add_relic)))
+	row.add_child(_make_button("ALLE ABGEBEN", _for_all_relics.bind(Relics.remove_relic)))
+	row.add_child(_make_button("ALLE AN", _for_all_relics.bind(func(id: String): Relics.set_active(id, true))))
+	row.add_child(_make_button("ALLE AUS", _for_all_relics.bind(func(id: String): Relics.set_active(id, false))))
+	_relic_page.add_child(row)
+	_refresh_relic_rows()
+
+func _refresh_relic_rows() -> void:
+	for child in _relic_rows.get_children():
+		_relic_rows.remove_child(child)
+		child.queue_free()
+	for id in Relics.RELICS:
+		_relic_rows.add_child(_make_relic_row(id))
+
+func _make_relic_row(id: String) -> HBoxContainer:
+	var relic: Dictionary = Relics.get_relic(id)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+
+	var icon := TextureRect.new()
+	icon.texture = load(relic.icon)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = RELIC_ICON_SIZE
+	row.add_child(icon)
+
+	var relic_name := _make_header(tr(relic.name))
+	relic_name.custom_minimum_size.x = RELIC_NAME_WIDTH
+	relic_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	relic_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(relic_name)
+
+	row.add_child(_make_relic_toggle("BESITZ", Relics.has_relic(id), func(on: bool):
+		if on:
+			Relics.add_relic(id)
+		else:
+			Relics.remove_relic(id)))
+	row.add_child(_make_relic_toggle("AKTIV", Relics.is_active(id), func(on: bool): Relics.set_active(id, on)))
+
+	var description := Label.new()
+	description.text = tr(relic.description)
+	description.custom_minimum_size.x = RELIC_DESC_WIDTH
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	description.add_theme_color_override("font_color", IronPlate.TEXT_COLOR)
+	row.add_child(description)
+	return row
+
+func _make_relic_toggle(label: String, on: bool, apply: Callable) -> Button:
+	var button := _make_toggle_button(_relic_toggle_text(label, on))
+	button.custom_minimum_size = BUTTON_SIZE
+	button.button_pressed = on
+	button.toggled.connect(func(now_on: bool):
+		apply.call(now_on)
+		button.text = _relic_toggle_text(label, now_on))
+	return button
+
+func _relic_toggle_text(label: String, on: bool) -> String:
+	return "%s: %s" % [label, "JA" if on else "NEIN"]
+
+func _for_all_relics(action: Callable) -> void:
+	for id in Relics.RELICS:
+		action.call(id)
+	_refresh_relic_rows()
 
 # ─────────────────────────
 # Ei-Attacken

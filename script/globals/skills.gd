@@ -320,6 +320,24 @@ func get_all_egg_skills(mon_name: String) -> Dictionary:
 		hints[entry.skill] = ["CONFIGURATOR_LOCKED_BOUNTY", entry.hint]
 	return {"available": get_available_egg_skills(mon_name), "locked": locked, "hints": hints}
 
+# Wie die Art diese verfügbare Ei-Attacke bekommen hat: [Label, Beschreibung], Gegenstück zu den Sperr-Hinweisen.
+# Noch gesperrt oder keine Ei-Attacke der Art: [].
+func get_egg_skill_source(mon_name: String, skill_name: String) -> Array:
+	var meta = Monmap.mon_metainfos_by_name(mon_name)
+	if meta.get("default_egg_skills", []).has(skill_name):
+		return ["EGG_SOURCE_DEFAULT", "EGG_SOURCE_DEFAULT_HINT"]
+	if not SaveManager.is_egg_skill_unlocked(mon_name, skill_name):
+		return []
+	if meta.get("unlockable_egg_skills", []).has(skill_name):
+		return ["EGG_SOURCE_SACRIFICE", "EGG_SOURCE_SACRIFICE_HINT"]
+	for milestone in MILESTONES:
+		if meta.get("milestone_egg_skills", {}).get(milestone.key, "") == skill_name:
+			return ["EGG_SOURCE_MILESTONE", milestone.source_hint]
+	for bounty in BOUNTIES:
+		if meta.get("bounty_egg_skills", {}).get(bounty.key, "") == skill_name:
+			return ["EGG_SOURCE_BOUNTY", bounty.source_hint]
+	return []
+
 # Kategorien der Ei-Attacken für die Übersicht in der Start-Auswahl, in Anzeigereihenfolge.
 # Neue Kategorie: hier eintragen und in egg_skill_category zuordnen.
 const EGG_SKILL_CATEGORIES = [
@@ -344,11 +362,12 @@ func egg_skill_category(skill: Dictionary) -> String:
 # und nur, solange das Start-Monster selbst noch im Team ist (ausgetauscht oder K.O. = kein Fortschritt).
 # Welcher Skill zu welchem Meilenstein gehört, steht in Monmap (milestone_egg_skills).
 # Sie tauchen nie bei wilden Monstern oder im Biom-Pool auf, man bekommt sie nur über den Meilenstein.
-# stat ist der Zähler in SaveManager (pro Art), hint der Freischalt-Hinweis im Konfigurator.
+# stat ist der Zähler in SaveManager (pro Art), hint der Freischalt-Hinweis im Konfigurator,
+# source_hint die Beschreibung, wie die Attacke freigeschaltet wurde.
 const MILESTONES = [
-	{"key": "boss_1", "stat": "biome_boss_kills", "count": 1, "hint": "MILESTONE_HINT_BOSS_1"},
-	{"key": "boss_5", "stat": "biome_boss_kills", "count": 5, "hint": "MILESTONE_HINT_BOSS_5"},
-	{"key": "game_win", "stat": "game_wins", "count": 1, "hint": "MILESTONE_HINT_GAME_WIN"},
+	{"key": "boss_1", "stat": "biome_boss_kills", "count": 1, "hint": "MILESTONE_HINT_BOSS_1", "source_hint": "MILESTONE_SOURCE_BOSS_1"},
+	{"key": "boss_5", "stat": "biome_boss_kills", "count": 5, "hint": "MILESTONE_HINT_BOSS_5", "source_hint": "MILESTONE_SOURCE_BOSS_5"},
+	{"key": "game_win", "stat": "game_wins", "count": 1, "hint": "MILESTONE_HINT_GAME_WIN", "source_hint": "MILESTONE_SOURCE_GAME_WIN"},
 ]
 
 # Noch gesperrte Meilensteine der Art als [{skill, hint, ...}].
@@ -380,13 +399,14 @@ func add_milestone_progress(mon_name: String, stat: String) -> Array:
 # Nur wenn ein Monster einer Art den letzten Treffer selbst landet, bekommt diese Art die Ei-Attacke aus
 # Monmap (bounty_egg_skills). K.O. durch ein anderes Team-Mitglied oder Fangen zählt nicht.
 # mon: Art des Kopfgeld-Monsters, level_bonus: Stufen über dem Kampf, min_depth: ab welcher Biom-Tiefe es auftaucht,
-# label: Anzeigename (Platzhalter {mon} = Name der Art), hint: Freischalt-Hinweis im Konfigurator.
+# label: Anzeigename (Platzhalter {mon} = Name der Art), hint: Freischalt-Hinweis im Konfigurator,
+# source_hint: Beschreibung, wie die Attacke freigeschaltet wurde.
 # Beispiele, bis es eigene Monster für die Kopfgelder gibt. Bekommt ein Kopfgeld eine eigene Art, trägt diese in
 # Monmap "bounty_target": "<key>" und kommt in den normalen Spawn-Pool: dann zählt jedes Auftauchen als Kopfgeld-Monster.
 const BOUNTIES = [
-	{"key": "alpha_1", "mon": "1", "level_bonus": 2, "min_depth": 0, "label": "BOUNTY_ALPHA", "hint": "BOUNTY_HINT_ALPHA_1"},
-	{"key": "alpha_2", "mon": "2", "level_bonus": 2, "min_depth": 1, "label": "BOUNTY_ALPHA", "hint": "BOUNTY_HINT_ALPHA_2"},
-	{"key": "northern_warden", "mon": "1", "level_bonus": 4, "min_depth": 3, "label": "BOUNTY_NORTHERN_WARDEN", "hint": "BOUNTY_HINT_NORTHERN_WARDEN"},
+	{"key": "alpha_1", "mon": "1", "level_bonus": 2, "min_depth": 0, "label": "BOUNTY_ALPHA", "hint": "BOUNTY_HINT_ALPHA_1", "source_hint": "BOUNTY_SOURCE_ALPHA_1"},
+	{"key": "alpha_2", "mon": "2", "level_bonus": 2, "min_depth": 1, "label": "BOUNTY_ALPHA", "hint": "BOUNTY_HINT_ALPHA_2", "source_hint": "BOUNTY_SOURCE_ALPHA_2"},
+	{"key": "northern_warden", "mon": "1", "level_bonus": 4, "min_depth": 3, "label": "BOUNTY_NORTHERN_WARDEN", "hint": "BOUNTY_HINT_NORTHERN_WARDEN", "source_hint": "BOUNTY_SOURCE_NORTHERN_WARDEN"},
 ]
 
 # Chance pro normalem Kampf, dass ein Kopfgeld-Monster eingestreut wird (zusätzlich zu denen, die von selbst kommen).
