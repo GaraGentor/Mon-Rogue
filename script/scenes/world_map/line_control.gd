@@ -66,7 +66,8 @@ func _ready() -> void:
 	from_node.item_rect_changed.connect(queue_redraw)
 	to_node.item_rect_changed.connect(queue_redraw)
 	from_node._path._ui_item.item_rect_changed.connect(queue_redraw)
-	to_node._path._ui_item.item_rect_changed.connect(queue_redraw)
+	if not to_node is Button:
+		to_node._path._ui_item.item_rect_changed.connect(queue_redraw)
 
 
 func _process(delta: float) -> void:
@@ -90,10 +91,14 @@ func apply_look(new_ink: Color, new_accent: Color) -> void:
 
 ## Start und Ende des Wegs in globalen Koordinaten
 func endpoints() -> Array[Vector2]:
-	return [
-		rect_center_top(from_node._path._ui_item.get_global_rect()),
-		rect_center_bottom(to_node._path._ui_item.get_global_rect()),
-	]
+	var end: Vector2
+	if to_node is Button:
+		# Der Boss-Button ist kein Feld im Grid und füllt sein ganzes Panel: Der Weg endet unten am Icon in der Mitte
+		var boss_rect := to_node.get_global_rect()
+		end = boss_rect.get_center() + Vector2(0.0, to_node.icon.get_height() * 0.5)
+	else:
+		end = rect_center_bottom(to_node._path._ui_item.get_global_rect())
+	return [rect_center_top(from_node._path._ui_item.get_global_rect()), end]
 
 
 func _apply_state() -> void:

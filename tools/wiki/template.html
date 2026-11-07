@@ -115,7 +115,9 @@ section[hidden] { display: none; }
 .tag { display: inline-block; font-size: .72rem; padding: 1px 7px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
 .tier { font-family: "Pixelify", monospace; color: var(--accent); letter-spacing: 1px; }
 
-.mon-img { width: 112px; height: 112px; object-fit: contain; image-rendering: pixelated; background: var(--panel-2); border-radius: 10px; flex: none; }
+.mon-img { width: 100%; height: 180px; object-fit: contain; background: var(--panel-2); border-radius: 10px; flex: none; }
+.stat-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-top: 4px; text-align: center; font-size: .85rem; }
+.stat-row span { display: block; font-size: .7rem; color: var(--muted); }
 .skill-group { margin-top: 12px; }
 .skill-group h4 { margin: 0 0 4px; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
 .skill-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 3px; }
@@ -142,7 +144,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .m-eq { color: var(--muted); }
 .swatch { width: 40px; height: 40px; border-radius: 10px; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.2); }
 .cycle { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 1rem; }
-.icon { width: 40px; height: 40px; padding: 7px; border-radius: 10px; background: var(--panel-2); flex: none; }
+.icon { width: 40px; height: 40px; padding: 7px; border-radius: 10px; background: #2b3336; flex: none; }
 :root[data-theme="dark"] .icon, :root:not([data-theme="light"]) .icon { filter: none; }
 code { font-family: ui-monospace, Consolas, monospace; font-size: .82rem; background: var(--panel-2); padding: 1px 5px; border-radius: 5px; word-break: break-word; }
 .warn { background: color-mix(in srgb, var(--bad) 14%, var(--panel)); border: 1px solid var(--bad); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; }
@@ -184,7 +186,7 @@ const UI = {
 	de: {
 		search: "Suchen…", monsters: "Monster", skills: "Skills", elements: "Elemente", gems: "Edelsteine",
 		relics: "Relikte", unlocks: "Freischaltungen", map: "Karte", rarity: "Seltenheit", element: "Element",
-		bst: "Basiswerte (BST)", maxUpgrades: "Max. Upgrades", catchBase: "Grund-Fangchance",
+		bst: "Basiswerte (BST)", preferredStats: "Bevorzugte Werteverteilung", preferredHint: "Summe 100 %, schwankt pro Run um bis zu ±15 %", maxUpgrades: "Max. Upgrades", catchBase: "Grund-Fangchance",
 		defaultSkills: "Start-Ei-Attacken", unlockable: "Durch Fangen & Opfern", milestone: "Meilensteine", bounty: "Kopfgelder",
 		name: "Name", tier: "Stufe", power: "Stärke", type: "Art", cost: "Kosten", cd: "CD", shop: "Shop-Preis",
 		source: "Quelle", usableBy: "Spielbar für", desc: "Beschreibung", target: "Ziel", all: "Alle",
@@ -193,12 +195,12 @@ const UI = {
 		perDepth: "Bonus pro Biom-Tiefe", depth: "Tiefe", stat: "Wert", choices: "Auswahl pro Feld",
 		hooks: "Effekt-Hooks", hook: "Hook", code: "Code", requirement: "Bedingung", reward: "Belohnung",
 		appearsFrom: "Taucht auf ab Tiefe", levelBonus: "Stufen-Bonus", bountyChance: "Kopfgeld-Chance pro Kampf",
-		paths: "Pfade", special: "Spezialfelder", lines: "Linien", nodeRows: "Zeilen mit festem Feld",
+		nodeTypes: "Feldtypen", paths: "Pfade", special: "Spezialfelder", lines: "Linien", nodeRows: "Zeilen mit festem Feld",
 		components: "Besteht aus", weight: "Spawn-Gewicht", noResults: "Keine Treffer.", warnings: "Warnungen beim Generieren",
 		strongVs: "stark gegen", maxSkills: "Max. Skills pro Monster", tierWeights: "Stufen-Gewichte (Spawn-Häufigkeit)",
 		onlyBase: "Nur Grund-Elemente", allCombos: "Alle Kombinationen", catchHint: "bei 0 HP und gleicher Stufe",
 		mon: "Monster", lists: {
-			attack_skills: "Basis-Angriff", defensive_skills: "Basis-Block", buff_skills: "Buff",
+			attack_skills: "Basis-Angriff", defensive_skills: "Basis-Block", buff_skills: "Buff", passive_skills: "Passiv", area_skills: "Flächenangriff", reward_skills: "Belohnung",
 			egg_skills: "Ei-Attacke", milestone_skills: "Meilenstein", bounty_skills: "Kopfgeld",
 		},
 		leads: {
@@ -206,7 +208,7 @@ const UI = {
 			skills: "Alle Skills aus <code>Skills</code>. Ein Monster kann einen Skill nur spielen, wenn sein Typ alle Elemente des Skills enthält. Spalten sind sortierbar.",
 			elements: "Element-Kreis und alle Kombinationen aus <code>ColorMap</code>. Jedes Skill-Element wird gegen jedes Ziel-Element verglichen; Kombi-Monster erben alle Schwächen und Resistenzen.",
 			gems: "Edelsteine erhöhen einen Wert eines eigenen Monsters prozentual für den restlichen Run.",
-			relics: "Relikte sind passive Run-Boni. Gewöhnliche gibt es auch in Schätzen, seltene nur als Boss-Belohnung und im Shop.",
+			relics: "Relikte sind passive Run-Boni. Es gibt sie zur Auswahl in der Kiste nach Biom-Bossen und im Laden, unabhängig von ihrer Seltenheit.",
 			unlocks: "Meilenstein-Ei-Attacken (mit der Art als Start-Monster) und Kopfgeld-Ei-Attacken (letzter Treffer gegen ein Kopfgeld-Monster).",
 			map: "Aufbau der Weltkarte pro Biom-Tiefe aus <code>Map.map_settings</code>. Zahlen in den Spalten sind die Zeilen, in denen das Feld fest liegt.",
 		},
@@ -214,7 +216,7 @@ const UI = {
 	en: {
 		search: "Search…", monsters: "Monsters", skills: "Skills", elements: "Elements", gems: "Gems",
 		relics: "Relics", unlocks: "Unlocks", map: "Map", rarity: "Rarity", element: "Element",
-		bst: "Base stats (BST)", maxUpgrades: "Max upgrades", catchBase: "Base catch chance",
+		bst: "Base stats (BST)", preferredStats: "Preferred stat spread", preferredHint: "Sums to 100 %, varies by up to ±15 % per run", maxUpgrades: "Max upgrades", catchBase: "Base catch chance",
 		defaultSkills: "Starting egg moves", unlockable: "Catch & sacrifice", milestone: "Milestones", bounty: "Bounties",
 		name: "Name", tier: "Tier", power: "Power", type: "Type", cost: "Cost", cd: "CD", shop: "Shop price",
 		source: "Source", usableBy: "Usable by", desc: "Description", target: "Target", all: "All",
@@ -223,12 +225,12 @@ const UI = {
 		perDepth: "Bonus per biome depth", depth: "Depth", stat: "Stat", choices: "Choices per node",
 		hooks: "Effect hooks", hook: "Hook", code: "Code", requirement: "Requirement", reward: "Reward",
 		appearsFrom: "Appears from depth", levelBonus: "Level bonus", bountyChance: "Bounty chance per battle",
-		paths: "Paths", special: "Special nodes", lines: "Lines", nodeRows: "Rows with a fixed node",
+		nodeTypes: "Node types", paths: "Paths", special: "Special nodes", lines: "Lines", nodeRows: "Rows with a fixed node",
 		components: "Made of", weight: "Spawn weight", noResults: "No results.", warnings: "Warnings during generation",
 		strongVs: "strong against", maxSkills: "Max skills per monster", tierWeights: "Tier weights (spawn frequency)",
 		onlyBase: "Base elements only", allCombos: "All combinations", catchHint: "at 0 HP and same level",
 		mon: "Monster", lists: {
-			attack_skills: "Basic attack", defensive_skills: "Basic block", buff_skills: "Buff",
+			attack_skills: "Basic attack", defensive_skills: "Basic block", buff_skills: "Buff", passive_skills: "Passive", area_skills: "Area attack", reward_skills: "Reward",
 			egg_skills: "Egg move", milestone_skills: "Milestone", bounty_skills: "Bounty",
 		},
 		leads: {
@@ -236,7 +238,7 @@ const UI = {
 			skills: "All skills from <code>Skills</code>. A monster can only play a skill if its type contains all of the skill's elements. Columns are sortable.",
 			elements: "Element cycle and all combinations from <code>ColorMap</code>. Every skill element is compared with every target element; combined monsters inherit all weaknesses and resistances.",
 			gems: "Gems raise one stat of your own monster by a percentage for the rest of the run.",
-			relics: "Relics are passive run bonuses. Common ones also appear in treasures, rare ones only as boss rewards and in the shop.",
+			relics: "Relics are passive run bonuses. You can pick them from the chest after biome bosses and buy them in the shop, regardless of rarity.",
 			unlocks: "Milestone egg moves (with the species as starter) and bounty egg moves (last hit against a bounty monster).",
 			map: "World map layout per biome depth from <code>Map.map_settings</code>. Numbers are the rows where that node is fixed.",
 		},
@@ -257,6 +259,9 @@ function localGet(key) { try { return localStorage.getItem(key); } catch { retur
 function localSet(key, value) { try { localStorage.setItem(key, value); } catch {} }
 
 const ui = (key) => (UI[state.lang] || UI.en)[key] ?? UI.en[key] ?? key;
+// wie Helper.mon_display_name
+const monName = (n) => (tr("MONSTER_" + n) === "MONSTER_" + n ? ui("mon") + " " + n : tr("MONSTER_" + n));
+const rarityName = (r) => tr("RARITY_" + r);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 function tr(key, args = {}) {
 	const text = DATA.tr[state.lang]?.[key] || DATA.tr.en?.[key] || key;
@@ -346,13 +351,21 @@ function header(key) {
 	return `<h2>${esc(ui(key))}</h2><p class="lead">${ui("leads")[key] || ""}</p>`;
 }
 
+// Bevorzugte Werteverteilung der Art, Spielwerte heißen im Spiel STAT_*
+function statProfile(m) {
+	const labels = { hp: "HP", atk: "ATK", def: "DEF", s_atk: "SPA", s_def: "SPD", speed: "SPE" };
+	if (!m.preferred_stats) return "";
+	return `<div class="skill-group"><h4>${ui("preferredStats")}</h4><div class="stat-row" title="${esc(ui("preferredHint"))}">${
+		Object.entries(labels).map(([key, label]) => `<div><span>${esc(tr("STAT_" + label).replace(":", ""))}</span>${m.preferred_stats[key] ?? "–"} %</div>`).join("")}</div></div>`;
+}
+
 function renderMonsters() {
 	const bountyByKey = Object.fromEntries(DATA.bounties.map((b) => [b.key, b]));
 	const msByKey = Object.fromEntries(DATA.milestones.map((m) => [m.key, m]));
 	const cards = DATA.mons.filter((m) => {
 		const skills = [...(m.default_egg_skills || []), ...(m.unlockable_egg_skills || []),
 			...Object.values(m.milestone_egg_skills || {}), ...Object.values(m.bounty_egg_skills || {})];
-		return matches(m.name, tr(m.name), elementName(m.initial_type), m.rarity, ...skills.map((s) => tr(s)));
+		return matches(m.name, monName(m.name), elementName(m.initial_type), rarityName(m.rarity), ...skills.map((s) => tr(s)));
 	}).map((m) => {
 		const list = (names, how) => names.length ? `<ul class="skill-list">${names.map((n, i) =>
 			`<li>${skillLabel(n)}${how ? `<span class="how">· ${esc(how(i))}</span>` : ""}</li>`).join("")}</ul>` : `<span class="muted">${ui("none")}</span>`;
@@ -361,10 +374,10 @@ function renderMonsters() {
 		const catchBase = DATA.catch.rarityBase?.[m.rarity];
 		return `<article class="card">
 			<div class="row" style="align-items:flex-start">
-				<img class="mon-img" src="${esc(res(m.texture_front))}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+				<img class="mon-img" src="${esc(res(m.image))}" alt="${esc(monName(m.name))}" loading="lazy" onerror="this.style.visibility='hidden'">
 				<div style="min-width:0">
-					<h3>${hl(tr(m.name) === m.name ? `${ui("mon")} ${m.name}` : tr(m.name))}</h3>
-					<div class="row" style="margin-top:4px">${chip(m.initial_type)} <span class="tag">${esc(m.rarity)}</span></div>
+					<h3>${hl(monName(m.name))}</h3>
+					<div class="row" style="margin-top:4px">${chip(m.initial_type)} <span class="tag">${esc(rarityName(m.rarity))}</span></div>
 					<dl class="kv">
 						<dt>${ui("bst")}</dt><dd>${(m.stats || []).join(" – ")}</dd>
 						<dt>${ui("maxUpgrades")}</dt><dd>${m.max_upgrades ?? ui("none")}</dd>
@@ -372,6 +385,7 @@ function renderMonsters() {
 					</dl>
 				</div>
 			</div>
+			${statProfile(m)}
 			<div class="skill-group"><h4>${ui("defaultSkills")}</h4>${list(m.default_egg_skills || [])}</div>
 			<div class="skill-group"><h4>${ui("unlockable")}</h4>${list(m.unlockable_egg_skills || [])}</div>
 			<div class="skill-group"><h4>${ui("milestone")}</h4>${list(ms.map(([, s]) => s), (i) => {
@@ -380,7 +394,7 @@ function renderMonsters() {
 			})}</div>
 			<div class="skill-group"><h4>${ui("bounty")}</h4>${list(bs.map(([, s]) => s), (i) => {
 				const def = bountyByKey[bs[i][0]];
-				return def ? tr(def.label, { mon: def.mon }) + ` (${ui("depth")} ${def.min_depth + 1}+)` : bs[i][0];
+				return def ? tr(def.label, { mon: monName(def.mon) }) + ` (${ui("depth")} ${def.min_depth + 1}+)` : bs[i][0];
 			})}</div>
 		</article>`;
 	});
@@ -410,7 +424,7 @@ function renderSkills() {
 			const c = typeof x === "number" ? x - y : String(x).localeCompare(String(y), state.lang);
 			return (dir === "asc" ? c : -c) || (a.tier || 1) - (b.tier || 1) || (a.value ?? 0) - (b.value ?? 0);
 		});
-	const usable = (s) => DATA.mons.filter((m) => covers(m.initial_type, s.nature)).map((m) => tr(m.name) === m.name ? "#" + m.name : tr(m.name));
+	const usable = (s) => DATA.mons.filter((m) => covers(m.initial_type, s.nature)).map((m) => monName(m.name));
 	const filters = `<div class="filters">
 		<select id="f-element" aria-label="${ui("element")}">
 			<option value="all">${ui("element")}: ${ui("all")}</option>
@@ -465,7 +479,7 @@ function renderElements() {
 		</div>
 		<dl class="kv">
 			<dt>${ui("skills")}</dt><dd>${skills.length ? skills.map((s) => esc(tr(s.name))).join(", ") : ui("none")}</dd>
-			<dt>${ui("monsters")}</dt><dd>${mons.length ? mons.map((m) => esc(tr(m.name) === m.name ? "#" + m.name : tr(m.name))).join(", ") : ui("none")}</dd>
+			<dt>${ui("monsters")}</dt><dd>${mons.length ? mons.map((m) => esc(monName(m.name))).join(", ") : ui("none")}</dd>
 		</dl></article>`;
 	}).join("");
 
@@ -515,11 +529,11 @@ function renderGems() {
 
 function renderRelics() {
 	const cards = Object.entries(DATA.relics)
-		.filter(([id, r]) => matches(id, tr(r.name), tr(r.description), r.rarity))
+		.filter(([id, r]) => matches(id, tr(r.name), tr(r.description), rarityName(r.rarity)))
 		.map(([id, r]) => `<article class="card"><div class="row" style="align-items:flex-start">
 			<img class="icon" src="${esc(res(r.icon))}" alt="" onerror="this.style.visibility='hidden'">
 			<div style="min-width:0"><h3>${hl(tr(r.name))}</h3>
-				<div class="row small" style="margin-top:2px"><span class="tag">${esc(r.rarity)}</span><code>${esc(id)}</code></div>
+				<div class="row small" style="margin-top:2px"><span class="tag">${esc(rarityName(r.rarity))}</span><code>${esc(id)}</code></div>
 				<p style="margin:8px 0 0">${hl(tr(r.description))}</p>
 			</div></div>
 			${Object.entries(r.hooks || {}).map(([hook, code]) => `<p class="small" style="margin:10px 0 0"><span class="muted">${ui("hook")} <b>${esc(hook)}</b>:</span><br><code>${esc(code)}</code></p>`).join("")}
@@ -530,9 +544,8 @@ function renderRelics() {
 }
 
 function renderUnlocks() {
-	const monName = (n) => (tr(n) === n ? `${ui("mon")} ${n}` : tr(n));
 	const ms = DATA.milestones.filter((m) => matches(m.key, tr(m.hint), ...DATA.mons.map((mon) => tr(mon.milestone_egg_skills?.[m.key]))));
-	const bs = DATA.bounties.filter((b) => matches(b.key, tr(b.label, { mon: b.mon }), tr(b.hint), ...DATA.mons.map((mon) => tr(mon.bounty_egg_skills?.[b.key]))));
+	const bs = DATA.bounties.filter((b) => matches(b.key, tr(b.label, { mon: monName(b.mon) }), tr(b.hint), ...DATA.mons.map((mon) => tr(mon.bounty_egg_skills?.[b.key]))));
 	const rewards = (field, key) => DATA.mons.filter((m) => m[field]?.[key])
 		.map((m) => `<li>${esc(monName(m.name))}: ${skillLabel(m[field][key])}</li>`).join("");
 	const msHtml = ms.map((m) => `<article class="card">
@@ -574,7 +587,10 @@ function renderMap() {
 			${scalar.map((k) => `<td class="num">${s[k] ?? ""}</td>`).join("")}
 			${lists.map((k) => `<td>${(s[k] || []).length ? s[k].join(", ") : `<span class="muted">${ui("none")}</span>`}</td>`).join("")}
 		</tr>`).join("")}</tbody></table></div>`;
-	return header("map") + table + `<p class="small muted" style="margin-top:12px">${ui("nodeRows")} · max_rows ${DATA.map.maxRows ?? "?"} · max_cols ${DATA.map.maxCols ?? "?"}</p>`;
+	const nodeTypes = Object.keys(DATA.enums.PATH_TYPE).filter((k) => tr("MAP_NODE_" + k + "_DESC") !== "MAP_NODE_" + k + "_DESC" && matches(tr("MAP_NODE_" + k), tr("MAP_NODE_" + k + "_DESC")));
+	const nodeHtml = nodeTypes.map((k) => `<article class="card"><h3>${hl(tr("MAP_NODE_" + k))}</h3><p class="small" style="margin:6px 0 0">${hl(tr("MAP_NODE_" + k + "_DESC"))}</p></article>`).join("");
+	return header("map") + table + `<p class="small muted" style="margin-top:12px">${ui("nodeRows")} · max_rows ${DATA.map.maxRows ?? "?"} · max_cols ${DATA.map.maxCols ?? "?"}</p>` +
+		(nodeHtml ? `<h3 style="margin:24px 0 10px">${ui("nodeTypes")}</h3><div class="grid">${nodeHtml}</div>` : "");
 }
 
 // ─────────────────────────

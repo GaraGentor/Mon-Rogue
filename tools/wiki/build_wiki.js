@@ -244,9 +244,10 @@ function collect() {
 	// Skills._skill_cost: 1 Aktion + 1 pro erreichter Schwelle aus COST_THRESHOLDS
 	const costThresholds = readVar(skillsSrc, "COST_THRESHOLDS", "Skills") ?? [];
 	ctx.helpers._skill_cost = (value) => 1 + costThresholds.filter((threshold) => value >= threshold).length;
-	ctx.helpers._basic_skill = readBuilder(skillsSrc, "_basic_skill");
-	ctx.helpers._egg_skill = readBuilder(skillsSrc, "_egg_skill");
-	ctx.helpers._effect_skill = readBuilder(skillsSrc, "_effect_skill");
+	// Alle Skill-Baukästen (func _xyz_skill(...): return ...), so laufen neue Baukästen automatisch mit
+	for (const m of skillsSrc.matchAll(/^func\s+(_\w*skill)\s*\([^)]*\)[^:\n]*:\s*return\b/gm)) {
+		ctx.helpers[m[1]] = readBuilder(skillsSrc, m[1]);
+	}
 	ctx.helpers._with = (skill, extra) => Object.assign(skill, extra);
 	// Welche Listen es gibt, steht in get_skill(); so tauchen neue Listen automatisch auf
 	const listNames = (/for list in \[([^\]]*)\]/.exec(skillsSrc)?.[1] ?? "attack_skills, defensive_skills, buff_skills, egg_skills")
@@ -262,6 +263,14 @@ function collect() {
 	const monmapSrc = read("script/globals/monmap.gd");
 	const helperSrc = read("script/globals/helper.gd");
 	const gemsSrc = read("script/scenes/gems/gems.gd");
+
+	// Bildpfad wie in Monmap.texture(), dort steht er nicht als Feld in den Daten
+	const mons = readVar(monmapSrc, "mons", "Monmap") ?? [];
+	for (const mon of mons) {
+		const image = `assets/mons/${mon.name}/${mon.name}_frontx256.png`;
+		if (fs.existsSync(path.join(ROOT, image))) mon.image = "res://" + image;
+		else warnings.push(`Monster ${mon.name}: Bild ${image} nicht gefunden`);
+	}
 
 	const relics = readVar(relicsSrc, "RELICS", "Relics") ?? {};
 	for (const relic of Object.values(relics)) {
@@ -285,7 +294,7 @@ function collect() {
 		milestones: readVar(skillsSrc, "MILESTONES", "Skills") ?? [],
 		bounties: readVar(skillsSrc, "BOUNTIES", "Skills") ?? [],
 		bountyChance: readVar(skillsSrc, "BOUNTY_CHANCE", "Skills"),
-		mons: readVar(monmapSrc, "mons", "Monmap") ?? [],
+		mons,
 		catch: {
 			rarityBase: readVar(helperSrc, "CATCH_RARITY_BASE", "Helper"),
 			hpWeight: readVar(helperSrc, "CATCH_HP_WEIGHT", "Helper"),

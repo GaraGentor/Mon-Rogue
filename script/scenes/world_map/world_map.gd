@@ -211,14 +211,22 @@ func draw_lines() -> void:
 			var allnext_nodes = ally_nodes.filter(func(n): return y_node._path._pos.y + 1 == n._path._pos.y)
 			for next_node in allnext_nodes:
 				print("will draw")
-				var line = line_node.duplicate(DUPLICATE_SCRIPTS | DUPLICATE_USE_INSTANTIATION)
-				line.from_node = y_node
-				line.to_node = next_node
-				map_layout.add_child(line)
-				lines.append(line)
+				add_line(y_node, next_node)
 			pass
 		pass
 	pass
+	# Vom letzten Feld jedes Pfads geht es zum Boss
+	var last_row: int = State.current_map[0].size() - 1
+	for item in all_items:
+		if item._path != null and item._path._pos.y == last_row:
+			add_line(item, boss_button)
+
+func add_line(from: Control, to: Control) -> void:
+	var line = line_node.duplicate(DUPLICATE_SCRIPTS | DUPLICATE_USE_INSTANTIATION)
+	line.from_node = from
+	line.to_node = to
+	map_layout.add_child(line)
+	lines.append(line)
 
 func _on_button_pressed() -> void:
 	print("Map.gen_map()", State.current_map)
@@ -376,10 +384,9 @@ func change_position(pos, initial = false) -> void:
 func update_line_states(pos: Vector3) -> void:
 	for line in lines:
 		var from_pos: Vector3 = line.from_node._path._pos
-		var to_pos: Vector3 = line.to_node._path._pos
 		if from_pos == pos:
 			line.set_state(UILine.LineState.WALKABLE)
-		elif to_pos.y <= pos.y:
+		elif line.to_node != boss_button and line.to_node._path._pos.y <= pos.y:
 			line.set_state(UILine.LineState.PASSED)
 		else:
 			line.set_state(UILine.LineState.LOCKED)
