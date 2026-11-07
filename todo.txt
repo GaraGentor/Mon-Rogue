@@ -1,29 +1,11 @@
-Beschreibung:
-	Ich möchte ein reward System haben nachdem ein Kampf Endet.
-	So soll es Funktionieren:
-		Pro Monster gibt es eine geringe chance random Loot zu bekommen. Dazu gehört einmal die Crystale zum Upgraden der Stats, Schlüssel, Geld, 25% Rabatt-Gutscheine für den Shop und Trainer
-		Bei Mini-Bosse kämpfen kommen noch ein Couver für Fähigkeiten, sowie eine Kiste für die Relikte (die Relikt kiste dropt immer, sowie der Couver)
-		Bei einem Biom Boss kommt immer eine Träne dazu und optional immer das Ei zum Freischalten, sobald ein monster nicht freigeschaltet ist dabei fällt dann die auswahl zwischen der einen oder anderen Option weg nachdem ein Boss gefallen ist
-		Wenn ich eine Kiste, Fähigkeiten Couver Loote, muss das sobald ich in die Map komme alles nach einander abgehandelt werden.
-		Schatzkisten sollen nun nur mit einem Schlüssel zu öffnen sein. Darin ist viel mehr Gold als sonst zu finden. 2-4 häufchen, die man einsammeln kann je 10-25 gold. Hierzu wird es allerdings nur die Map für geben wo man ein Schatz bekommen kann als Ort auf der Karte
-		
-		Ich habe neue Bilder hinzugefügt. Die müssen eingesetzt werden und auch die gleichen Animationen haben beim "Öffnen oder aussuchen"
-		
-		Bag für die Crystale, wenn ich auf ein Crystal Feld komme auf der Map.
-		Box für die Relikte
-		Envelop für die Fähigkeiten
-		rewacht_chest bleibt nur noch für die Schätze
-		
-	Gebe erst deine Meinung hierzu beovr du los legst.:
-		- Rewards immer nach kampf? Auch wenn ein Monster Gefangen wurde und nicht besiegt? Oder nur wenn mindestens eins besiegt wurde?
-		- Machen durch den Reward dann Feste Orte für die gleichen Rewards sinn oder sind die dann überflüssig? Z.B.: Kristalle, da man diese nun looten kann
+Ändere mit die Stat Stones zu neuen Icons und beschreibungen:
+	
+	- HP Stein wird zu "Leuchtkrabben Leuchtturm"
+	- Angriff Stein wird zu "Borkenhieb Astknüppel"
+	- Defensive Stein wird zu "Kristallwühler Haut"
+	- SAngriff stein wird zu "Funkenigel Schwanz"
+	- SDefensive stein wird zu "Nebelspuk schleier"
+	- Initiativen stein wird zu "Sturmgreif Feder"
 
-- Dazu muss noch die Fähigkeiten auswahl als Belohnung implementiert werden und auch im Debug modus hinzugefügt
-	- Nimm die Ansicht aus dem Trainer, da wird ja angezeigt für wen die Fähigkeiten geeignet sind und für wen nicht
-	- Das soll aus einem Fähigkeiten Set bestehen, das nicht jemandem beigebracht werden kann oder aus EI Attack hervorkommen kann. Dort sind die Fähigkeiten UNIQUE, denk dir erstmal 4 Stück aus fürs testen der basis elemente.
-	- Schon jemandem beigebrachte Skills werden aus dem Pool aus den 10 entfernt und kommen kein zweites mal
-	- Zur auswahl bei der Belohnung stehen 3 Skills
-
-Nebenquest:
-- Beim Lager bau ein, dass man Geld dem Feuer verfüttern kann bevor man leben bekommt, 1 gold = 5 Leben man kann 1er Stacks schmeißen oder 5 gold für 25 leben oder 10 gold für 50 leben. mach es ähnlich wie das rausziehen der Tränen beim Kärkermeister
-- Die Tasche soll etwas vor dem Feuer liegen mit dem Geld drin dass man drag and droppen muss.
+- Mach mir dazu auch die icons und leg den living pixel shader drauf, you know?
+- Danach muss das überall angepasst werden.

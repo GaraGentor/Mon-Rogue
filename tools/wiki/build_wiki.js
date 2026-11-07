@@ -307,7 +307,6 @@ function collect() {
 			stats: readVar(gemsSrc, "STATS", "Gems") ?? {},
 			bonusByDepth: readVar(gemsSrc, "BONUS_BY_DEPTH", "Gems") ?? [],
 			choices: readVar(gemsSrc, "GEM_CHOICES", "Gems"),
-			icon: /GEM_ICON\s*=\s*preload\("([^"]+)"\)/.exec(gemsSrc)?.[1],
 		},
 		map: {
 			settings: readVar(mapSrc, "map_settings", "Map") ?? {},
@@ -345,7 +344,7 @@ function build() {
 
 	console.log(`Wiki gebaut: ${path.relative(ROOT, path.join(OUT_DIR, "index.html"))}`);
 	console.log(`  ${data.mons.length} Monster, ${data.skills.length} Skills, ${Object.keys(data.relics).length} Relikte, ` +
-		`${Object.keys(data.gems.stats).length} Edelsteine, ${data.elements.combos.length} Elemente`);
+		`${Object.keys(data.gems.stats).length} Trophäen, ${data.elements.combos.length} Elemente`);
 	for (const w of warnings) console.warn("  WARNUNG: " + w);
 }
 

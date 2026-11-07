@@ -147,9 +147,6 @@ class ShelfItem extends RewardDialog.RewardCard:
 		art.material = _gold_target
 		RewardDialog.ignore_mouse_below(self)
 
-	func set_tint(color: Color) -> void:
-		_gold_target.set_shader_parameter("tint_color", color)
-
 	func set_gold(gold: bool) -> void:
 		_gold_target.set_shader_parameter("outline_color", GOLD if gold else NO_OUTLINE)
 		_plate.set_rim(GOLD if gold else IronPlate.RIM)
@@ -517,8 +514,6 @@ func _add_gem_offers() -> void:
 	stats.shuffle()
 	for stat in stats.slice(0, GEM_OFFERS):
 		var card: ShelfItem = GemField.add_gem_card(self, stat, bonus)
-		card.set_art(texture_icon(GemField.GEM_ICON))
-		card.set_tint(GemField.STATS[stat].color)
 		set_price(card, GEM_PRICES[_depth()])
 
 func _add_relic_offers() -> void:

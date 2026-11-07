@@ -114,7 +114,7 @@ REVIVE_DONE,{mon} is back with {hp}% HP!,{mon} ist mit {hp} % KP zurück!
 LAST_WILL_INTRO,"{mon} has fallen. Pass on one thing, the rest is lost.","{mon} ist gefallen. Gib eine Sache weiter, der Rest geht verloren."
 LAST_WILL_PICK_GIFT,What should {mon} leave behind?,Was soll {mon} hinterlassen?
 LAST_WILL_PICK_HEIR,Who should inherit {gift}?,Wer soll {gift} erben?
-LAST_WILL_GEMS,Gems,Edelsteine
+LAST_WILL_GEMS,Trophies,Trophäen
 LAST_WILL_ELEMENT_DESC,Adds this element to the heir.,Gibt dem Erben dieses Element dazu.
 LAST_WILL_HAS_ELEMENT,Already has it,Hat es schon
 LAST_WILL_ALL_HAVE_ELEMENT,All heirs already have it,Alle Erben haben es schon
@@ -134,7 +134,7 @@ LEVEL_UP_LOOT_HINT,"Drag your loot into the bag, or it stays behind.","Zieh die 
 KEY_NAME,Key,Schlüssel
 KEY_DESC,An old key. It opens one treasure chest.,Ein alter Schlüssel. Er öffnet eine Schatzkiste.
 KEY_LOOT_AMOUNT,+{amount} Key,+{amount} Schlüssel
-GEM_LOOT_AMOUNT,+{amount} Gem,+{amount} Edelstein
+GEM_LOOT_AMOUNT,+{amount} Trophy,+{amount} Trophäe
 COUPON_LOOT_AMOUNT,+{amount} Coupon,+{amount} Gutschein
 COUPON_DESC,Drag onto the self-checkout or the trainer for 25% off your next purchase. Lost if you leave without buying.,Zieh ihn auf die Selbstzahler-Kasse oder den Trainer: 25% Rabatt auf deinen nächsten Kauf. Verfällt beim Gehen ohne Kauf.
 COUPON_ALREADY_ACTIVE,A coupon is already active.,Es gilt schon ein Gutschein.
@@ -146,9 +146,9 @@ EGG_LOOT,Egg,Ei
 EGG_LOOT_DESC,One of your current monsters appears as an egg in new runs,Eines deiner aktuellen Monster erscheint in neuen Läufen als Ei
 SHOP_CHANGES_TO,Changes to,Wird zu
 SHOP_DRAG_HINT,"Drag an Element Potion
-or a Gem onto
+or a Trophy onto
 your Monster","Zieh einen Element-Trank
-oder Edelstein auf
+oder Trophäe auf
 dein Monster"
 SHOP_FINISH,Finish Shopping!,Einkauf beenden!
 SHOP_NOT_ENOUGH_MONEY,"Nope, not enough Monster Essence!","Nö, nicht genug Monster Essenz!"
@@ -393,23 +393,29 @@ RELIC_LUCKY_CHARM_DESC,Catch chance +25%.,Fangchance +25 %.
 RELIC_GOLDEN_IDOL,Golden Idol,Goldener Götze
 RELIC_GOLDEN_IDOL_DESC,+30% ME from won battles.,+30 % ME aus gewonnenen Kämpfen.
 RELIC_REWARD_CHOOSE,Choose a relic,Wähle ein Relikt
-MAP_NODE_GEM,GEMS,EDELSTEINE
-GEM_CHOOSE,Choose a gem,Wähle einen Edelstein
-GEM_CHOOSE_MON,Which monster gets the gem?,Welches Monster bekommt den Edelstein?
+MAP_NODE_GEM,TROPHIES,TROPHÄEN
+GEM_CHOOSE,Choose a trophy,Wähle eine Trophäe
+GEM_CHOOSE_MON,Which monster gets the trophy?,Welches Monster bekommt die Trophäe?
 GEM_DESC,{stat} +{value} for the rest of the run,{stat} +{value} für den restlichen Lauf
-GEM_CURRENT,Gems so far: +{value},Bisherige Edelsteine: +{value}
+GEM_CURRENT,Trophies so far: +{value},Bisherige Trophäen: +{value}
 REWARD_BAG,Bag,Tasche
 REWARD_BAG_HEADER,Into the bag!,Ab in die Tasche!
-GEM_HP,Ruby of Life,Rubin des Lebens
-GEM_ATK,Amber of Strength,Bernstein der Stärke
-GEM_DEF,Granite of Defense,Granit der Abwehr
-GEM_S_ATK,Amethyst of Power,Amethyst der Macht
-GEM_S_DEF,Sapphire of Warding,Saphir des Schutzes
-GEM_SPEED,Emerald of Swiftness,Smaragd der Schnelligkeit
+GEM_HP,Beaconclaw Lighthouse,Leuchtkrabben Leuchtturm
+GEM_HP_DESC,Its light has never gone out. Whoever carries it holds out longer.,"Sein Licht ist nie erloschen. Wer ihn trägt, hält länger durch."
+GEM_ATK,Barkcleaver Branch Club,Borkenhieb Astknüppel
+GEM_ATK_DESC,Cut from the hardest branch. Every blow lands heavier.,Aus dem härtesten Ast geschlagen. Jeder Hieb sitzt schwerer.
+GEM_DEF,Crystalback Hide,Kristallwühler Haut
+GEM_DEF_DESC,"Rock and amber, packed tight. Blows simply glance off.","Fels und Bernstein, dicht an dicht. Schläge prallen einfach ab."
+GEM_S_ATK,Sparkhog Tail,Funkenigel Schwanz
+GEM_S_ATK_DESC,Still crackling with charge. Every special attack hits harder.,Knistert noch immer vor Spannung. Jede Spezial-Attacke trifft härter.
+GEM_S_DEF,Mistwraith Veil,Nebelspuk Schleier
+GEM_S_DEF_DESC,Barely there. Magic gets lost in its folds.,Kaum zu greifen. Magie verliert sich in seinen Falten.
+GEM_SPEED,Stormgryph Feather,Sturmgreif Feder
+GEM_SPEED_DESC,Weighs almost nothing and carries the storm within.,Wiegt fast nichts und trägt den Sturm in sich.
 SHOP_BOUGHT,{item} bought!,{item} gekauft!
 SHOP_SAY_WELCOME,Welcome to self-checkout! There are no staff here. You serve yourself.,Willkommen an der Selbstzahler-Kasse! Personal gibt es hier nicht. Sie bedienen sich selbst.
 SHOP_SAY_POTIONS,"Potions are on the top shelves. Drag one onto a monster: it gains the element and can use more skills.","Tränke stehen oben im Regal. Auf ein Monster gezogen, bekommt es das Element dazu und kann mehr Skills einsetzen."
-SHOP_SAY_GEMS,Gems are on the lower left. Drag one onto a monster to raise a stat for the rest of the run.,"Edelsteine liegen links unten. Auf ein Monster gezogen, erhöhen sie einen Wert für den restlichen Lauf."
+SHOP_SAY_GEMS,Trophies are on the lower left. Drag one onto a monster to raise a stat for the rest of the run.,"Trophäen liegen links unten. Auf ein Monster gezogen, erhöhen sie einen Wert für den restlichen Lauf."
 SHOP_SAY_RELICS,Relics and keys are on the lower right. Please place them in the bag below.,Relikte und Schlüssel finden Sie rechts unten. Legen Sie diese bitte in die Tasche unter mir.
 SHOP_SAY_CLICK,Click an item for details. Payment is automatic once you put it down.,"Klicken Sie eine Ware für Details an. Bezahlt wird automatisch, sobald Sie sie ablegen."
 SHOP_SAY_THANKS_0,Thank you for your purchase! Enjoy your {item}.,Vielen Dank für Ihren Einkauf! Viel Freude mit: {item}.
@@ -506,12 +512,12 @@ MAP_LEGEND_HINT,Click an entry for details.,Klicke auf einen Eintrag für Detail
 MAP_NODE_COMBAT_DESC,"A fight against wild monsters of the current biome. Wins pay Monster Essence and experience, and weakened enemies can be caught. Every fight in a biome makes the next enemies a bit stronger.","Ein Kampf gegen wilde Monster aus dem aktuellen Biom. Siege bringen Monster Essenz und Erfahrung, geschwächte Gegner kannst du fangen. Mit jedem Kampf im Biom werden die nächsten Gegner etwas stärker."
 MAP_NODE_BOSS_DESC,"A fight with boss strength in the middle of the map: more and tougher enemies than usual. It does not end the biome, that only happens with the boss at the top.","Ein Kampf in Boss-Stärke mitten auf der Karte: mehr und zähere Gegner als sonst. Er beendet das Biom nicht, das passiert erst beim Boss ganz oben."
 MAP_NODE_CAMP_DESC,"A place to rest: heals your monsters by half of their maximum HP, essence in the fire heals more.","Ein Rastplatz: heilt deine Monster um die Hälfte ihrer maximalen KP, Essenz im Feuer heilt mehr."
-MAP_NODE_SHOP_DESC,"Spend your Monster Essence: element potions give a monster an additional element (so it can use more skills), gems raise a stat for the rest of the run, relics give passive bonuses.","Hier gibst du Monster Essenz aus: Element-Tränke geben einem Monster ein zusätzliches Element (damit kann es mehr Skills einsetzen), Edelsteine erhöhen einen Wert für den restlichen Run, Relikte geben passive Boni."
+MAP_NODE_SHOP_DESC,"Spend your Monster Essence: element potions give a monster an additional element (so it can use more skills), trophies raise a stat for the rest of the run, relics give passive bonuses.","Hier gibst du Monster Essenz aus: Element-Tränke geben einem Monster ein zusätzliches Element (damit kann es mehr Skills einsetzen), Trophäen erhöhen einen Wert für den restlichen Run, Relikte geben passive Boni."
 MAP_NODE_TRAINER_DESC,"Teaches your monsters rare skills, half of them with several elements. A monster can only use a skill if it has all of its elements, the pictures on each card show who fits. Without a free slot you replace an old skill. You only pay once the skill is learned.","Bringt deinen Monstern seltene Skills bei, die Hälfte davon mit mehreren Elementen. Ein Monster kann einen Skill nur einsetzen, wenn es alle seine Elemente hat, die Bilder auf jeder Karte zeigen, wer passt. Ohne freien Platz ersetzt du einen alten Skill. Bezahlt wird erst, wenn der Skill gelernt ist."
 MAP_NODE_JAILER_DESC,"The jailer keeps up to three monster species in chains. Every chain is a missing upgrade (+1 action per turn). Hand him a boss tear to break a chain, once the last one is gone the species is free and fully upgraded, permanently, also for future runs. Showing other prisoners costs Monster Essence.","Der Kerkermeister hält bis zu drei Monster-Arten in Ketten. Jede Kette ist eine fehlende Verbesserung (+1 Aktion pro Zug). Gib ihm eine Boss Träne, um eine Kette zu sprengen, ist die letzte weg, ist die Art frei und voll verbessert, dauerhaft, auch für spätere Runs. Andere Gefangene zeigen kostet Monster Essenz."
 MAP_NODE_EVENT_DESC,"A random event: either a camp that heals your monsters, or the wheel of fortune where you win or lose half of your Monster Essence.","Ein Zufallsereignis: entweder ein Lager, das deine Monster heilt, oder das Glücksrad, bei dem du die Hälfte deiner Monster Essenz gewinnst oder verlierst."
 MAP_NODE_TREASURE_DESC,"A chest full of Monster Essence, you need a key to open it.","Eine Kiste voller Monster Essenz, zum Öffnen brauchst du einen Schlüssel."
-MAP_NODE_GEM_DESC,"Pick one of three gems. It raises one stat of a monster (e.g. attack or HP) for the rest of the run. The deeper you are, the stronger the gems.","Wähle einen von drei Edelsteinen. Er erhöht einen Wert eines Monsters (z. B. Angriff oder KP) für den restlichen Run. Je tiefer du bist, desto stärker die Steine."
+MAP_NODE_GEM_DESC,"Pick one of three trophies. It raises one stat of a monster (e.g. attack or HP) for the rest of the run. The deeper you are, the stronger the trophies.","Wähle eine von drei Trophäen. Sie erhöht einen Wert eines Monsters (z. B. Angriff oder KP) für den restlichen Run. Je tiefer du bist, desto stärker die Trophäen."
 MAP_NODE_HUB,OUTPOST,RASTLAGER
 MAP_NODE_HUB_DESC,"The last stop of every path, right before the boss. Here you can rest (heals half of the maximum HP), visit the shop and the trainer, each once. Prepare your team for the boss fight!","Das letzte Feld jedes Pfads, direkt vor dem Boss. Hier kannst du dich ausruhen (heilt die Hälfte der maximalen KP), den Laden und den Trainer besuchen, jedes einmal. Mach dein Team bereit für den Bosskampf!"
 CAMP_FEED_HINT,"Drag essence into the fire before you rest: 1 ME = {hp} HP for each monster.","Zieh Essenz ins Feuer, bevor du dich ausruhst: 1 ME = {hp} KP für jedes Monster."
@@ -567,7 +573,7 @@ BOUNTY_SOURCE_NORTHERN_WARDEN,"Bounty hunter: you defeated the Northern Warden w
 JAILER_TEAR_COUNT_ONE,{amount} Boss Tear,{amount} Boss Träne
 JAILER_TEAR_COUNT_MANY,{amount} Boss Tears,{amount} Boss Tränen
 TREASURE_HINT,Drag all the essence into the bag.,Zieh die ganze Essenz in die Tasche.
-GEM_HINT,Drag a gem onto one of your monsters.,Zieh einen Edelstein auf eines deiner Monster.
+GEM_HINT,Drag a trophy onto one of your monsters.,Zieh eine Trophäe auf eines deiner Monster.
 RELIC_REWARD_HINT,Drag a relic into the bag.,Zieh ein Relikt in die Tasche.
 BATTLE_CATCH_CALL_1,Come...,Komm...
 BATTLE_CATCH_CALL_2,Follow me...,Folge mir...

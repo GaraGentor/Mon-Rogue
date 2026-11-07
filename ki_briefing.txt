@@ -8,7 +8,7 @@ Run-Struktur und Kartenwahl wie in Slay the Spire. Das Spiel ist in Entwicklung.
 # Ablauf eines Runs
 - Ich wähle ein Ei als Start-Monster und nehme 3 seiner Ei-Attacken mit.
 - Ich reise durch 5 Biome und wähle auf einer Pfad-Karte jeweils das nächste Feld:
-  Kampf, Boss, Lager, Shop, Trainer, Kerkermeister, Ereignis, Schatz, Edelstein.
+  Kampf, Boss, Lager, Shop, Trainer, Kerkermeister, Ereignis, Schatz, Trophäe.
   Vor dem Boss steht ein Rastlager.
 - Ein voller Run hat rund 26 normale Kämpfe. Die Gegner steigen von etwa Stufe 5 auf 35.
 - Der Run endet, wenn alle eigenen Monster K.O. sind oder der Endboss besiegt ist.
@@ -49,8 +49,8 @@ Run-Struktur und Kartenwahl wie in Slay the Spire. Das Spiel ist in Entwicklung.
 # Run-Belohnungen
 - EP dienen als Währung und zum Einkaufen.
 - Relics sind passive Boni. Es gibt bisher nur 3, ausgelöst über benannte Hooks.
-- Edelsteine geben feste Stat-Punkte für den Run.
-- Der Shop verkauft Elementtränke, Edelsteine und Relics, der Trainer seltene Skills.
+- Monster-Trophäen (z. B. Sturmgreif Feder) geben feste Stat-Punkte für den Run.
+- Der Shop verkauft Elementtränke, Trophäen und Relics, der Trainer seltene Skills.
 - Das Glücksrad-Ereignis gewinnt oder verliert 50 % des Goldes.
 
 # Dauerhafter Fortschritt

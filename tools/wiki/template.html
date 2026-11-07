@@ -184,7 +184,7 @@ const DATA = /*__WIKI_DATA__*/null;
 
 const UI = {
 	de: {
-		search: "Suchen…", monsters: "Monster", skills: "Skills", elements: "Elemente", gems: "Edelsteine",
+		search: "Suchen…", monsters: "Monster", skills: "Skills", elements: "Elemente", gems: "Trophäen",
 		relics: "Relikte", unlocks: "Freischaltungen", map: "Karte", rarity: "Seltenheit", element: "Element",
 		bst: "Basiswerte (BST)", preferredStats: "Bevorzugte Werteverteilung", preferredHint: "Summe 100 %, schwankt pro Run um bis zu ±15 %", maxUpgrades: "Max. Upgrades", catchBase: "Grund-Fangchance",
 		defaultSkills: "Start-Ei-Attacken", unlockable: "Durch Fangen & Opfern", milestone: "Meilensteine", bounty: "Kopfgelder",
@@ -207,14 +207,14 @@ const UI = {
 			monsters: "Alle Monster-Arten aus <code>Monmap.mons</code> mit ihren Ei-Attacken und wie man sie freischaltet.",
 			skills: "Alle Skills aus <code>Skills</code>. Ein Monster kann einen Skill nur spielen, wenn sein Typ alle Elemente des Skills enthält. Spalten sind sortierbar.",
 			elements: "Element-Kreis und alle Kombinationen aus <code>ColorMap</code>. Jedes Skill-Element wird gegen jedes Ziel-Element verglichen; Kombi-Monster erben alle Schwächen und Resistenzen.",
-			gems: "Edelsteine erhöhen einen Wert eines eigenen Monsters prozentual für den restlichen Run.",
+			gems: "Trophäen erhöhen einen Wert eines eigenen Monsters um feste Punkte für den restlichen Run.",
 			relics: "Relikte sind passive Run-Boni. Es gibt sie zur Auswahl in der Kiste nach Biom-Bossen und im Laden, unabhängig von ihrer Seltenheit.",
 			unlocks: "Meilenstein-Ei-Attacken (mit der Art als Start-Monster) und Kopfgeld-Ei-Attacken (letzter Treffer gegen ein Kopfgeld-Monster).",
 			map: "Aufbau der Weltkarte pro Biom-Tiefe aus <code>Map.map_settings</code>. Zahlen in den Spalten sind die Zeilen, in denen das Feld fest liegt.",
 		},
 	},
 	en: {
-		search: "Search…", monsters: "Monsters", skills: "Skills", elements: "Elements", gems: "Gems",
+		search: "Search…", monsters: "Monsters", skills: "Skills", elements: "Elements", gems: "Trophies",
 		relics: "Relics", unlocks: "Unlocks", map: "Map", rarity: "Rarity", element: "Element",
 		bst: "Base stats (BST)", preferredStats: "Preferred stat spread", preferredHint: "Sums to 100 %, varies by up to ±15 % per run", maxUpgrades: "Max upgrades", catchBase: "Base catch chance",
 		defaultSkills: "Starting egg moves", unlockable: "Catch & sacrifice", milestone: "Milestones", bounty: "Bounties",
@@ -237,7 +237,7 @@ const UI = {
 			monsters: "All monster species from <code>Monmap.mons</code> with their egg moves and how to unlock them.",
 			skills: "All skills from <code>Skills</code>. A monster can only play a skill if its type contains all of the skill's elements. Columns are sortable.",
 			elements: "Element cycle and all combinations from <code>ColorMap</code>. Every skill element is compared with every target element; combined monsters inherit all weaknesses and resistances.",
-			gems: "Gems raise one stat of your own monster by a percentage for the rest of the run.",
+			gems: "Trophies raise one stat of your own monster by fixed points for the rest of the run.",
 			relics: "Relics are passive run bonuses. You can pick them from the chest after biome bosses and buy them in the shop, regardless of rarity.",
 			unlocks: "Milestone egg moves (with the species as starter) and bounty egg moves (last hit against a bounty monster).",
 			map: "World map layout per biome depth from <code>Map.map_settings</code>. Numbers are the rows where that node is fixed.",
@@ -508,20 +508,20 @@ function renderElements() {
 }
 
 function renderGems() {
-	const rgb = (c) => `rgb(${c.slice(0, 3).map((v) => Math.round(v * 255)).join(",")})`;
 	const depths = DATA.gems.bonusByDepth;
 	const cards = Object.entries(DATA.gems.stats)
-		.filter(([key, g]) => matches(key, tr(g.name), tr(g.stat)))
+		.filter(([key, g]) => matches(key, tr(g.name), tr(g.desc), tr(g.stat)))
 		.map(([key, g]) => `<article class="card"><div class="row">
-			<div class="swatch" style="background:${rgb(g.color)};background-image:url('${esc(res(DATA.gems.icon))}');background-size:cover;background-blend-mode:multiply"></div>
+			<div class="swatch" style="background:url('${esc(res(g.icon))}') center/contain no-repeat;box-shadow:none"></div>
 			<div><h3>${hl(tr(g.name))}</h3><div class="small muted">${esc(tr(g.stat).replace(/:$/, ""))} · <code>${esc(key)}</code></div></div>
 		</div>
-		<p class="small" style="margin:10px 0 0">${esc(tr("GEM_DESC", { stat: tr(g.stat).replace(/:$/, ""), value: `${Math.round(depths[0] * 100)}–${Math.round(depths[depths.length - 1] * 100)}` }))}</p>
+		<p class="small" style="margin:10px 0 0">${hl(tr(g.desc))}</p>
+		<p class="small" style="margin:6px 0 0">${esc(tr("GEM_DESC", { stat: tr(g.stat).replace(/:$/, ""), value: `${depths[0]}–${depths[depths.length - 1]}` }))}</p>
 		</article>`);
 	const table = `<div class="card wide"><h3>${ui("perDepth")}</h3>
 		<div class="table-wrap" style="margin-top:10px;box-shadow:none"><table>
 			<thead><tr><th>${ui("depth")}</th>${depths.map((_, i) => `<th class="num">${i + 1}</th>`).join("")}</tr></thead>
-			<tbody><tr><td>Bonus</td>${depths.map((b) => `<td class="num">+${Math.round(b * 100)} %</td>`).join("")}</tr></tbody>
+			<tbody><tr><td>Bonus</td>${depths.map((b) => `<td class="num">+${b}</td>`).join("")}</tr></tbody>
 		</table></div>
 		<p class="small muted" style="margin:8px 0 0">${ui("choices")}: ${DATA.gems.choices ?? "?"}</p></div>`;
 	return header("gems") + `<div class="grid">${cards.join("")}${table}</div>`;

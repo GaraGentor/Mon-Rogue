@@ -1,29 +1,29 @@
 extends ChestRewardDialog
 
-## Edelstein-Feld: drei Edelsteine zur Wahl, der gewählte erhöht einen Wert eines eigenen
-## Monsters um feste Punkte für den restlichen Run. Pro Biom-Tiefe werden die Steine stärker.
-## Als Beute aus dem Kampf kommt nur ein einzelner Stein (gem_choices, siehe world_map.gd).
+## Trophäen-Feld: drei Monster-Trophäen zur Wahl, die gewählte erhöht einen Wert eines eigenen
+## Monsters um feste Punkte für den restlichen Run. Pro Biom-Tiefe werden die Trophäen stärker.
+## Als Beute aus dem Kampf kommt nur eine einzelne Trophäe (gem_choices, siehe world_map.gd).
+## Im Code heißen sie weiter "gem", gespeicherte Stat-Keys und Übersetzungs-Keys bleiben gleich.
 
 const GEM_CHOICES := 3
 const ACCENT := Color(0.2, 0.6, 0.65)
 
 ## Stat-Key (siehe Monster.gem_bonus) -> Anzeige
 const STATS := {
-	"hp": {"name": "GEM_HP", "stat": "STAT_HP", "color": Color(0.85, 0.25, 0.3)},
-	"atk": {"name": "GEM_ATK", "stat": "STAT_ATK", "color": Color(0.95, 0.55, 0.2)},
-	"def": {"name": "GEM_DEF", "stat": "STAT_DEF", "color": Color(0.6, 0.6, 0.65)},
-	"s_atk": {"name": "GEM_S_ATK", "stat": "STAT_SPA", "color": Color(0.7, 0.35, 0.9)},
-	"s_def": {"name": "GEM_S_DEF", "stat": "STAT_SPD", "color": Color(0.3, 0.55, 0.95)},
-	"speed": {"name": "GEM_SPEED", "stat": "STAT_SPE", "color": Color(0.35, 0.85, 0.45)},
+	"hp": {"name": "GEM_HP", "desc": "GEM_HP_DESC", "stat": "STAT_HP", "icon": "res://assets/ui/trophies/lighthouse.svg"},
+	"atk": {"name": "GEM_ATK", "desc": "GEM_ATK_DESC", "stat": "STAT_ATK", "icon": "res://assets/ui/trophies/branch_club.svg"},
+	"def": {"name": "GEM_DEF", "desc": "GEM_DEF_DESC", "stat": "STAT_DEF", "icon": "res://assets/ui/trophies/crystal_hide.svg"},
+	"s_atk": {"name": "GEM_S_ATK", "desc": "GEM_S_ATK_DESC", "stat": "STAT_SPA", "icon": "res://assets/ui/trophies/spark_tail.svg"},
+	"s_def": {"name": "GEM_S_DEF", "desc": "GEM_S_DEF_DESC", "stat": "STAT_SPD", "icon": "res://assets/ui/trophies/mist_veil.svg"},
+	"speed": {"name": "GEM_SPEED", "desc": "GEM_SPEED_DESC", "stat": "STAT_SPE", "icon": "res://assets/ui/trophies/storm_feather.svg"},
 }
 
 ## Bonus pro Biom-Tiefe (State.map_level) in festen Punkten auf den Wert
 const BONUS_BY_DEPTH := [15, 20, 25, 30, 35]
 
-const GEM_ICON = preload("res://assets/ui/shop/gem.svg")
 const COUNT_ICON_SIZE := Vector2(20, 20)
 const COUNT_FONT_SIZE := 16
-## noch nicht gesammelte Steine treten zurück
+## noch nicht gesammelte Trophäen treten zurück
 const NO_GEM_ALPHA := 0.35
 
 var gem_choices := GEM_CHOICES
@@ -40,10 +40,17 @@ func _ready() -> void:
 	var stats = STATS.keys()
 	stats.shuffle()
 	for stat in stats.slice(0, gem_choices):
-		add_gem_card(self, stat, _bonus)
+		# auf dem Teppich ist nur Platz für den Effekt, die Beschreibung steht im Tooltip
+		add_gem_card(self, stat, _bonus, false).tooltip_text = tr(STATS[stat].desc)
 	play_chest_intro()
 
-## Monster-Ziele zeigen ihre gesammelten Steine und ihre Werte, beim Ziehen auch die Änderung durch den Stein
+## Bild der Trophäe mit lebenden Pixeln
+static func gem_icon(stat: String) -> Control:
+	var icon := texture_icon(load(STATS[stat].icon))
+	icon.material = Monmap.LIVING_MATERIAL
+	return icon
+
+## Monster-Ziele zeigen ihre gesammelten Trophäen und ihre Werte, beim Ziehen auch die Änderung durch die Trophäe
 static func show_gem_info(dialog: RewardDialog) -> void:
 	for target in dialog._fixed_targets:
 		if target.mon == null:
@@ -53,7 +60,7 @@ static func show_gem_info(dialog: RewardDialog) -> void:
 		target.box.add_child(target.stats)
 		ignore_mouse_below(target)
 
-## Eine Zeile mit allen Steinarten und wie viele davon das Monster schon hat
+## Eine Zeile mit allen Trophäen-Arten und wie viele davon das Monster schon hat
 static func gem_counts(mon: Monster) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -65,7 +72,7 @@ static func gem_counts(mon: Monster) -> HBoxContainer:
 		entry.tooltip_text = TranslationServer.translate(STATS[stat].name)
 		if count == 0:
 			entry.modulate.a = NO_GEM_ALPHA
-		var icon := texture_icon(GEM_ICON, STATS[stat].color)
+		var icon := gem_icon(stat)
 		icon.custom_minimum_size = COUNT_ICON_SIZE
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		entry.add_child(icon)
@@ -77,12 +84,14 @@ static func gem_counts(mon: Monster) -> HBoxContainer:
 		row.add_child(entry)
 	return row
 
-## Edelstein-Karte, auch von Schatz und Shop genutzt: wird auf ein Monster gezogen.
+## Trophäen-Karte, auch vom Shop genutzt: wird auf ein Monster gezogen.
 ## Die Änderung zeigen die Werte am Ziel (show_gem_info).
-static func add_gem_card(dialog: RewardDialog, stat: String, bonus: int) -> RewardDialog.RewardCard:
+static func add_gem_card(dialog: RewardDialog, stat: String, bonus: int, with_desc := true) -> RewardDialog.RewardCard:
 	var info: Dictionary = STATS[stat]
 	var stat_name = dialog.tr(info.stat).trim_suffix(":")
 	var text = dialog.tr("GEM_DESC").format({"stat": stat_name, "value": bonus})
+	if with_desc:
+		text = dialog.tr(info.desc) + "\n" + text
 	var give := func(mon: Monster):
 		mon.add_gem(stat, bonus)
-	return dialog.add_mon_card(dialog.tr(info.name), text, texture_icon(GEM_ICON, info.color), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, Callable(), {"stat": stat, "bonus": bonus})
+	return dialog.add_mon_card(dialog.tr(info.name), text, gem_icon(stat), dialog.tr("GEM_CHOOSE_MON"), State.mons, give, Callable(), {"stat": stat, "bonus": bonus})
